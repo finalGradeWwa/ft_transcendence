@@ -1,0 +1,10 @@
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev # przełączymy na Dockerfile w końcowym projekcie
+    # Umożliwi dostęp do aplikacji pod adresem http://localhost:3000 na komputerze
+    ports:
+      - "3000:3000"
+    # Zrestartuj kontener, jeśli się zawiesi
+    restart: always
