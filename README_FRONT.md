@@ -47,3 +47,4 @@
 	node:20
 		Next.js jest frameworkiem React renderowanym po stronie serwera (SSR), 
 		co oznacza, że kod musi być uruchamiany w środowisku Node.js.
+		
