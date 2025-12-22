@@ -1,15 +1,18 @@
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
 
-// Sprawdź czy plik config istnieje
-console.log('tailwind.config.js exists:', fs.existsSync('./tailwind.config.js'));
+console.log(
+  'tailwind.config.js exists:',
+  fs.existsSync('./tailwind.config.js')
+);
 console.log('postcss.config.js exists:', fs.existsSync('./postcss.config.js'));
 
-// Sprawdź zawartość
-const tailwindConfig = require('./tailwind.config.js');
-console.log('Tailwind config colors:', Object.keys(tailwindConfig.theme.extend.colors));
+// W Next.js zamiast require() dla plików JS, używamy dynamicznego importu lub po prostu importujemy na górze, jeśli to możliwe.
+import tailwindConfig from './tailwind.config.js';
+console.log(
+  'Tailwind config colors:',
+  Object.keys(tailwindConfig.theme.extend.colors)
+);
 
-// Sprawdź czy komponenty istnieją
 const componentsExist = fs.existsSync('./components');
 console.log('components folder exists:', componentsExist);
 
