@@ -1,0 +1,18 @@
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Kopiujemy pliki zależności
+COPY package.json package-lock.json ./
+
+# Instalujemy wszystko (łącznie z typami dla TS)
+RUN npm install
+
+# Kopiujemy resztę plików
+COPY . .
+
+# Ważne dla Next.js 15/16 w Dockerze:
+ENV NEXT_TELEMETRY_DISABLED 1
+
+# Startujemy w trybie dev (bez budowania!)
+CMD ["npm", "run", "dev"]

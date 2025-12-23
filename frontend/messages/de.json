@@ -1,0 +1,24 @@
+{
+  "HomePage": {
+    "title": "Weed be better together",
+    "recommended": "EMPFOHLEN:",
+    "search": "Pflanzen suchen...",
+    "login": "Anmelden",
+    "nick": "Benutzername:",
+    "password": "Passwort:",
+    "loginBtn": "Einloggen",
+    "cancel": "Abbrechen",
+    "noAccount": "Kein Konto?",
+    "register": "Registrieren!",
+    "author": "Autor:",
+    "rating": "Bewertung:",
+    "showMore": "Mehr Pflanzen anzeigen",
+    "nav": ["Startseite", "Galerie", "Über uns", "AGB", "Kontakt"],
+    "searchPlaceholder": "Suche ist aktiv",
+    "searchInfo": "Hier wird die vollständige Suchlogik sein.",
+    "close": "Schließen",
+    "rights": "Alle Rechte vorbehalten.",
+    "privacy": "Datenschutz",
+    "terms": "Nutzungsbedingungen"
+  }
+}
