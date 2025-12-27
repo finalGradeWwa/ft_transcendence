@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import (AbstractBaseUser,
  BaseUserManager, PermissionsMixin)
+from datetime import datetime
 
 # Create your models here.
 
@@ -25,20 +26,24 @@ class User(AbstractBaseUser, PermissionsMixin):
  blank=True)
     username = models.CharField(max_length=50, unique=True,
  null=False, blank=False)
-    password = models.CharField(max_length=128)
+    # password = models.CharField(max_length=128)
     email = models.EmailField(max_length=200, unique=True,
  null=False, blank=False)
-    # Other fileds
+    # Other fields
 
-    # date_joined = models.DateTimeField(default=timezone.now)
+    date_joined = models.DateTimeField(default=datetime.now)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
     avatar_photo = models.ImageField(upload_to="users/static", null=True, blank=True)
     # number_of_plants = models.DecimalField()
     # plants = models.ManyToManyField('Plant', related_name='plants_list')
-    friends = models.ManyToManyField('User', related_name='friends_list')
-
+    friends = models.ManyToManyField(
+        'User',
+        related_name='friends_list',
+        symmetrical=True,
+        help_text='Friendships are automatically mutual: if you add a user as a friend, they are also your friend.',
+    )
     objects = UserManager()
 
     USERNAME_FIELD = 'username'
