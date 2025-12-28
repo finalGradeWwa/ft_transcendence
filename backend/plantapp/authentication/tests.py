@@ -92,7 +92,7 @@ class LoginTests(APITestCase):
 
     def test_login_success(self):
         response = self.client.post(self.url, {
-            'username': 'testuser',
+            'email': 'test@example.com',
             'password': 'SecurePass123!'
         }, format='json')
 
@@ -102,7 +102,7 @@ class LoginTests(APITestCase):
 
     def test_login_wrong_password(self):
         response = self.client.post(self.url, {
-            'username': 'testuser',
+            'email': 'test@example.com',
             'password': 'WrongPassword!'
         }, format='json')
 
@@ -110,7 +110,7 @@ class LoginTests(APITestCase):
 
     def test_login_nonexistent_user(self):
         response = self.client.post(self.url, {
-            'username': 'nouser',
+            'email': 'nouser@example.com',
             'password': 'password123'
         }, format='json')
 
@@ -184,7 +184,7 @@ class LogoutViewTests(APITestCase):
         )
         # Get tokens
         login_response = self.client.post(reverse('token_obtain_pair'), {
-            'username': 'testuser',
+            'email': 'test@example.com',
             'password': 'SecurePass123!'
         }, format='json')
         self.refresh_token = login_response.data['refresh']
