@@ -1,4 +1,7 @@
 from django.test import TestCase
+from django.urls import reverse
+from rest_framework.test import APITestCase
+from rest_framework import status
 from django.contrib.auth import get_user_model
 
 # Create your tests here.
@@ -57,3 +60,102 @@ class UserModelTests(TestCase):
             password="password123"
         )
         self.assertEqual(str(user), user.username)
+
+class MeViewTests(APITestCase):
+
+    def setUp(self):
+        self.url = reverse('me')
+        self.user = User.objects.create_user(
+            username='testuser',
+            email='test@example.com',
+            password='SecurePass123!',
+            fullname='Test User',
+            bio='Test bio'
+        )
+        self.client.force_authenticate(user=self.user)
+
+    def test_get_me_success(self):
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['username'], 'testuser')
+        self.assertEqual(response.data['email'], 'test@example.com')
+        self.assertEqual(response.data['fullname'], 'Test User')
+        self.assertEqual(response.data['bio'], 'Test bio')
+        self.assertIn('id', response.data)
+        self.assertIn('date_joined', response.data)
+
+    def test_get_me_unauthenticated(self):
+        self.client.force_authenticate(user=None)
+
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_patch_me_success(self):
+        response = self.client.patch(self.url, {
+            'fullname': 'Updated Name',
+            'bio': 'Updated bio'
+        }, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['fullname'], 'Updated Name')
+        self.assertEqual(response.data['bio'], 'Updated bio')
+
+        # Verify in database
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.fullname, 'Updated Name')
+
+    def test_patch_me_partial_update(self):
+        response = self.client.patch(self.url, {
+            'bio': 'Only bio updated'
+        }, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['bio'], 'Only bio updated')
+        self.assertEqual(response.data['fullname'], 'Test User')  # Unchanged
+
+    def test_patch_me_duplicate_username(self):
+        User.objects.create_user(
+            username='otheruser',
+            email='other@example.com',
+            password='password123'
+        )
+
+        response = self.client.patch(self.url, {
+            'username': 'otheruser'
+        }, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('username', response.data)
+
+    def test_patch_me_duplicate_email(self):
+        User.objects.create_user(
+            username='otheruser',
+            email='other@example.com',
+            password='password123'
+        )
+
+        response = self.client.patch(self.url, {
+            'email': 'other@example.com'
+        }, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('email', response.data)
+
+    def test_patch_me_same_username_allowed(self):
+        response = self.client.patch(self.url, {
+            'username': 'testuser'  # Same username
+        }, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_patch_me_unauthenticated(self):
+        self.client.force_authenticate(user=None)
+
+        response = self.client.patch(self.url, {
+            'fullname': 'Hacker'
+        }, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
