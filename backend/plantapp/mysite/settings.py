@@ -66,9 +66,11 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
     'authentication',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -199,3 +201,13 @@ SIMPLE_JWT = {
     "REVOKE_TOKEN_CLAIM": "hash_password",
     "CHECK_USER_IS_ACTIVE": True,
 }
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",  # Next.js dev server
+    "http://127.0.0.1:3000",
+]
+
+CORS_ALLOW_CREDENTIALS = True # For cookies
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
