@@ -7,7 +7,7 @@ class UserSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = User
 		fields = (
-			"id",
+			"id", # Do we need 'id' in users model?
 			"username",
 			"email",
 			"fullname",
