@@ -170,7 +170,7 @@ SIMPLE_JWT = {
     "ISSUER": None,
     "JSON_ENCODER": None,
     "JWK_URL": None, # used with OAuth
-    "LEEWAY": 0, # margine time
+    "LEEWAY": 0, # margin time
 
     "AUTH_HEADER_TYPES": ("Bearer",),
     "AUTH_HEADER_NAME": "HTTP_AUTHORIZATION",
