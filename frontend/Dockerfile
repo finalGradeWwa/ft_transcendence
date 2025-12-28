@@ -1,48 +1,47 @@
+# PL: Etap bazowy: Definicja lekkiego obrazu Node.js i katalogu roboczego.
+# EN: Base stage: Defining a lightweight Node.js image and working directory.
 FROM node:20-alpine AS base
-
-# katalog roboczy wewnątrz kontenera
 WORKDIR /app
-
-# kopiujemy pliki manifestu zależności
 COPY package.json package-lock.json ./
 
-# instalacja zależności
+# PL: Etap zależności: Instalacja pakietów niezbędnych do budowania.
+# EN: Dependencies stage: Installing packages required for building.
 FROM base AS deps
 RUN npm install
 
-# budowanie aplikacji
+# PL: Etap budowania: Kompilacja aplikacji Next.js do wersji produkcyjnej.
+# EN: Builder stage: Compiling the Next.js application for production.
 FROM base AS builder
-# kopiujemy zainstalowane zależności i resztę kodu
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-
-# budujemy aplikację Next.js. Ta komenda generuje pliki do katalogu .next
 RUN npm run build
 
-# używamy mniejszego obrazu Node.js, aby zminimalizować rozmiar
+# PL: Etap końcowy (Runner): Minimalistyczny obraz produkcyjny zoptymalizowany pod kątem bezpieczeństwa.
+# EN: Final stage (Runner): Minimalist production image optimized for security.
 FROM node:20-alpine AS runner
 
-# ustawiamy zmienne środowiskowe Next.js
+# PL: Konfiguracja zmiennych środowiskowych dla środowiska produkcyjnego.
+# EN: Environment variable configuration for the production environment.
 ENV NODE_ENV production
 ENV PORT 3000
 
-# tworzymy użytkownika i grupę dla bezpieczeństwa
-# cel: Podniesienie Bezpieczeństwa (Security Hardening).
-# aplikacja Next.js nie będzie uruchamiana jako użytkownik root wewnątrz kontenera.
-# nawet jeśli kontener zostanie zaatakowany, złośliwy kod będzie miał tylko ograniczone uprawnienia do plików i systemu,
-# 	co drastycznie zmniejsza ryzyko poważnego uszkodzenia serwera hosta
+# PL: Utworzenie użytkownika systemowego w celu uniknięcia uruchamiania procesu jako root.
+# EN: Creating a system user to avoid running the process as root.
 RUN addgroup --system --gid 1001 nextjs
 RUN adduser --system --uid 1001 nextjs
 
-# kopiujemy tylko niezbędne pliki z etapu budowania:
+# PL: Kopiowanie wyłącznie artefaktów niezbędnych do działania aplikacji (output: standalone).
+# EN: Copying only the artifacts necessary for the application to run (output: standalone).
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/node_modules ./node_modules
 
-# uruchamiamy aplikację jako użytkownik nextjs
+# PL: Zmiana uprawnień i wystawienie portu.
+# EN: Changing permissions and exposing the port.
 USER nextjs
 EXPOSE 3000
 
-# Next.js używa komendy `node server.js` do uruchomienia po zbuildowaniu
+# PL: Uruchomienie zoptymalizowanego serwera Node.js.
+# EN: Starting the optimized Node.js server.
 CMD ["node", "server.js"]

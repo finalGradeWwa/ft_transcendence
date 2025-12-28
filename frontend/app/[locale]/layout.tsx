@@ -1,31 +1,15 @@
 import '@/app/globals.css';
-import { Metadata } from 'next'; // Dodaj ten import
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/navigation';
 
-// Konfiguracja metadanych i favicon
-export const metadata: Metadata = {
-  title: 'Weed be better together',
-  description: 'Twoje centrum wiedzy o roślinach',
-  icons: {
-    icon: [
-      { url: '/images/favicon/favicon.ico' }, // Podstawowa ikona
-      {
-        url: '/images/favicon/favicon-96x96.png',
-        sizes: '96x96',
-        type: 'image/png',
-      },
-      { url: '/images/favicon/favicon.svg', type: 'image/svg+xml' },
-    ],
-    apple: [
-      { url: '/images/favicon/apple-touch-icon.png' }, // Ikona dla urządzeń Apple
-    ],
-  },
-  manifest: '/images/favicon/site.webmanifest',
-};
-
+/**
+ * PL: Główny układ strony z obsługą lokalizacji (i18n).
+ * Odpowiada za konfigurację języka, walidację lokalizacji oraz dostarczanie tłumaczeń do komponentów klienckich.
+ * * EN: Main layout component with internationalization (i18n) support.
+ * Responsible for language configuration, locale validation, and providing translations to client components.
+ */
 export default async function LocaleLayout({
   children,
   params,
@@ -33,14 +17,20 @@ export default async function LocaleLayout({
   children: React.ReactNode;
   params: Promise<{ locale: string }>;
 }) {
+  /**
+   * PL: Oczekiwanie na parametry lokalizacji i walidacja dostępnych języków.
+   * EN: Awaiting locale parameters and validating available languages.
+   */
   const { locale } = await params;
 
-  // Walidacja języka
   if (!routing.locales.includes(locale as (typeof routing.locales)[number])) {
     notFound();
   }
 
-  // Pobranie wiadomości z plików JSON
+  /**
+   * PL: Pobieranie wiadomości tłumaczeń dla danego języka.
+   * EN: Fetching translation messages for the given locale.
+   */
   const messages = await getMessages();
 
   return (
