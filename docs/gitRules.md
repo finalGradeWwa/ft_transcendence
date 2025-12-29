@@ -78,7 +78,7 @@ git commit -m "typ" -m "krótki opis"
 ### Przykłady
 
 ```bash
-git commit -m "feature" -m "dodaj logowanie użytkownika"
-git commit -m "fix" -m "napraw błąd walidacji emaila"
-git commit -m "docs" -m "zaktualizuj README"
+git commit -m "feature" -m "dodano logowanie użytkownika"
+git commit -m "fix" -m "napriono błąd walidacji emaila"
+git commit -m "docs" -m "zaktualizowalem README"
 ```
