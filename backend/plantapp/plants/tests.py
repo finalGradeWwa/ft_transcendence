@@ -14,7 +14,7 @@ class PlantRequirementTests(TestCase):
             password='testpass123'
         )
         self.client = Client()
-        self.client.force_login(self.user)  # ZMIEŃ tutaj - było login(), ma być force_login()
+        self.client.force_login(self.user)
         
         # Tworzymy testową roślinę
         self.plant = PlantRequirement.objects.create(
@@ -74,7 +74,7 @@ class PlantRequirementTests(TestCase):
         """Test czy użytkownik widzi tylko swoje rośliny"""
         other_user = User.objects.create_user(
             username='otheruser',
-            email='otheruser@example.com',  # DODAJ TO
+            email='otheruser@example.com',
             password='otherpass123'
         )
         other_plant = PlantRequirement.objects.create(
