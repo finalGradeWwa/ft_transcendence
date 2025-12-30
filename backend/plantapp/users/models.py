@@ -29,21 +29,9 @@ class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(max_length=200, unique=True,
  null=False, blank=False)
     # Other fields
-
-    date_joined = models.DateTimeField(default=timezone.now)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
-    avatar_photo = models.ImageField(upload_to="users/static", null=True, blank=True)
-    # number_of_plants = models.DecimalField()
-    # plants = models.ManyToManyField('Plant', related_name='plants_list')
-    friends = models.ManyToManyField(
-        'User',
-        related_name='friends_list',
-        symmetrical=True,
-        help_text='Friendships are automatically mutual: if you add a user as a friend, they are also your friend.',
-    )
-    bio = models.TextField(verbose_name="Biography", max_length=600, null=True, blank=True)
     objects = UserManager()
 
     USERNAME_FIELD = 'username'
@@ -51,3 +39,10 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.username
+
+class UserProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    date_joined = models.DateTimeField(default=timezone.now)
+    avatar_photo = models.ImageField(upload_to="users/static", null=True, blank=True)
+    bio = models.TextField(verbose_name="Biography", max_length=600, null=True, blank=True)
+    followers = models.ManyToManyField(User, blank=True,)
