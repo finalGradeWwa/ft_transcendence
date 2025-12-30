@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<head><title>Delete Plant</title></head>
+<body>
+    <h1>Delete {{ plant.common_name }}?</h1>
+    <form method="post">
+        {% csrf_token %}
+        <p>Are you sure you want to delete this plant?</p>
+        <button type="submit">Yes, delete</button>
+        <a href="{% url 'plant_detail' plant.id %}">Cancel</a>
+    </form>
+</body>
+</html>
