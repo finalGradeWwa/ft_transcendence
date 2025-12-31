@@ -1,5 +1,18 @@
+/**
+ * PL: Konfiguracja TypeScript (tsconfig.json). Definiuje zasady kompilacji, 
+ * rygorystyczność sprawdzania typów oraz mapowanie ścieżek dla Next.js, 
+ * zapewniając poprawne wsparcie dla JSX i nowoczesnych modułów ES.
+ * * EN: TypeScript configuration (tsconfig.json). Defines compilation rules, 
+ * type-checking strictness, and path mapping for Next.js, 
+ * ensuring proper support for JSX and modern ES modules.
+ */
+
 {
   "compilerOptions": {
+    /**
+     * PL: Docelowa wersja JavaScript oraz biblioteki środowiska (DOM, ESNext).
+     * EN: Target JavaScript version and environment libraries (DOM, ESNext).
+     */
     "target": "ES2017",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
@@ -18,10 +31,18 @@
         "name": "next"
       }
     ],
+    /**
+     * PL: Aliasy ścieżek - pozwala na używanie zapisu '@/' zamiast ścieżek względnych.
+     * EN: Path aliases - allows using the '@/' notation instead of relative paths.
+     */
     "paths": {
       "@/*": ["./*"]
     }
   },
+  /**
+   * PL: Pliki i katalogi włączone do procesu sprawdzania typów.
+   * EN: Files and directories included in the type-checking process.
+   */
   "include": [
     "next-env.d.ts",
     "**/*.ts",
@@ -30,5 +51,9 @@
     ".next/dev/types/**/*.ts",
     "**/*.mts"
   ],
+  /**
+   * PL: Katalogi wykluczone z procesu kompilacji.
+   * EN: Directories excluded from the compilation process.
+   */
   "exclude": ["node_modules"]
 }

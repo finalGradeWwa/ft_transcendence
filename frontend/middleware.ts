@@ -1,8 +1,21 @@
+/**
+ * PL: Mechanizm Middleware dla next-intl. Pełni rolę "strażnika ruchu", który analizuje
+ * każde żądanie przed wyrenderowaniem strony, obsługując wykrywanie języka,
+ * automatyczne przekierowania oraz zarządzanie ciasteczkami lokalizacji.
+ * * EN: Middleware mechanism for next-intl. Acts as a "traffic guardian" that analyzes
+ * every request before rendering the page, handling language detection,
+ * automatic redirects, and locale cookie management.
+ */
+
 import createMiddleware from 'next-intl/middleware';
 import { routing } from './i18n/navigation';
 
 export default createMiddleware(routing);
 
+/**
+ * PL: Konfiguracja matchera definiująca, które ścieżki powinny być procesowane przez Middleware.
+ * EN: Matcher configuration defining which paths should be processed by the Middleware.
+ */
 export const config = {
   matcher: ['/', '/(pl|en|de|ar)/:path*', '/((?!api|_next|_vercel|.*\\..*).*)'],
 };
