@@ -40,10 +40,13 @@ class User(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return self.username
 
-
-class UserProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
     date_joined = models.DateTimeField(default=timezone.now)
     avatar_photo = models.ImageField(upload_to="users/static", null=True, blank=True)
     bio = models.TextField(verbose_name="Biography", max_length=600, null=True, blank=True)
-    followers = models.ManyToManyField(User, blank=True,)
+    # following wskazuje na użytkowników obserwowanych przez danego użytkownika
+    following = models.ManyToManyField("self", blank=True,symmetrical=False, related_name="followers")
+
+    def count_following(self):
+        return self.following.count()
+    def count_followers(self):
+        return User.objects.filter(following=self).count()

@@ -42,3 +42,9 @@ class UserUpdateSerializer(serializers.ModelSerializer):
         if queryset.exists():
             raise serializers.ValidationError("This username is already taken.")
         return value
+
+class ListFollowersSerializer(serializers.ModelSerializer):
+     class Meta:
+        model = User
+        fields = ("followers",)
+        read_only_fields = fields
