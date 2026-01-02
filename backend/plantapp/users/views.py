@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.shortcuts import get_object_or_404
 from rest_framework import status
-from .serializers import UserSerializer, UserUpdateSerializer, ListFollowersSerializer
+from .serializers import UserSerializer, UserUpdateSerializer, PublicUserSerializer
 from django.contrib.auth import get_user_model
 
 
@@ -38,7 +38,7 @@ class ListFollowersAPIView(APIView):
         user = get_object_or_404(User, pk=user_id)
         followers = user.followers.all()
 
-        serializer = UserSerializer(
+        serializer = PublicUserSerializer(
             followers,
             many=True,
             context={"request": request},
@@ -52,7 +52,7 @@ class ListFollowingAPIView(APIView):
         user = get_object_or_404(User, pk=user_id)
         following = user.following.all()
 
-        serializer = UserSerializer(
+        serializer = PublicUserSerializer(
             following,
             many=True,
             context={"request": request},

@@ -11,7 +11,6 @@ class UserSerializer(serializers.ModelSerializer):
 			"username",
 			"email",
 			"fullname",
-			"avatar_photo",
 			"bio",
 			"date_joined",
 			"is_active",
@@ -23,7 +22,7 @@ class UserUpdateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ("username", "email", "fullname", "bio", "avatar_photo")
+        fields = ("username", "email", "fullname", "bio")
 
     def validate_email(self, value: str) -> str:
         user = self.instance
@@ -42,6 +41,11 @@ class UserUpdateSerializer(serializers.ModelSerializer):
         if queryset.exists():
             raise serializers.ValidationError("This username is already taken.")
         return value
+
+class PublicUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ("id", "username", "fullname")
 
 class ListFollowersSerializer(serializers.ModelSerializer):
      class Meta:
