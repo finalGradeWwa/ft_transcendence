@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% if plant %}Edit{% else %}Add{% endif %} Plant</title>
+</head>
+<body>
+    <h1>{% if plant %}Edit{% else %}Add{% endif %} Plant</h1>
+    
+    <form method="post">
+        {% csrf_token %}
+        
+        <label>Common Name: <input type="text" name="common_name" value="{{ plant.common_name|default:'' }}" required></label><br>
+        <label>Latin Name: <input type="text" name="latin_name" value="{{ plant.latin_name|default:'' }}"></label><br>
+        
+        <label>Soil Type:
+            <select name="soil_type">
+                <option value="">-- Select soil type --</option>
+                <option value="sandy" {% if plant.soil_type == "sandy" %}selected{% endif %}>Sandy</option>
+                <option value="loamy" {% if plant.soil_type == "loamy" %}selected{% endif %}>Loamy</option>
+                <option value="clayey" {% if plant.soil_type == "clayey" %}selected{% endif %}>Clayey</option>
+                <option value="silty" {% if plant.soil_type == "silty" %}selected{% endif %}>Silty</option>
+                <option value="peaty" {% if plant.soil_type == "peaty" %}selected{% endif %}>Peaty</option>
+                <option value="chalky" {% if plant.soil_type == "chalky" %}selected{% endif %}>Chalky</option>
+                <option value="saline" {% if plant.soil_type == "saline" %}selected{% endif %}>Saline</option>
+            </select>
+        </label><br>
+        
+        <label>Soil Moisture Min: <input type="number" step="0.1" name="soil_moisture_min" value="{{ plant.soil_moisture_min|default:'' }}"></label><br>
+        <label>Soil Moisture Max: <input type="number" step="0.1" name="soil_moisture_max" value="{{ plant.soil_moisture_max|default:'' }}"></label><br>
+        
+        <label>pH Min: <input type="number" step="0.1" name="soil_ph_min" value="{{ plant.soil_ph_min|default:'' }}"></label><br>
+        <label>pH Max: <input type="number" step="0.1" name="soil_ph_max" value="{{ plant.soil_ph_max|default:'' }}"></label><br>
+        
+        <label>Light Min: <input type="number" step="0.1" name="light_min" value="{{ plant.light_min|default:'' }}"></label><br>
+        <label>Light Max: <input type="number" step="0.1" name="light_max" value="{{ plant.light_max|default:'' }}"></label><br>
+        
+        <label>Temperature Min: <input type="number" step="0.1" name="temperature_min" value="{{ plant.temperature_min|default:'' }}"></label><br>
+        <label>Temperature Max: <input type="number" step="0.1" name="temperature_max" value="{{ plant.temperature_max|default:'' }}"></label><br>
+        
+        <label>Air Humidity Min: <input type="number" step="0.1" name="air_humidity_min" value="{{ plant.air_humidity_min|default:'' }}"></label><br>
+        <label>Air Humidity Max: <input type="number" step="0.1" name="air_humidity_max" value="{{ plant.air_humidity_max|default:'' }}"></label><br>
+        
+        <label>Nitrogen Min: <input type="number" step="0.1" name="nitrogen_min" value="{{ plant.nitrogen_min|default:'' }}"></label><br>
+        <label>Nitrogen Max: <input type="number" step="0.1" name="nitrogen_max" value="{{ plant.nitrogen_max|default:'' }}"></label><br>
+        
+        <label>Phosphorus Min: <input type="number" step="0.1" name="phosphorus_min" value="{{ plant.phosphorus_min|default:'' }}"></label><br>
+        <label>Phosphorus Max: <input type="number" step="0.1" name="phosphorus_max" value="{{ plant.phosphorus_max|default:'' }}"></label><br>
+        
+        <label>Potassium Min: <input type="number" step="0.1" name="potassium_min" value="{{ plant.potassium_min|default:'' }}"></label><br>
+        <label>Potassium Max: <input type="number" step="0.1" name="potassium_max" value="{{ plant.potassium_max|default:'' }}"></label><br>
+        
+        <button type="submit">Save</button>
+        <a href="{% url 'plant_list' %}">Cancel</a>
+    </form>
+</body>
+</html>

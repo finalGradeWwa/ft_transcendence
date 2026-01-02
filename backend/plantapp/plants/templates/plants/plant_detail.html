@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ plant.common_name }}</title>
+</head>
+<body>
+    <h1>{{ plant.common_name }}</h1>
+    <p><strong>Latin Name:</strong> {{ plant.latin_name }}</p>
+    <p><strong>Soil Type:</strong> {{ plant.get_soil_type_display }}</p>
+    <p><strong>Soil Moisture:</strong> {{ plant.soil_moisture_min }} - {{ plant.soil_moisture_max }}</p>
+    <p><strong>pH:</strong> {{ plant.soil_ph_min }} - {{ plant.soil_ph_max }}</p>
+    <p><strong>Light:</strong> {{ plant.light_min }} - {{ plant.light_max }}</p>
+    <p><strong>Temperature:</strong> {{ plant.temperature_min }} - {{ plant.temperature_max }}°C</p>
+    <p><strong>Air Humidity:</strong> {{ plant.air_humidity_min }} - {{ plant.air_humidity_max }}%</p>
+    <p><strong>Nitrogen (N):</strong> {{ plant.nitrogen_min }} - {{ plant.nitrogen_max }}</p>
+    <p><strong>Phosphorus (P):</strong> {{ plant.phosphorus_min }} - {{ plant.phosphorus_max }}</p>
+    <p><strong>Potassium (K):</strong> {{ plant.potassium_min }} - {{ plant.potassium_max }}</p>
+    
+    <a href="{% url 'plant_update' plant.id %}">Edit</a>
+    <a href="{% url 'plant_list' %}">Back to List</a>
+    <a href="{% url 'plant_delete' plant.id %}">Delete</a>
+</body>
+</html>

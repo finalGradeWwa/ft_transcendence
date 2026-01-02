@@ -1,10 +1,39 @@
-myenv
-plantapp/accounts/__pycache__
-plantapp/mysite/__pycache__
-plantapp/users/migrations/__pycache__
-plantapp/users/__pycache__
-plantapp/.env
-*.sqlite3
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.so
+.Python
 
-.DS_Store
+# Virtual Environment
+venv/
+myenv/
+env/
+ENV/
+
+# Django
+*.log
+*.pot
+*.sqlite3
+db.sqlite3
+/staticfiles/
+/mediafiles/
 .env
+*.env
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# OS
+Thumbs.db
+
+# Node (jeśli używasz frontendu)
+node_modules/
+npm-debug.log
+yarn-error.log

@@ -67,6 +67,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt.token_blacklist',
     'authentication',
     'corsheaders',
+    'plants',
 ]
 
 MIDDLEWARE = [
@@ -211,3 +212,7 @@ CORS_ALLOW_CREDENTIALS = True # For cookies
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+LOGIN_URL = '/admin/login/'
+LOGIN_REDIRECT_URL = '/plants/'
+
