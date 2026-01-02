@@ -71,6 +71,12 @@ class FollowUserAPIView(APIView):
                 {"detail": "You cannot follow yourself."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
+        if user.following.filter(pk=target.pk).exists():
+             return Response(
+            {"detail": f"You are already following {target.username}."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+            
 
         user.following.add(target)
 

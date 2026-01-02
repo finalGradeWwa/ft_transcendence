@@ -232,5 +232,12 @@ class FollowAPITests(APITestCase):
         response = self.client.post(url)
 
         self.assertEqual(response.status_code, 404)
-    # print(self.alice.following.all())
-    # print(self.bob.followers.all())
+
+    def test_user_cannot_follow_twice(self):
+        self.client.force_authenticate(user=self.alice)
+
+        url = f"/users/{self.bob.id}/follow/"
+        response = self.client.post(url)
+        response = self.client.post(url)
+        
+        self.assertEqual(response.status_code, 400)
