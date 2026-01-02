@@ -225,5 +225,12 @@ class FollowAPITests(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data[0]["username"], "bob")
     
+    def test_user_cannot_follow_non_existent(self):
+        self.client.force_authenticate(user=self.alice)
+
+        url = "/users/99999/follow/"
+        response = self.client.post(url)
+
+        self.assertEqual(response.status_code, 404)
     # print(self.alice.following.all())
     # print(self.bob.followers.all())
