@@ -159,12 +159,9 @@ const LoginModal = ({
 
 export const HomePageClient = ({ plants }: { plants: Array<PlantType> }) => {
   const t = useTranslations('HomePage');
-
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isNavOpen, setIsNavOpen] = useState(false);
-
-  // bezpieczne rzutowanie na tablicę stringów
   const navItems = t.raw('nav') as string[];
 
   return (

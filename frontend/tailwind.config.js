@@ -1,17 +1,29 @@
-// tailwind.config.js
+/**
+ * PL: Konfiguracja Tailwind CSS dla projektu. Definiuje ścieżki do plików zawierających
+ * klasy użytkowe oraz rozszerza domyślną paletę kolorów o niestandardowe motywy
+ * używane w interfejsie użytkownika.
+ * * EN: Tailwind CSS configuration for the project. Defines paths to files containing
+ * utility classes and extends the default color palette with custom themes
+ * used in the user interface.
+ */
 
-// 1. Definiujemy konfiguracje jako NAZWANA zmienna (tailwindConfig)
 /** @type {import('tailwindcss').Config} */
 const tailwindConfig = {
+  /**
+   * PL: Ścieżki do wszystkich komponentów i stron, które Tailwind ma skanować w poszukiwaniu klas.
+   * EN: Paths to all components and pages that Tailwind should scan for classes.
+   */
   content: [
     './app/**/*.{js,ts,jsx,tsx,mdx}',
     './components/**/*.{js,ts,jsx,tsx,mdx}',
-    // './src/**/*.{js,ts,jsx,tsx,mdx}', // usuniete, bo folder nie istnieje
   ],
   theme: {
     extend: {
+      /**
+       * PL: Niestandardowa paleta kolorów zdefiniowana dla zachowania spójności wizualnej marki.
+       * EN: Custom color palette defined to maintain brand visual consistency.
+       */
       colors: {
-        // Format: 'nazwa-klasy-tailwind': '#hex'
         'light-bg': '#F8F8F8',
         'dark-text': '#333333',
         'container-light': '#dad5d0ff',
@@ -27,5 +39,4 @@ const tailwindConfig = {
   plugins: [],
 };
 
-// 2. Eksportujemy nazwana zmienna jako default.
 module.exports = tailwindConfig;
