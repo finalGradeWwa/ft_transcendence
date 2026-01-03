@@ -29,21 +29,9 @@ class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(max_length=200, unique=True,
  null=False, blank=False)
     # Other fields
-
-    date_joined = models.DateTimeField(default=timezone.now)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
-    avatar_photo = models.ImageField(upload_to="users/static", null=True, blank=True)
-    # number_of_plants = models.DecimalField()
-    # plants = models.ManyToManyField('Plant', related_name='plants_list')
-    friends = models.ManyToManyField(
-        'User',
-        related_name='friends_list',
-        symmetrical=True,
-        help_text='Friendships are automatically mutual: if you add a user as a friend, they are also your friend.',
-    )
-    bio = models.TextField(verbose_name="Biography", max_length=600, null=True, blank=True)
     objects = UserManager()
 
     USERNAME_FIELD = 'email'
@@ -51,3 +39,12 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.username
+
+    date_joined = models.DateTimeField(default=timezone.now)
+    bio = models.TextField(verbose_name="Biography", max_length=600, null=True, blank=True)
+    following = models.ManyToManyField("self", blank=True,symmetrical=False, related_name="followers")
+
+    def count_following(self):
+        return self.following.count()
+    def count_followers(self):
+        return User.followers.count()

@@ -159,3 +159,85 @@ class MeViewTests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
+class FollowAPITests(APITestCase):
+    def setUp(self):
+        self.alice = User.objects.create_user(
+            email="alice@a.com",
+            username="alice",
+            password="password123",
+        )
+        self.bob = User.objects.create_user(
+            email="bob@b.com",
+            username="bob",
+            password="password123",
+        )
+    def test_user_can_follow_another_user(self):
+        self.client.force_authenticate(user=self.alice)
+
+        url = f"/users/{self.bob.id}/follow/"
+        response = self.client.post(url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(
+            self.alice.following.filter(id=self.bob.id).exists()
+        )
+        self.assertTrue(
+            self.bob.followers.filter(id=self.alice.id).exists()
+        )
+    def test_user_cannot_follow_self(self):
+        self.client.force_authenticate(user=self.alice)
+
+        url = f"/users/{self.alice.id}/follow/"
+        response = self.client.post(url)
+
+        self.assertEqual(response.status_code, 400)
+        self.assertFalse(
+            self.alice.following.filter(id=self.alice.id).exists()
+        )
+    def test_user_can_unfollow(self):
+        self.alice.following.add(self.bob)
+
+        self.client.force_authenticate(user=self.alice)
+        url = f"/users/{self.bob.id}/unfollow/"
+        response = self.client.post(url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(
+            self.alice.following.filter(id=self.bob.id).exists()
+        )
+
+    def test_list_followers(self):
+        self.alice.following.add(self.bob)
+
+        url = f"/users/{self.bob.id}/followers/"
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]["username"], "alice")
+
+    def test_list_following(self):
+        self.alice.following.add(self.bob)
+
+        url = f"/users/{self.alice.id}/following/"
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data[0]["username"], "bob")
+    
+    def test_user_cannot_follow_non_existent(self):
+        self.client.force_authenticate(user=self.alice)
+
+        url = "/users/99999/follow/"
+        response = self.client.post(url)
+
+        self.assertEqual(response.status_code, 404)
+
+    def test_user_cannot_follow_twice(self):
+        self.client.force_authenticate(user=self.alice)
+
+        url = f"/users/{self.bob.id}/follow/"
+        response = self.client.post(url)
+        response = self.client.post(url)
+        
+        self.assertEqual(response.status_code, 400)
