@@ -1,8 +1,5 @@
 myenv
-plantapp/accounts/__pycache__
-plantapp/mysite/__pycache__
-plantapp/users/migrations/__pycache__
-plantapp/users/__pycache__
+__pycache__/
 plantapp/.env
 *.sqlite3
 

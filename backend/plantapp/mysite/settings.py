@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'daphne',
     'django.contrib.staticfiles',
     'users',
     'rest_framework',
@@ -67,6 +68,8 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt.token_blacklist',
     'authentication',
     'corsheaders',
+    'channels',
+    'chat_app',
 ]
 
 MIDDLEWARE = [
@@ -99,6 +102,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'mysite.wsgi.application'
 
+ASGI_APPLICATION = 'mysite.asgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
