@@ -21,4 +21,4 @@ application = ProtocolTypeRouter({
     # Just HTTP for now. (We can add other protocols later.)
 })
 
-ASGI_APPLICATION = 'mysite.asgi.application'
+# ASGI_APPLICATION = 'mysite.asgi.application'
