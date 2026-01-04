@@ -1,18 +1,27 @@
+# PL: Obraz bazowy Node.js w wersji Alpine (lekka dystrybucja Linuxa).
+# EN: Base Node.js image in Alpine version (lightweight Linux distribution).
 FROM node:20-alpine
 
+# PL: Ustawienie katalogu roboczego wewnątrz kontenera.
+# EN: Setting the working directory inside the container.
 WORKDIR /app
 
-# Kopiujemy pliki zależności
+# PL: Kopiowanie plików definicji zależności.
+# EN: Copying dependency definition files.
 COPY package.json package-lock.json ./
 
-# Instalujemy wszystko (łącznie z typami dla TS)
+# PL: Instalacja wszystkich zależności (produkcyjnych i deweloperskich).
+# EN: Installation of all dependencies (production and development).
 RUN npm install
 
-# Kopiujemy resztę plików
+# PL: Kopiowanie pozostałej części kodu źródłowego.
+# EN: Copying the rest of the source code.
 COPY . .
 
-# Ważne dla Next.js 15/16 w Dockerze:
+# PL: Blokada zbierania anonimowych danych analitycznych przez Next.js.
+# EN: Disabling anonymous telemetry data collection by Next.js.
 ENV NEXT_TELEMETRY_DISABLED 1
 
-# Startujemy w trybie dev (bez budowania!)
+# PL: Uruchomienie aplikacji w trybie deweloperskim z funkcją Hot Reload.
+# EN: Starting the application in development mode with Hot Reload enabled.
 CMD ["npm", "run", "dev"]
