@@ -1,6 +1,7 @@
 {
   "HomePage": {
-    "title": "Weed be better together",
+    "title": "Plant Portal",
+	"description": "Twoja baza wiedzy o roślinach, galeria zdjęć i społeczność pasjonatów botaniki.",
     "recommended": "POLECANE:",
     "search": "Wyszukaj rośliny...",
     "login": "Logowanie",
@@ -16,19 +17,57 @@
     "nav": ["Strona Główna", "Galeria", "O nas", "Regulamin", "Kontakt"],
     "searchPlaceholder": "Wyszukiwanie jest aktywne",
     "searchInfo": "Tutaj będzie pełna logika wyszukiwania.",
-    "close": "Zamknij",
     "rights": "Wszelkie prawa zastrzeżone.",
     "privacy": "Polityka Prywatności",
-    "terms": "Warunki Użytkowania"
+    "terms": "Warunki Użytkowania",
+    "aria": {
+	  "close": "Zamknij",
+      "homePageLink": "strona główna",
+      "openMenu": "Otwórz menu",
+      "closeMenu": "Zamknij menu",
+      "mainNavigation": "Główna nawigacja",
+	  "footerNavigation": "Nawigacja w stopce",
+      "selectLanguage": "Wybierz język strony",
+      "searchBtn": "Szukaj",
+      "add": "Dodaj nową roślinę",
+      "profile": "Profil użytkownika",
+      "userTools": "Narzędzia użytkownika"
+    }
   },
-	"ProfilePage": {
+  "ProfilePage": {
 	"plantsCount": "Liczba roślin",
 	"friendsCount": "Znajomi",
 	"userPlantsTitle": "Twoja kolekcja roślin",
 	"editProfile": "Edytuj profil"
   },
-  "TermsPage": {
-    "title": "Regulamin serwisu",
-    "content": "I. Definicje\n1. Dostawca usług – John Weeder, z siedzibą w Warszawie (00-234), ul. Polna 7, NIP: 111-111-11-11.\n2. Użytkownik – Każda osoba korzystająca z Serwisu.\n3. Konto – Spersonalizowana przestrzeń w Serwisie zabezpieczona loginem i hasłem.\n4. Treść – Zdjęcia, opisy roślin, komentarze i wiadomości zamieszczane przez Użytkownika.\n5. Serwis – Portal botaniczny znajdujący się pod adresem [Twoja domena].\n6. DSA – Rozporządzenie (UE) 2022/2065 (Digital Services Act).\n\nII. Zawarcie umowy\n1. Umowa zawierana jest w momencie rejestracji (dla Użytkowników zarejestrowanych) lub w momencie wejścia na stronę (dla Użytkowników niezarejestrowanych).\n2. Umowa dla Użytkowników zarejestrowanych zawierana jest na czas nieokreślony.\n3. Użytkownik może w każdej chwili zakończyć umowę poprzez usunięcie swojego konta.\n\nIII. Zasady korzystania\n1. Serwis służy do dzielenia się pasją botaniczną oraz kolekcjami roślin.\n2. Użytkownikom zabrania się zamieszczania treści nielegalnych, w tym:\n   ◦ Treści naruszających prawa autorskie fotografów lub innych autorów.\n   ◦ Nielegalnego handlu gatunkami chronionymi (wymienionymi w CITES lub lokalnych przepisach ochrony środowiska).\n   ◦ Spamu, reklam konkurencyjnych usług lub materiałów obraźliwych.\n3. Użytkownicy muszą zachowywać się w sposób szanujący innych członków społeczności.\n\nIV. Treści generowane przez AI\n1. Użytkownik musi posiadać pełne prawa do zamieszczanych przez siebie treści.\n2. Dostawca usług zastrzega sobie prawo do usunięcia treści wygenerowanych w całości lub w istotnej części przez AI (Sztuczną Inteligencję), szczególnie jeśli nie są wyraźnie oznaczone lub imitują prawdziwe rośliny/sytuacje w celu wprowadzenia w błąd innych Użytkowników.\n3. Ocena autentyczności: Administrator ma wyłączne prawo do technicznej i estetycznej oceny treści. Jeśli Administrator ma uzasadnione podejrzenie, że zdjęcie jest nieoznakowaną generacją AI, może usunąć treść na podstawie analizy technicznej lub niezgodności anatomicznych/botanicznych.\n\nV. Moderacja i DSA\n1. Moderacja odbywa się ręcznie przez Administratorów.\n2. Zgłaszanie: Każda osoba może zgłosić treści nielegalne lub naruszające regulamin za pomocą przycisku/formularza „Zgłoś”.\n3. Uzasadnienie: Jeśli treść zostanie usunięta lub ograniczona, Użytkownik otrzyma wyjaśnienie drogą mailową (zgodnie z wymogami DSA).\n4. Prawo do odwołania: Użytkownicy mają prawo odwołać się od decyzji moderacyjnej w ciągu 6 miesięcy od powiadomienia.\n\nVI. Odpowiedzialność\n1. Dostawca usług nie ponosi odpowiedzialności za autentyczność danych podanych przez Użytkowników ani za treści, które publikują.\n2. Użytkownik ponosi wyłączną odpowiedzialność za naruszenia praw autorskich lub praw osobistych wynikające z jego publikacji.\n3. Serwis ma charakter wyłącznie informacyjny. Dostawca usług nie odpowiada za jakiekolwiek szkody w roślinach lub zdrowiu wynikające z porad udostępnionych przez Użytkowników.\n\nVII. Postanowienia końcowe\n1. Dostawca usług zastrzega sobie prawo do zmiany niniejszego Regulaminu z 14-dniowym wyprzedzeniem.\n2. Sprawy nieuregulowane niniejszym Regulaminem podlegają prawu polskiemu oraz przepisom UE.\n3. Niniejszy Regulamin wchodzi w życie z dniem 26 grudnia 2025 r."
+  "RegisterPage": {
+    "title": "Stwórz konto",
+    "firstName": "Imię",
+    "lastName": "Nazwisko",
+    "nick": "Pseudonim (Nick)",
+    "avatar": "Zdjęcie profilowe (Avatar)",
+    "email": "Adres E-mail",
+    "chooseFile": "Wybierz plik",
+    "noFileSelected": "Nie wybrano pliku",
+    "password": "Hasło",
+    "passwordRequirements": "Min. 8 znaków (duża litera, mała litera, cyfra, znak specjalny).",
+    "confirmPassword": "Powtórz hasło",
+    "acceptTerms": "Oświadczam, że akceptuję",
+    "termsLink": "regulamin serwisu",
+    "registerBtn": "Zarejestruj",
+    "alreadyHaveAccount": "Masz już konto?",
+    "errorPasswordMatch": "Hasła nie są identyczne",
+    "errorRegistrationFailed": "Rejestracja nie powiodła się. Spróbuj ponownie.",
+    "successMessage": "Konto zostało pomyślnie utworzone!",
+	"serverError": "Błąd połączenia z serwerem. Spróbuj ponownie później.",
+	"showPassword": "Pokaż hasło",
+	"hidePassword": "Ukryj hasło",
+	"avatarRequirements": "Dopuszczalne formaty: JPG, JPEG, PNG, WEBP.",
+	"errorInvalidFormat": "Nieprawidłowy format pliku. Wybierz JPG, PNG lub WebP."
+  },
+  "errors": {
+	"connectionError": "Błąd połączenia. Spróbuj ponownie później.",
+	"invalidCredentials": "Nieprawidłowy login lub hasło.",
+	"genericError": "Coś poszło nie tak."
   }
 }

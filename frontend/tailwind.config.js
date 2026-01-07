@@ -16,6 +16,8 @@ const tailwindConfig = {
   content: [
     './app/**/*.{js,ts,jsx,tsx,mdx}',
     './components/**/*.{js,ts,jsx,tsx,mdx}',
+    './frontend/app/**/*.{js,ts,jsx,tsx,mdx}',
+    './frontend/components/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   theme: {
     extend: {
@@ -26,13 +28,13 @@ const tailwindConfig = {
       colors: {
         'light-bg': '#F8F8F8',
         'dark-text': '#333333',
-        'container-light': '#dad5d0ff',
-        'container-light2': '#c7c1bcff',
-        'primary-green': '#186618ff',
-        'secondary-beige': '#e7dcc7ff',
+        'container-light': '#dad5d0',
+        'container-light2': '#c7c1bc',
+        'primary-green': '#186618',
+        'secondary-beige': '#e7dcc7',
         'subtle-gray': '#E0E0E0',
-        'border-gray': '#adadadff',
-        'header-main': '#ffffffff',
+        'border-gray': '#adadad',
+        'header-main': '#ffffff',
       },
     },
   },

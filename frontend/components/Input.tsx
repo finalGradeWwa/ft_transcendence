@@ -13,9 +13,9 @@ import React, { forwardRef, InputHTMLAttributes } from 'react';
  * PL: Interfejs definiujący właściwości komponentu Input, rozszerzający standardowe atrybuty HTML.
  * EN: Interface defining Input component props, extending standard HTML attributes.
  */
-interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
+interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string;
-  id: string;
+  id?: string; // Dodaj ten znak zapytania
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
