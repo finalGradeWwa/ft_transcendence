@@ -73,3 +73,19 @@ class ChangePasswordSerializer(serializers.Serializer):
         user.set_password(self.validated_data["new_password"])
         user.save(update_fields=["password"])
         return user
+
+class LoginSerializer(serializers.Serializer):
+	email = serializers.EmailField()
+	password = serializers.CharField(write_only=True)
+
+	def validate(self, attrs):
+		email = attrs.get("email")
+		password = attrs.get("password")
+
+		user = User.objects.filter(email__iexact=email).first()
+		if user is None or not user.check_password(password):
+			raise serializers.ValidationError("Invalid email or password.")
+
+		attrs["user"] = user
+		return attrs
+
