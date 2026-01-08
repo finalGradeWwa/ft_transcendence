@@ -99,13 +99,13 @@ export default function RegisterPage() {
           >
             <Input
               label={tr('firstName')}
-              name="first_name"
+              name="firstName"
               required
               disabled={isLoading}
             />
             <Input
               label={tr('lastName')}
-              name="last_name"
+              name="lastName"
               required
               disabled={isLoading}
             />
@@ -131,7 +131,7 @@ export default function RegisterPage() {
                 <input
                   type="file"
                   id="avatar-upload"
-                  name="avatar"
+                  name="avatar_photo"
                   className="hidden"
                   accept=".jpg,.jpeg,.png,.webp"
                   onChange={e => setFileName(e.target.files?.[0]?.name || '')}
