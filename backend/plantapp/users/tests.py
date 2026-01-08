@@ -69,7 +69,8 @@ class MeViewTests(APITestCase):
             username='testuser',
             email='test@example.com',
             password='SecurePass123!',
-            fullname='Test User',
+            firstName='Test',
+            lastName='User',
             bio='Test bio'
         )
         self.client.force_authenticate(user=self.user)
@@ -80,7 +81,8 @@ class MeViewTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['username'], 'testuser')
         self.assertEqual(response.data['email'], 'test@example.com')
-        self.assertEqual(response.data['fullname'], 'Test User')
+        self.assertEqual(response.data['firstName'], 'Test')
+        self.assertEqual(response.data['lastName'], 'User')
         self.assertEqual(response.data['bio'], 'Test bio')
         self.assertIn('id', response.data)
         self.assertIn('date_joined', response.data)
@@ -94,17 +96,20 @@ class MeViewTests(APITestCase):
 
     def test_patch_me_success(self):
         response = self.client.patch(self.url, {
-            'fullname': 'Updated Name',
+            'firstName': 'Updated',
+            'lastName': 'Name',
             'bio': 'Updated bio'
         }, format='json')
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['fullname'], 'Updated Name')
+        self.assertEqual(response.data['firstName'], 'Updated')
+        self.assertEqual(response.data['lastName'], 'Name')
         self.assertEqual(response.data['bio'], 'Updated bio')
 
         # Verify in database
         self.user.refresh_from_db()
-        self.assertEqual(self.user.fullname, 'Updated Name')
+        self.assertEqual(self.user.firstName, 'Updated')
+        self.assertEqual(self.user.lastName, 'Name')
 
     def test_patch_me_partial_update(self):
         response = self.client.patch(self.url, {
@@ -113,7 +118,8 @@ class MeViewTests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['bio'], 'Only bio updated')
-        self.assertEqual(response.data['fullname'], 'Test User')  # Unchanged
+        self.assertEqual(response.data['firstName'], 'Test')  # Unchanged
+        self.assertEqual(response.data['lastName'], 'User')  # Unchanged
 
     def test_patch_me_duplicate_username(self):
         User.objects.create_user(
@@ -154,7 +160,7 @@ class MeViewTests(APITestCase):
         self.client.force_authenticate(user=None)
 
         response = self.client.patch(self.url, {
-            'fullname': 'Hacker'
+            'firstName': 'Hacker'
         }, format='json')
 
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
