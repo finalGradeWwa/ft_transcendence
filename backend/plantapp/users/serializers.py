@@ -8,8 +8,8 @@ class UserSerializer(serializers.ModelSerializer):
 		model = User
 		fields = (
 			"id", # Do we need 'id' in users model?
-			"firstName",
-            "lastName",
+			"first_name",
+            "last_name",
             "username",
 			"email",
 			"bio",
@@ -23,7 +23,7 @@ class UserUpdateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ("username", "email", "firstName", "lastName", "bio")
+        fields = ("username", "email", "first_name", "last_name", "bio")
 
     def validate_email(self, value: str) -> str:
         user = self.instance
@@ -46,7 +46,7 @@ class UserUpdateSerializer(serializers.ModelSerializer):
 class PublicUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ("id", "username", "firstName", "lastName")
+        fields = ("id", "username", "first_name", "last_name")
 
 class ListFollowersSerializer(serializers.ModelSerializer):
      class Meta:

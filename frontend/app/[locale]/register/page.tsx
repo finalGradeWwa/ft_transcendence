@@ -99,13 +99,13 @@ export default function RegisterPage() {
           >
             <Input
               label={tr('firstName')}
-              name="firstName"
+              name="first_name"
               required
               disabled={isLoading}
             />
             <Input
               label={tr('lastName')}
-              name="lastName"
+              name="last_name"
               required
               disabled={isLoading}
             />
