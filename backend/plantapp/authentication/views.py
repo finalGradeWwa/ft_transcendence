@@ -73,7 +73,7 @@ class LogoutView(APIView):
 
 		return Response(status=status.HTTP_205_RESET_CONTENT)
 
-# POSR /api/auth/login/
+# POST /api/auth/login/
 
 class LoginView(APIView):
 

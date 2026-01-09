@@ -147,6 +147,21 @@ class LoginTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn('tokens', response.data)
 
+    def test_login_inactive_user(self):
+        self.user.is_active = False
+        self.user.save(update_fields=['is_active'])
+
+        response = self.client.post(self.url, {
+            'email': 'test@example.com',
+            'password': 'SecurePass123!'
+        }, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('non_field_errors', response.data)
+        self.assertNotIn('tokens', response.data)
+        self.assertNotIn('user', response.data)
+
+
 
 class ChangePasswordViewTests(APITestCase):
 
