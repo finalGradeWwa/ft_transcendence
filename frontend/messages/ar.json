@@ -6,6 +6,7 @@
     "search": "بحث عن النباتات...",
     "login": "تسجيل الدخول",
     "nick": "الاسم:",
+    "email": "البريد الإلكتروني:",
     "password": "كلمة المرور:",
     "loginBtn": "دخول",
     "cancel": "إلغاء",
@@ -21,12 +22,12 @@
     "privacy": "سياسة الخصوصية",
     "terms": "شروط الاستخدام",
     "aria": {
-	  "close": "إغلاق",
+      "close": "إغلاق",
       "homePageLink": "الصفحة الرئيسية",
       "openMenu": "افتح القائمة",
       "closeMenu": "أغلق القائمة",
       "mainNavigation": "التنقل الرئيسي",
-	  "footerNavigation": "تنقل التذييل",
+      "footerNavigation": "تنقل التذييل",
       "selectLanguage": "اختر اللغة",
       "searchBtn": "بحث",
       "add": "أضف نباتاً جديداً",
@@ -59,14 +60,14 @@
     "errorPasswordMatch": "كلمات المرور غير متطابقة",
     "errorRegistrationFailed": "فشل التسجيل. يرجى المحاولة مرة أخرى.",
     "successMessage": "تم إنشاء الحساب بنجاح!",
-	"serverError": "خطأ في الاتصال بالخادم. يرجى المحاولة مرة أخرى لاحقاً.",
-	"showPassword": "عرض كلمة المرور",
-	"hidePassword": "إخفاء كلمة المرور",
-	"avatarRequirements": "التنسيقات المسموح بها: JPG، JPEG، PNG, WEBP.",
-	"errorInvalidFormat": "تنسيق ملف غير صالح. يرجى اختيار JPG أو PNG أو WebP."
+    "serverError": "خطأ في الاتصال بالخادم. يرجى المحاولة مرة أخرى لاحقاً.",
+    "showPassword": "عرض كلمة المرور",
+    "hidePassword": "إخفاء كلمة المرور",
+    "avatarRequirements": "التنسيقات المسموح بها: JPG، JPEG، PNG, WEBP.",
+    "errorInvalidFormat": "تنسيق ملف غير صالح. يرجى اختيار JPG أو PNG أو WebP."
   },
   "errors": {
-	"connectionError": "خطأ w الاتصال. حاول مرة أخرى لاحقًا.",
-	"invalidCredentials": "اسم المستخدم أو كلمة المرور غير صالحة."
+    "connectionError": "خطأ w الاتصال. حاول مرة أخرى لاحقًا.",
+    "invalidCredentials": "اسم المستخدم أو كلمة المرور غير صالحة."
   }
 }

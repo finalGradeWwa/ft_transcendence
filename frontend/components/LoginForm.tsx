@@ -18,7 +18,7 @@ import { Button } from '@/components/Button';
  * EN: Login form data type.
  */
 type FormData = {
-  username: string;
+  email: string;
   password: string;
 };
 
@@ -79,7 +79,7 @@ export const LoginForm = ({
 
   /** PL: Stan danych formularza. EN: Form data state. */
   const [formData, setFormData] = useState<FormData>({
-    username: '',
+    email: '',
     password: '',
   });
 
@@ -128,11 +128,12 @@ export const LoginForm = ({
 
       <Input
         ref={usernameRef}
-        label={t('nick')}
-        name="username"
-        id="login-username"
+        label={t('email')}
+        type="email"
+        name="email"
+        id="login-email"
         required
-        value={formData.username}
+        value={formData.email}
         onChange={update}
         disabled={isLoading}
       />

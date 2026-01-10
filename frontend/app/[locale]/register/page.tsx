@@ -131,7 +131,7 @@ export default function RegisterPage() {
                 <input
                   type="file"
                   id="avatar-upload"
-                  name="avatar"
+                  name="avatar_photo"
                   className="hidden"
                   accept=".jpg,.jpeg,.png,.webp"
                   onChange={e => setFileName(e.target.files?.[0]?.name || '')}

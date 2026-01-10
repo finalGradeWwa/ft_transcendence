@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
             name='Plant',
             fields=[
                 ('plant_id', models.AutoField(primary_key=True, serialize=False)),
-                ('nickname', models.CharField()),
+                ('nickname', models.CharField(max_length=100)),
                 ('soil_type_used', models.CharField(choices=[('C', 'Clay'), ('SD', 'Sand'), ('ST', 'Silt'), ('L', 'Loam'), ('P', 'Peat'), ('CH', 'Chalk'), ('D', 'Default Soil')], default='D', max_length=2)),
                 ('created_at', models.DateTimeField(default=django.utils.timezone.now)),
                 ('current_ph', models.DecimalField(decimal_places=2, max_digits=4, validators=[django.core.validators.MinValueValidator(0), django.core.validators.MaxValueValidator(14)])),

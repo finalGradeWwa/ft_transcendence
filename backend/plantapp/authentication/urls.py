@@ -6,7 +6,7 @@ from rest_framework_simplejwt.views import (
 	TokenVerifyView,
 )
 
-from .views import RegisterView, ChangePasswordView, LogoutView
+from .views import RegisterView, ChangePasswordView, LogoutView , LoginView
 
 
 urlpatterns = [
@@ -16,8 +16,9 @@ urlpatterns = [
 	path('api/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
 
 	# Auth endpoints
-	path('api/auth/register/', RegisterView.as_view(), name='register'),
+	path('api/register/', RegisterView.as_view(), name='register'),
 	path('api/auth/change-password/', ChangePasswordView.as_view(), name='change_password'),
 	path('api/auth/logout/', LogoutView.as_view(), name='logout'),
+	path('api/auth/login/', LoginView.as_view(), name='login'),
 ]
 
