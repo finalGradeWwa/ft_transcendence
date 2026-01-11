@@ -83,7 +83,7 @@ class RegisterViewTests(APITestCase):
 class LoginTests(APITestCase):
 
     def setUp(self):
-        self.url = reverse('token_obtain_pair')
+        self.url = reverse('login')
         self.user = User.objects.create_user(
             username='testuser',
             email='test@example.com',
@@ -97,8 +97,12 @@ class LoginTests(APITestCase):
         }, format='json')
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertIn('access', response.data)
-        self.assertIn('refresh', response.data)
+        self.assertIn('user', response.data)
+        self.assertIn('tokens', response.data)
+        self.assertIn('access', response.data['tokens'])
+        self.assertIn('refresh', response.data['tokens'])
+        self.assertEqual(response.data['user']['username'], 'testuser')
+        self.assertEqual(response.data['user']['email'], 'test@example.com')
 
     def test_login_wrong_password(self):
         response = self.client.post(self.url, {
@@ -106,7 +110,8 @@ class LoginTests(APITestCase):
             'password': 'WrongPassword!'
         }, format='json')
 
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('non_field_errors', response.data)
 
     def test_login_nonexistent_user(self):
         response = self.client.post(self.url, {
@@ -114,7 +119,48 @@ class LoginTests(APITestCase):
             'password': 'password123'
         }, format='json')
 
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('non_field_errors', response.data)
+
+    def test_login_missing_email(self):
+        response = self.client.post(self.url, {
+            'password': 'SecurePass123!'
+        }, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('email', response.data)
+
+    def test_login_missing_password(self):
+        response = self.client.post(self.url, {
+            'email': 'test@example.com'
+        }, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('password', response.data)
+
+    def test_login_case_insensitive_email(self):
+        response = self.client.post(self.url, {
+            'email': 'TEST@EXAMPLE.COM',
+            'password': 'SecurePass123!'
+        }, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn('tokens', response.data)
+
+    def test_login_inactive_user(self):
+        self.user.is_active = False
+        self.user.save(update_fields=['is_active'])
+
+        response = self.client.post(self.url, {
+            'email': 'test@example.com',
+            'password': 'SecurePass123!'
+        }, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('non_field_errors', response.data)
+        self.assertNotIn('tokens', response.data)
+        self.assertNotIn('user', response.data)
+
 
 
 class ChangePasswordViewTests(APITestCase):

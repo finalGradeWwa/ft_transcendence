@@ -23,12 +23,15 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser, PermissionsMixin):
-    fullname = models.CharField(max_length=100, null=True,
+    first_name = models.CharField(max_length=100, null=True,
+ blank=True)
+    last_name = models.CharField(max_length=100, null=True,
  blank=True)
     username = models.CharField(max_length=50, unique=True,
  null=False, blank=False)
     email = models.EmailField(max_length=200, unique=True,
  null=False, blank=False)
+    avatar_photo = models.ImageField(upload_to='avatars/', null=True, blank=True)
     # Other fields
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)

@@ -5,7 +5,7 @@ from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError
 
-from .serializers import UserRegistrationSerializer, ChangePasswordSerializer
+from .serializers import UserRegistrationSerializer, ChangePasswordSerializer, LoginSerializer
 from users.serializers import UserSerializer
 
 # POST /api/auth/register/
@@ -72,3 +72,24 @@ class LogoutView(APIView):
 			)
 
 		return Response(status=status.HTTP_205_RESET_CONTENT)
+
+# POST /api/auth/login/
+
+class LoginView(APIView):
+
+	permission_classes = [AllowAny]
+
+	def post(self, request):
+		serializer = LoginSerializer(data=request.data)
+		serializer.is_valid(raise_exception=True)
+
+		user = serializer.validated_data["user"]
+		refresh = RefreshToken.for_user(user)
+
+		return Response({
+            "user": UserSerializer(user).data,
+            "tokens": {
+                "refresh": str(refresh),
+                "access": str(refresh.access_token),
+            }
+        }, status=status.HTTP_200_OK)
