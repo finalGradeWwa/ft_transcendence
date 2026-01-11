@@ -70,7 +70,7 @@ INSTALLED_APPS = [
     'plants', 
     'gardens',
     'organizations',
-    'core',
+    # 'core',
 ]
 
 MIDDLEWARE = [

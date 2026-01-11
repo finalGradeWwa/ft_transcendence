@@ -14,9 +14,9 @@ class Plant(models.Model):
     garden = models.ForeignKey(
         'gardens.Garden', 
         related_name="plants",
-        on_delete=models.DO_NOTHING,
+        on_delete=models.SET_NULL,
         null=True,
-        blank=True
+        blank=True,
         )
     nickname = models.CharField(max_length=25, unique=True)
     created_at = models.DateTimeField(default=timezone.now)

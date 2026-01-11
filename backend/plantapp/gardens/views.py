@@ -7,7 +7,6 @@ from rest_framework import status
 from .services import create_garden, add_garden_user
 from .serializers import GardenListSerializer, GardenContentSerializer
 from django.db.models import Count
-from django.conf import settings
 from django.contrib.auth import get_user_model
 
 # Create your views here.

@@ -6,7 +6,7 @@ urlpatterns = [
 	path('my/', ListMyGardens.as_view(), name='my-gardens'),
 	path('<int:pk>/', GardenAPIView.as_view(), name='garden-detail'),
 	path(
-		"gardens/<int:pk>/users/",
+		"<int:pk>/users/",
 		AddGardenUserAPIView.as_view(),
 		name="garden-user-create",
 	),
