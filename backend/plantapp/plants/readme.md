@@ -1,0 +1,7 @@
+## plants - Django application 
+
+
+
+
+
+

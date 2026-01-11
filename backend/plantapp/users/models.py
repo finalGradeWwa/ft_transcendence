@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import (AbstractBaseUser,
  BaseUserManager, PermissionsMixin)
 from django.utils import timezone
+# from gardens import Garden
 
 # Create your models here.
 
@@ -33,7 +34,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
     objects = UserManager()
-
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
 
