@@ -23,7 +23,8 @@ class GardenAPITests(APITestCase):
         )
 
         self.garden = Garden.objects.create(
-            garden_name="Alice's Garden"
+            garden_name="Alice's Garden",
+            name="Alice's Garden",
         )
 
         self.alice_membership = GardenUser.objects.create(

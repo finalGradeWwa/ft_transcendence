@@ -34,8 +34,12 @@ class PlantAPIView(APIView):
             data=request.data
         )
 
+        serializer = PlantSerializer(plant)
         return Response(
-            {"detail": f"Your plant {plant.plant_id} has been added."},
+            {
+                "detail": f"Your plant {plant.plant_id} has been added.",
+                "plant": serializer.data,
+            },
             status=status.HTTP_201_CREATED,
         )
 

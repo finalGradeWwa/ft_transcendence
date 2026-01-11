@@ -1,7 +1,4 @@
 from .models import Garden, GardenOwner, GardenUser
-from rest_framework.response import Response
-from django.shortcuts import get_object_or_404
-from rest_framework import status
 
 def create_garden(*, creator, data):
     garden = Garden.objects.create(
@@ -17,10 +14,6 @@ def create_garden(*, creator, data):
         organization_user=garden_user
     )
     return garden
-
-from django.shortcuts import get_object_or_404
-from gardens.models import GardenUser, GardenOwner
-
 
 def add_garden_user(*, owner, garden, user_to_add):
     if not GardenOwner.objects.filter(
