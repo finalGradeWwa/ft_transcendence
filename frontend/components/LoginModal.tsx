@@ -44,15 +44,22 @@ const LoginModal = ({ isVisible, onClose, t }: any) => {
   return (
     <div
       /** PL: Półprzezroczyste tło z efektem rozmycia. EN: Semi-transparent background with blur effect. */
-      className="fixed inset-0 bg-black/50 flex justify-center items-center z-50 backdrop-blur-sm"
+      className="fixed inset-0 bg-black/50 flex justify-center items-center z-50 backdrop-blur-sm p-4"
       onClick={onClose}
     >
-      <ModalContent
-        t={t}
-        tError={tError}
-        onClose={onClose}
-        usernameRef={usernameInputRef}
-      />
+      <div
+        /** PL: Zatrzymanie bąbelkowania zdarzenia, aby kliknięcie wewnątrz modalu go nie zamykało. 
+            EN: Stopping event bubbling so clicking inside the modal doesn't close it. */
+        onClick={e => e.stopPropagation()}
+        className="w-full max-w-md"
+      >
+        <ModalContent
+          t={t}
+          tError={tError}
+          onClose={onClose}
+          usernameRef={usernameInputRef}
+        />
+      </div>
     </div>
   );
 };
