@@ -4,28 +4,31 @@ import { notFound } from 'next/navigation';
 import { Navigation } from '@/components/Navigation';
 import ReactMarkdown from 'react-markdown';
 
-interface TermsPageProps {
+interface PrivacyPolicyPageProps {
   params: Promise<{ locale: string }>;
 }
 
-async function getTermsContent(locale: string) {
-  const filePath = path.join(process.cwd(), 'content/terms', `${locale}.md`);
+async function getPrivacyContent(locale: string) {
+  const filePath = path.join(
+    process.cwd(),
+    'content/privacy-policy',
+    `${locale}.md`
+  );
   try {
     if (!fs.existsSync(filePath)) return null;
     let content = fs.readFileSync(filePath, 'utf8');
-
-    content = content.replace(/^#?\s*Regulamin\s*\n/i, '');
     content = content.replace(/^(\d+[\.\)])/gm, '\n\n**$1**');
-
     return content;
   } catch {
     return null;
   }
 }
 
-export default async function TermsPage({ params }: TermsPageProps) {
+export default async function PrivacyPolicyPage({
+  params,
+}: PrivacyPolicyPageProps) {
   const { locale } = await params;
-  const content = await getTermsContent(locale);
+  const content = await getPrivacyContent(locale);
 
   if (!content) {
     notFound();

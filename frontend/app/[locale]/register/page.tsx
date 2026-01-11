@@ -6,7 +6,7 @@
  */
 
 import { useState } from 'react';
-import { Link } from '@/i18n/navigation';
+import { Link, useRouter } from '@/i18n/navigation';
 import { Input } from '@/components/Input';
 import { Heading } from '@/components/Heading';
 import { Navigation } from '@/components/Navigation';
@@ -17,6 +17,7 @@ import { useTranslations } from 'next-intl';
 export default function RegisterPage() {
   const t = useTranslations('HomePage');
   const tr = useTranslations('RegisterPage');
+  const router = useRouter();
 
   const [fileName, setFileName] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -48,10 +49,28 @@ export default function RegisterPage() {
     }
 
     try {
+      // ==============================================================
+      // TRYB TESTOWY (MOCK) - ABY UŻYĆ PRAWDZIWEGO BACKENDU, ZAKOMENTUJ PONIŻSZY BLOK
+      // ==============================================================
+
+      const response = {
+        ok: true,
+        status: 201,
+        json: async () => ({ detail: 'Success Mock' }),
+      };
+      // Symulacja czasu odpowiedzi serwera (1 sekunda)
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      // ==============================================================
+      // PRAWDZIWY BACKEND - ODKOMENTUJ PONIŻSZY KOD, GDY SERWER BĘDZIE GOTOWY
+      // ==============================================================
+      /*
       const response = await fetch('http://localhost:8000/api/register/', {
         method: 'POST',
         body: formData,
       });
+      */
+      // ==============================================================
 
       const data = await response.json();
 
@@ -59,7 +78,10 @@ export default function RegisterPage() {
         throw new Error(data.detail || tr('errorRegistrationFailed'));
       }
 
-      alert(tr('successMessage'));
+      /** * PL: Przekierowanie na stronę główną z parametrami otwierającymi modal logowania i flagą sukcesu.
+       * EN: Redirect to home page with parameters to open login modal and success flag.
+       */
+      router.push('/?showLogin=true&registered=true');
     } catch (err: any) {
       setError(
         err.name === 'TypeError' || err.message === 'Failed to fetch'
@@ -131,7 +153,7 @@ export default function RegisterPage() {
                 <input
                   type="file"
                   id="avatar-upload"
-                  name="avatar_photo"
+                  name="avatar"
                   className="hidden"
                   accept=".jpg,.jpeg,.png,.webp"
                   onChange={e => setFileName(e.target.files?.[0]?.name || '')}

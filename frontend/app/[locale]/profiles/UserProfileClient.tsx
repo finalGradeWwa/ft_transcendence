@@ -1,188 +1,218 @@
 'use client';
 
-import { useState } from 'react'; // DODANO: potrzebne do stanu modalu
-import dynamic from 'next/dynamic'; // DODANO: do optymalizacji
-import Link from 'next/link';
-import Image from 'next/image';
-import { useTranslations } from 'next-intl';
-import { Icon } from '@/components/icons/ui/Icon';
+/** * PL: Nowoczesny komponent profilu (7xl). Dynamicznie wyświetla dane z backendu Django i obsługuje i18n.
+ * EN: Modern profile component (7xl). Dynamically displays data from Django backend and supports i18n.
+ */
+
 import { Navigation } from '@/components/Navigation';
+import { Heading } from '@/components/Heading';
+import { Text } from '@/components/typography/Text';
+import { Link } from '@/i18n/navigation';
+import { useTranslations } from 'next-intl';
+import Image from 'next/image';
 
-// DODANO: Dynamiczny import (kod pobierany tylko po kliknięciu w nawigacji)
-const LoginModal = dynamic(() => import('@/components/LoginModal'), {
-  ssr: false,
-});
+interface UserProfileProps {
+  user: {
+    username: string;
+    email: string;
+    joined: string;
+    gardens: number;
+    plants: number;
+    avatar: string;
+  } | null;
+}
 
-// --- TYPY / TYPES ---
-type UserPlant = {
-  id: number;
-  genus: string;
-  species: string;
-  imageUrl: string;
+/** * PL: Pomocnicze funkcje formatowania.
+ * EN: Helper formatting functions.
+ */
+const getAvatarUrl = (path?: string) => {
+  if (!path) return '/images/favicon/fav_480.webp';
+  return path.startsWith('http') ? path : `http://localhost:8000${path}`;
 };
 
-type UserData = {
-  username: string;
-  avatarUrl: string;
-  plantsCount: number;
-  friendsCount: number;
+const formatDate = (dateString?: string) => {
+  if (!dateString) return '';
+  try {
+    return new Date(dateString).toISOString().split('T')[0];
+  } catch {
+    return dateString;
+  }
 };
 
-// --- DANE TESTOWE / MOCK DATA ---
-const MOCK_USER_PLANTS: UserPlant[] = [
-  {
-    id: 1,
-    genus: 'Monstera',
-    species: 'Deliciosa',
-    imageUrl: '/images/temp/plant_1.jpg',
-  },
-  {
-    id: 2,
-    genus: 'Ficus',
-    species: 'Lyrata',
-    imageUrl: '/images/temp/plant_2.jpg',
-  },
-  {
-    id: 3,
-    genus: 'Sansevieria',
-    species: 'Trifasciata',
-    imageUrl: '/images/temp/plant_3.jpg',
-  },
-  {
-    id: 4,
-    genus: 'Aloe',
-    species: 'Vera',
-    imageUrl: '/images/temp/plant_4.jpg',
-  },
-];
-
-const getMockUserData = (username: string): UserData => ({
-  username,
-  avatarUrl: '/images/temp/avatar_placeholder.jpg',
-  plantsCount: 24,
-  friendsCount: 152,
-});
-
-// --- KOMPONENTY POMOCNICZE ---
-const UserStat = ({
-  iconName,
-  label,
-  value,
-}: {
-  iconName: any;
-  label: string;
-  value: number;
-}) => (
-  <div className="flex items-center justify-center md:justify-start gap-3 text-lg text-neutral-900">
-    <Icon name={iconName} className="text-primary-green" size={20} />
-    <span>
-      {label}: <strong>{value}</strong>
-    </span>
-  </div>
-);
-
-const ProfileHeader = ({ t, userData }: { t: any; userData: UserData }) => (
-  <section className="bg-secondary-beige/95 rounded-2xl p-6 shadow-xl border border-primary-green mb-10 backdrop-blur-sm">
-    <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
-      <div className="relative w-32 h-32 md:w-40 md:h-40 shrink-0">
-        <div className="w-full h-full rounded-full border-4 border-primary-green overflow-hidden relative shadow-lg bg-secondary-beige flex items-center justify-center text-primary-green">
-          <Icon name="user" size={64} aria-hidden="true" />
-        </div>
-      </div>
-      <div className="flex flex-col space-y-4 text-center md:text-start pt-2">
-        <h2 className="text-3xl font-bold text-neutral-900 italic">
-          {userData.username}
-        </h2>
-        <div className="flex flex-col space-y-2">
-          <UserStat
-            iconName="leaf"
-            label={t('plantsCount')}
-            value={userData.plantsCount}
-          />
-          <UserStat
-            iconName="people"
-            label={t('friendsCount')}
-            value={userData.friendsCount}
-          />
-        </div>
-        <button className="mt-2 bg-primary-green hover:bg-green-700 text-white font-bold py-2 px-6 rounded-lg self-center md:self-start transition shadow-md active:scale-95">
-          {t('editProfile')}
-        </button>
-      </div>
-    </div>
-  </section>
-);
-
-const PlantsGallery = ({
+/** * PL: Sub-komponent sekcji danych osobowych.
+ * EN: Personal data sub-component.
+ */
+const PersonalInfo = ({
+  user,
   t,
-  userPlants,
 }: {
+  user: UserProfileProps['user'];
   t: any;
-  userPlants: UserPlant[];
-}) => (
-  <section className="pb-20">
-    <h3 className="text-2xl md:text-3xl font-bold mb-8 text-white-text flex items-center gap-3 drop-shadow-md">
-      <Icon name="leaf" size={28} /> {t('userPlantsTitle')}
-    </h3>
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 text-neutral-900">
-      {userPlants.map((plant, index) => (
-        <Link key={plant.id} href={`/plants/${plant.id}`} className="group">
-          <article className="bg-secondary-beige/95 p-4 rounded-xl shadow-lg border border-subtle-gray transition transform group-hover:scale-[1.03] duration-300 h-full backdrop-blur-sm">
-            <div className="relative w-full h-48 mb-4 overflow-hidden rounded-lg">
-              <Image
-                src={plant.imageUrl}
-                alt={plant.species}
-                fill
-                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                priority={index < 4}
-                className="object-cover transition transform group-hover:scale-110 duration-500"
-                decoding="async"
-              />
-            </div>
-            <p className="text-sm text-amber-900 font-bold uppercase tracking-wider">
-              {plant.genus}
-            </p>
-            <h4 className="text-xl font-bold text-primary-green italic uppercase">
-              {plant.species}
-            </h4>
-          </article>
-        </Link>
-      ))}
-    </div>
-  </section>
-);
-
-// --- GŁÓWNY KOMPONENT ---
-export const UserProfileClient = ({
-  dynamicUsername,
-}: {
-  dynamicUsername: string;
 }) => {
-  const t = useTranslations('ProfilePage');
-  const tHome = useTranslations('HomePage'); // Potrzebne dla przycisku login w nawigacji
-  const userData = getMockUserData(dynamicUsername);
-
-  // DODANO: Obsługa stanu modalu
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  if (!user) {
+    return (
+      <div className="lg:col-span-2 flex flex-col md:flex-row items-center md:items-start gap-8 md:gap-12 p-6 sm:p-10 bg-header-main/50 rounded-xl shadow-md border border-subtle-gray/30 overflow-hidden">
+        <div className="w-40 h-40 sm:w-48 sm:h-48 rounded-full bg-neutral-200 animate-pulse shrink-0" />
+        <div className="flex-grow space-y-6 w-full">
+          <div className="h-10 bg-neutral-200 animate-pulse rounded-md w-3/4 mx-auto md:mx-0" />
+          <div className="space-y-4">
+            <div className="h-6 bg-neutral-200 animate-pulse rounded-md w-1/2 mx-auto md:mx-0" />
+            <div className="h-6 bg-neutral-200 animate-pulse rounded-md w-1/3 mx-auto md:mx-0" />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div
-      className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8"
-      {...(isLoginModalOpen ? { 'aria-hidden': true, inert: true } : {})}
-    >
-      <Navigation onLoginClick={() => setIsLoginModalOpen(true)} />
-
-      <main className="py-8">
-        <ProfileHeader t={t} userData={userData} />
-        <PlantsGallery t={t} userPlants={MOCK_USER_PLANTS} />
-      </main>
-
-      {/* DODANO: Modal logowania */}
-      <LoginModal
-        isVisible={isLoginModalOpen}
-        onClose={() => setIsLoginModalOpen(false)}
-        t={tHome}
-      />
+    <div className="lg:col-span-2 flex flex-col md:flex-row items-center md:items-start gap-8 md:gap-12 p-6 sm:p-10 bg-container-light/70 rounded-xl shadow-md border border-subtle-gray/30 overflow-hidden">
+      <div className="relative w-40 h-40 sm:w-48 sm:h-48 overflow-hidden rounded-full border-4 border-secondary-beige shadow-lg flex-shrink-0">
+        <Image
+          src={getAvatarUrl(user.avatar)}
+          alt={t('aria.avatarAlt', { name: user.username })}
+          fill
+          className="object-cover"
+          priority
+        />
+      </div>
+      <div className="flex-grow space-y-6 text-center md:text-left min-w-0 w-full">
+        <Heading
+          as="h1"
+          className="text-3xl sm:text-4xl font-black !text-primary-green uppercase tracking-tight break-words whitespace-normal block"
+        >
+          {user.username}
+        </Heading>
+        <div className="space-y-4 text-neutral-900 w-full">
+          <div className="flex items-center justify-center md:justify-start gap-4 min-w-0">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 640 640"
+              className="w-6 h-6 sm:w-7 sm:h-7 fill-primary-green shrink-0"
+              aria-hidden="true"
+            >
+              <path d="M112 128C85.5 128 64 149.5 64 176C64 191.1 71.1 205.3 83.2 214.4L291.2 370.4C308.3 383.2 331.7 383.2 348.8 370.4L556.8 214.4C568.9 205.3 576 191.1 576 176C576 149.5 554.5 128 528 128L112 128zM64 260L64 448C64 483.3 92.7 512 128 512L512 512C547.3 512 576 483.3 576 448L576 260L377.6 408.8C343.5 434.4 296.5 434.4 262.4 408.8L64 260z" />
+            </svg>
+            <Text className="text-base sm:text-lg font-medium break-all whitespace-normal">
+              {user.email}
+            </Text>
+          </div>
+          <div className="flex items-center justify-center md:justify-start gap-4">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 512 512"
+              className="w-6 h-6 sm:w-7 sm:h-7 fill-primary-green shrink-0"
+              aria-hidden="true"
+            >
+              <path d="M256 0a256 256 0 1 1 0 512A256 256 0 1 1 256 0zM232 120V256c0 8 4 15.5 10.7 20l96 64c11 7.4 25.9 4.4 33.3-6.7s4.4-25.9-6.7-33.3L280 243.2V120c0-13.3-10.7-24-24-24s-24 10.7-24 24z" />
+            </svg>
+            <Text className="text-base sm:text-lg font-medium">
+              <span className="sr-only">{t('joinedLabel')}: </span>
+              {formatDate(user.joined)}
+            </Text>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
+
+/** * PL: Sub-komponent statystyk.
+ * EN: Statistics sub-component.
+ */
+const StatCard = ({
+  count,
+  label,
+  href,
+  aria,
+  isLoading,
+}: {
+  count?: number;
+  label: string;
+  href: string;
+  aria: string;
+  isLoading: boolean;
+}) => (
+  <Link href={href} className="group flex-1" aria-label={aria}>
+    <div className="h-full bg-container-light/90 p-6 rounded-xl flex flex-col justify-center items-center text-center shadow-sm border border-subtle-gray/30 transition-all duration-300 group-hover:bg-white group-hover:border-primary-green group-hover:shadow-md">
+      {isLoading ? (
+        <div className="h-12 w-16 bg-neutral-200 animate-pulse rounded-md" />
+      ) : (
+        <span className="block text-4xl sm:text-5xl font-black text-primary-green leading-none">
+          {count}
+        </span>
+      )}
+      <span className="uppercase font-black text-sm sm:text-base mt-2 tracking-[0.2em] text-neutral-700 break-words whitespace-normal px-2">
+        {label}
+      </span>
+    </div>
+  </Link>
+);
+
+/** * PL: Główny komponent klienta.
+ * EN: Main client component.
+ */
+export default function UserProfileClient({ user }: UserProfileProps) {
+  const t = useTranslations('ProfilePage');
+
+  return (
+    <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8">
+      <Navigation />
+      <main className="py-12 flex justify-center">
+        <div className="bg-container-light/10 backdrop-blur-md p-6 sm:p-10 rounded-xl shadow-2xl w-full border border-primary-green/50">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <PersonalInfo user={user} t={t} />
+
+            <div className="flex flex-col gap-4">
+              <StatCard
+                count={user?.gardens}
+                label={t('stats.gardens')}
+                href="/my-gardens"
+                aria={t('aria.gardensLink')}
+                isLoading={!user}
+              />
+              <StatCard
+                count={user?.plants}
+                label={t('stats.plants')}
+                href="/my-plants"
+                aria={t('aria.plantsLink')}
+                isLoading={!user}
+              />
+            </div>
+          </div>
+
+          <div className="mt-8 pt-8 border-t border-white/20">
+            <Heading
+              as="h3"
+              className="text-xl font-black !text-white uppercase mb-6 tracking-widest drop-shadow-sm break-words whitespace-normal"
+            >
+              {t('settings.title')}
+            </Heading>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {[
+                { key: 'edit', href: '/profile/edit' },
+                { key: 'notifications', href: '/profile/notifications' },
+                { key: 'privacy', href: '/profile/privacy' },
+              ].map(({ key, href }) => (
+                <Link
+                  key={key}
+                  href={href}
+                  className="group block p-6 sm:p-8 bg-container-light/90 rounded-xl border border-transparent shadow-sm transition-all duration-300 hover:bg-white hover:border-primary-green hover:shadow-md overflow-hidden"
+                >
+                  <Text className="font-black text-primary-green uppercase text-base sm:text-lg tracking-wider mb-3 break-words whitespace-normal">
+                    {t(`settings.${key}.label`)}
+                  </Text>
+                  <Text
+                    variant="small"
+                    className="text-neutral-700 font-medium leading-relaxed break-words whitespace-normal"
+                  >
+                    {t(`settings.${key}.desc`)}
+                  </Text>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  );
+}

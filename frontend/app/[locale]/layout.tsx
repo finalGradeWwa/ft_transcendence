@@ -1,10 +1,17 @@
 import '@/app/globals.css';
+import { Inter } from 'next/font/google';
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, getTranslations } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/navigation';
 import { Background } from '@/components/Background';
 import { Footer } from '@/components/Footer';
+
+const inter = Inter({
+  subsets: ['latin', 'latin-ext'],
+  display: 'swap',
+  variable: '--font-inter',
+});
 
 export async function generateMetadata({
   params,
@@ -20,10 +27,6 @@ export async function generateMetadata({
   };
 }
 
-/**
- * PL: Główny układ strony z obsługą lokalizacji (i18n).
- * * EN: Main layout component with internationalization (i18n) support.
- */
 export default async function LocaleLayout({
   children,
   params,
@@ -41,12 +44,18 @@ export default async function LocaleLayout({
   const direction = locale === 'ar' ? 'rtl' : 'ltr';
 
   return (
-    <html lang={locale} dir={direction} data-scroll-behavior="smooth">
+    <html
+      lang={locale}
+      dir={direction}
+      className={`${inter.variable} scroll-smooth`}
+    >
       <body className="antialiased font-sans">
         <NextIntlClientProvider messages={messages} locale={locale}>
           <Background>
             <div className="flex flex-col min-h-screen">
-              <main className="flex-grow">{children}</main>
+              <main className="flex-grow" id="main-content">
+                {children}
+              </main>
               <Footer />
             </div>
           </Background>

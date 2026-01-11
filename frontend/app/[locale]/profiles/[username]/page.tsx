@@ -10,7 +10,7 @@
  * konkretnego użytkownika.
  */
 
-import { UserProfileClient } from '../UserProfileClient';
+import UserProfileClient from '../UserProfileClient';
 import { Background } from '@/components/Background';
 
 export default async function ProfilePage({
@@ -20,9 +20,22 @@ export default async function ProfilePage({
 }) {
   const { username } = await params;
 
+  /**
+   * PL: Obiekt danych użytkownika (uchwyty dla backendu).
+   * EN: User data object (backend handles).
+   */
+  const mockUser = {
+    username: username,
+    email: `${username}@example.com`,
+    joined: '2024-05-20',
+    gardens: 0,
+    plants: 0,
+    avatar: '',
+  };
+
   return (
     <Background>
-      <UserProfileClient dynamicUsername={username} />
+      <UserProfileClient user={mockUser} />
     </Background>
   );
 }

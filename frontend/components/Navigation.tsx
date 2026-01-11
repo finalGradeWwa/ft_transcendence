@@ -1,31 +1,37 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react'; // Dodano useEffect, Suspense
+import { useState, useEffect, Suspense } from 'react';
+import dynamic from 'next/dynamic';
 import { Link } from '@/i18n/navigation';
 import { useTranslations } from 'next-intl';
-import { useSearchParams } from 'next/navigation'; // Dodano useSearchParams
-// Importujemy Twój komponent Icon
+import { useSearchParams } from 'next/navigation';
 import { Icon } from '@/components/icons/ui/Icon';
 import Image from 'next/image';
-import { HeaderControls } from './HeaderControls';
+
+const HeaderControls = dynamic(
+  () => import('./HeaderControls').then(mod => mod.HeaderControls),
+  { ssr: true }
+);
 
 const Logo = ({ title }: { title: string }) => {
   const t = useTranslations('HomePage');
+  const navItems = t.raw('nav');
   return (
     <Link
       href="/"
-      className="flex items-center gap-x-6"
-      aria-label={`${title} - ${t('aria.homePageLink')}`}
+      className="flex flex-col min-[320px]:flex-row items-center gap-y-4 min-[320px]:gap-y-0 min-[320px]:gap-x-6 rounded-lg focus-visible:ring-2 focus-visible:ring-header-main focus-visible:ring-offset-2 focus-visible:ring-offset-black outline-none border border-transparent"
+      aria-label={navItems[0]}
     >
-      <h1 className="text-3xl md:text-4xl font-bold text-header-main">
+      <h1 className="text-3xl md:text-4xl font-bold text-header-main text-center min-[320px]:text-left">
         {title}
       </h1>
-      <div className="relative w-16 h-16">
+      <div className="relative w-16 h-16 shrink-0">
         <Image
           src="/images/favicon/fav_480.webp"
           alt=""
           fill
           sizes="64px"
+          priority
           className="rounded-full object-cover border border-primary-green"
         />
       </div>
@@ -42,7 +48,7 @@ const NavList = ({ items }: { items: string[] }) => {
         <li key={item} className="my-1">
           <Link
             href={paths[index]}
-            className="inline-block text-white hover:text-primary-green hover:bg-secondary-beige/90 font-medium px-4 py-2 rounded-lg transition-all duration-300 focus-visible:ring-2 focus-visible:ring-primary-green outline-none"
+            className="inline-block text-white hover:text-primary-green hover:bg-secondary-beige/90 focus-visible:bg-secondary-beige/90 focus-visible:text-primary-green font-medium px-4 py-2 rounded-lg transition-all duration-300 focus-visible:ring-2 focus-visible:ring-header-main focus-visible:ring-offset-2 focus-visible:ring-offset-black outline-none border border-transparent hover:border-primary-green"
           >
             {item}
           </Link>
@@ -64,7 +70,7 @@ const MenuToggle = ({
     <div className="flex justify-center mt-4 md:hidden">
       <button
         onClick={onClick}
-        className="text-white p-2 focus-visible:ring-2 focus-visible:ring-primary-green outline-none"
+        className="text-white p-2 rounded-lg focus-visible:ring-2 focus-visible:ring-header-main focus-visible:ring-offset-2 focus-visible:ring-offset-black outline-none border border-transparent hover:border-primary-green transition-colors"
         aria-expanded={isOpen}
         aria-controls="mobile-navigation"
         aria-label={isOpen ? t('aria.closeMenu') : t('aria.openMenu')}
@@ -93,7 +99,6 @@ const MobileMenu = ({ items }: { items: string[] }) => {
       <nav
         id="mobile-navigation"
         className={`${baseClass} ${stateClass}`}
-        // Usunięto inert i aria-hidden, które blokowały linki na desktopie
         aria-label={t('aria.mainNavigation')}
       >
         <NavList items={items} />
@@ -102,10 +107,6 @@ const MobileMenu = ({ items }: { items: string[] }) => {
   );
 };
 
-/**
- * PL: Komponent pomocniczy do obsługi parametrów URL (wymagany Suspense w Next.js).
- * EN: Helper component to handle URL parameters (requires Suspense in Next.js).
- */
 const AuthTrigger = ({ onLoginClick }: { onLoginClick?: () => void }) => {
   const searchParams = useSearchParams();
 
@@ -125,24 +126,17 @@ export const Navigation = (props: {
 }) => {
   const t = useTranslations('HomePage');
 
-  const Brand = <Logo title={t('title')} />;
-  const Actions = <HeaderControls {...props} />;
-  const Menu = <MobileMenu items={t.raw('nav')} />;
-
   return (
-    <header className="py-6 border-b border-subtle-gray" role="banner">
-      {/** * PL: Sprawdzanie czy w URL jest parametr showLogin=true po rejestracji.
-       * EN: Checking if URL has showLogin=true parameter after registration.
-       */}
+    <header className="py-6 border-b border-subtle-gray">
       <Suspense fallback={null}>
         <AuthTrigger onLoginClick={props.onLoginClick} />
       </Suspense>
 
       <div className="flex flex-col md:flex-row justify-between items-center space-y-10 md:space-y-0 md:gap-8">
-        {Brand}
-        {Actions}
+        <Logo title={t('title')} />
+        <HeaderControls {...props} />
       </div>
-      {Menu}
+      <MobileMenu items={t.raw('nav')} />
     </header>
   );
 };
