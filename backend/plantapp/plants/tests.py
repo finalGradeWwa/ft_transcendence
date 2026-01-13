@@ -1,93 +1,72 @@
-from django.test import TestCase
-from django.core.exceptions import ValidationError
-from django.utils import timezone
-from .models import Plant, SoilType, LightType
 from django.contrib.auth import get_user_model
+from django.urls import reverse
+from rest_framework import status
+from rest_framework.test import APITestCase
 
-User = get_user_model()
+from gardens.models import Garden, GardenUser
+from .models import Plant
 
-# Create your tests here.
 
-class PlantModelTests(TestCase):
-
+class PlantAPITests(APITestCase):
     def setUp(self):
-        self.user = User.objects.create_user(
-            email="alice@a.com",
-            username="alice",
+        self.user = get_user_model().objects.create_user(
+            email="user@example.com",
+            username="user",
             password="password123",
-		)
-    def test_create_plant_successfully(self):
+        )
+        self.other_user = get_user_model().objects.create_user(
+            email="other@example.com",
+            username="other",
+            password="password123",
+        )
 
-        plant = Plant.objects.create(
+        self.garden = Garden.objects.create(
+            name="My Garden",
+            garden_name="My Garden",
+            slug="my-garden",
+        )
+        GardenUser.objects.create(organization=self.garden, user=self.user)
+
+        self.plant = Plant.objects.create(
             owner=self.user,
-            nickname="Test Plant",
-            soil_type_used=SoilType.LOAM,
-            current_ph=6.5,
-            current_temp_c=21,
-            current_moisture=50,
-            current_humidity=55,
-            current_light=LightType.MEDIUM_LIGHT,
+            garden=self.garden,
+            nickname="Fern",
+            species="Fern",
         )
 
-        self.assertEqual(plant.nickname, "Test Plant")
-        self.assertEqual(plant.soil_type_used, SoilType.LOAM)
-   
-   
-    def test_defaults_are_set(self):
+    def test_get_requires_authentication(self):
+        url = reverse("get-plant", args=[self.plant.pk])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-        plant = Plant.objects.create(
-            owner=self.user,
-            nickname="Lazy Plant",
-            current_ph=7.0,
-            current_temp_c=20,
-            current_moisture=40,
-            current_humidity=45,
-        )
+    def test_get_returns_owned_plant(self):
+        url = reverse("get-plant", args=[self.plant.pk])
+        self.client.force_authenticate(self.user)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data.get("plant_id"), self.plant.plant_id)
+        self.assertEqual(response.data.get("nickname"), self.plant.nickname)
 
-        self.assertEqual(plant.soil_type_used, SoilType.DEFAULT)
-        self.assertEqual(plant.current_light, LightType.MEDIUM_LIGHT)
-        self.assertIsNotNone(plant.created_at)
-   
-   
-    def test_invalid_soil_type_rejected(self):
-        plant = Plant(
-            owner=self.user,
-            nickname="Rebel Plant",
-            soil_type_used="XX",
-            current_ph=6.0,
-            current_temp_c=22,
-            current_moisture=60,
-            current_humidity=65,
-        )
+    def test_get_returns_404_for_non_member(self):
+        url = reverse("get-plant", args=[self.plant.pk])
+        self.client.force_authenticate(self.other_user)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-        with self.assertRaises(ValidationError):
-            plant.full_clean()
-    def test_ph_out_of_range_fails(self):
-        plant = Plant(
-            owner=self.user,
-            nickname="Acid Lord",
-            current_ph=20,
-            current_temp_c=25,
-            current_moisture=50,
-            current_humidity=50,
-        )
+    def test_create_plant_succeeds_for_authenticated_user(self):
+        url = reverse("create-plant")
+        self.client.force_authenticate(self.user)
+        payload = {
+            "nickname": "NewFern",
+            "species": "Fern",
+        }
+        response = self.client.post(url, payload)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertTrue(Plant.objects.filter(nickname="NewFern").exists())
 
-        with self.assertRaises(ValidationError):
-            plant.full_clean()
-   
-   
-    def test_created_at_is_recent(self):
-        plant = Plant.objects.create(
-            owner=self.user,
-            nickname="Time Plant",
-            current_ph=6.8,
-            current_temp_c=23,
-            current_moisture=55,
-            current_humidity=60,
-        )
-
-        self.assertLess(
-            (timezone.now() - plant.created_at).total_seconds(),
-            5
-        )
-
+    def test_delete_removes_owned_plant(self):
+        url = reverse("get-plant", args=[self.plant.pk])
+        self.client.force_authenticate(self.user)
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(Plant.objects.filter(pk=self.plant.pk).exists())
