@@ -18,7 +18,7 @@ import { Button } from '@/components/Button';
  * EN: Login form data type.
  */
 type FormData = {
-  username: string;
+  email: string;
   password: string;
 };
 
@@ -30,10 +30,15 @@ const loginRequest = async (data: FormData): Promise<void> => {
   const res = await fetch('http://localhost:8000/api/auth/login/', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data),
+    body: JSON.stringify({
+      email: data.email,
+      password: data.password,
+    }),
   });
 
   if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    console.warn('Logowanie odrzucone:', errorData);
     throw new Error('LOGIN_FAILED');
   }
 };
@@ -77,15 +82,17 @@ export const LoginForm = ({
 }: LoginFormProps) => {
   const router = useRouter();
 
-  /** PL: Stan danych formularza. EN: Form data state. */
   const [formData, setFormData] = useState<FormData>({
-    username: '',
+    email: '',
     password: '',
   });
 
-  /** PL: Stan błędów i ładowania. EN: Error and loading states. */
+  /** PL:
+   * Stan błędów i ładowania.
+   * EN: Error and loading states. */
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   /**
    * PL: Obsługa wysyłania formularza.
@@ -117,10 +124,9 @@ export const LoginForm = ({
   };
 
   return (
-    <form className="space-y-4" onSubmit={handleSubmit}>
-      {/* PL: Wyświetlanie błędu z ikoną systemową. EN: Displaying error with system icon. */}
+    <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
       {error && (
-        <div className="mb-4 p-2 text-sm font-bold text-red-700 bg-white border-2 border-red-600 rounded flex items-center gap-2">
+        <div className="p-2 text-sm font-bold text-red-700 bg-white border-2 border-red-600 rounded flex items-center gap-2">
           <Icon name="close" size={16} />
           {error}
         </div>
@@ -128,27 +134,76 @@ export const LoginForm = ({
 
       <Input
         ref={usernameRef}
-        label={t('nick')}
-        name="username"
-        id="login-username"
+        label={t('email') || 'E-mail'}
+        name="email"
+        type="email"
+        id="login-email"
         required
-        value={formData.username}
+        value={formData.email}
         onChange={update}
         disabled={isLoading}
       />
 
-      <Input
-        label={t('password')}
-        type="password"
-        name="password"
-        id="login-password"
-        required
-        value={formData.password}
-        onChange={update}
-        disabled={isLoading}
-      />
+      <div className="relative flex flex-col gap-1">
+        <Input
+          label={t('password')}
+          type={showPassword ? 'text' : 'password'}
+          name="password"
+          id="login-password"
+          required
+          value={formData.password}
+          onChange={update}
+          disabled={isLoading}
+        />
+        <button
+          type="button"
+          onClick={() => setShowPassword(!showPassword)}
+          className="absolute right-3 top-9 z-10 text-primary-green hover:text-green-700 transition-colors"
+        >
+          {showPassword ? (
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="w-5 h-5"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88"
+              />
+            </svg>
+          ) : (
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="w-5 h-5"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
+              />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+              />
+            </svg>
+          )}
+        </button>
+      </div>
 
-      <Button type="submit" isLoading={isLoading}>
+      <Button
+        type="submit"
+        isLoading={isLoading}
+        className="w-full py-4 uppercase font-bold text-lg tracking-widest shadow-lg focus-visible:outline-2 focus-visible:outline-black focus-visible:outline-offset-[3px]"
+      >
         {t('loginBtn')}
       </Button>
     </form>

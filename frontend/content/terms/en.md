@@ -1,7 +1,7 @@
 # Terms of Service
 
 ## I. Definitions
-1. **Service Provider** – John Weeder, located in Warsaw (00-234), Polna 7 Str., NIP: 111-111-11-11.
+1. **Service Provider** – John Weeder, located in Warsaw (00-234), Polna 7 Str., VAT ID: 111-111-11-11.
 2. **User** – Any individual using the Service.
 3. **Account** – A personalized space in the Service secured by a login and password.
 4. **Content** – Photos, plant descriptions, comments, and messages posted by the User.

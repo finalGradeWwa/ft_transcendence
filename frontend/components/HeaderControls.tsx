@@ -1,7 +1,7 @@
 'use client';
 
 import { useLocale } from 'next-intl';
-import { useRouter, usePathname } from '@/i18n/navigation';
+import { useRouter, usePathname, Link } from '@/i18n/navigation';
 import { Icon } from '@/components/icons/ui/Icon';
 
 interface HeaderControlsProps {
@@ -13,20 +13,42 @@ const IconButton = ({
   onClick,
   iconName,
   ariaLabel,
+  href,
 }: {
   onClick?: () => void;
   iconName: 'search' | 'plus' | 'user';
   ariaLabel: string;
-}) => (
-  <button
-    type="button"
-    onClick={onClick}
-    className="p-2 rounded-full bg-secondary-beige text-neutral-900 hover:text-primary-green shadow-md transition-all focus-visible:ring-2 focus-visible:ring-[#ffffff] focus-visible:ring-offset-2 focus-visible:ring-offset-black outline-none shrink-0"
-    aria-label={ariaLabel}
-  >
-    <Icon name={iconName} size={18} aria-hidden="true" />
-  </button>
-);
+  href?: string;
+}) => {
+  const content = <Icon name={iconName} size={18} aria-hidden="true" />;
+
+  const className =
+    'p-2 rounded-full bg-secondary-beige text-neutral-900 hover:text-primary-green shadow-md transition-all focus-visible:ring-2 focus-visible:ring-[#ffffff] focus-visible:ring-offset-2 focus-visible:ring-offset-black outline-none shrink-0 flex items-center justify-center';
+
+  if (href) {
+    return (
+      <Link
+        href={href}
+        className={className}
+        aria-label={ariaLabel}
+        scroll={false}
+      >
+        {content}
+      </Link>
+    );
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={className}
+      aria-label={ariaLabel}
+    >
+      {content}
+    </button>
+  );
+};
 
 const languageOptions = [
   { value: 'pl', label: 'Polski' },
@@ -77,7 +99,7 @@ export function HeaderControls({
         />
         <IconButton iconName="plus" ariaLabel="Dodaj nową roślinę" />
         <IconButton
-          onClick={onLoginClick}
+          href={`${pathname}?showLogin=true`}
           iconName="user"
           ariaLabel="Profil użytkownika"
         />

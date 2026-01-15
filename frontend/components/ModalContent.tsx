@@ -14,10 +14,15 @@ import { ModalFooter } from './ModalFooter';
 import { Heading } from '@/components/Heading';
 import { Text } from '@/components/typography/Text';
 
-export const ModalContent = ({ t, tError, onClose, usernameRef }: any) => {
+export const ModalContent = ({
+  t,
+  tError,
+  onClose,
+  usernameRef,
+  isRegistered,
+}: any) => {
   /** PL: Pobranie parametrów z adresu URL. EN: Fetching parameters from URL. */
   const searchParams = useSearchParams();
-  const isRegistered = searchParams.get('registered') === 'true';
 
   return (
     <div
@@ -40,10 +45,9 @@ export const ModalContent = ({ t, tError, onClose, usernameRef }: any) => {
        * EN: Message displayed only after successful registration.
        */}
       {isRegistered && (
-        <div className="mb-6 p-3 bg-green-50 border border-green-500 rounded-lg animate-in fade-in slide-in-from-top-2 duration-500">
+        <div className="mb-6 p-3 bg-green-50 border border-green-500 rounded-lg">
           <Text className="text-green-800 font-bold text-sm text-center">
-            {t('successRegistrationInfo') ||
-              'Konto utworzone! Zaloguj się poniżej.'}
+            TEST: REJESTRACJA OK
           </Text>
         </div>
       )}

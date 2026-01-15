@@ -1,7 +1,7 @@
 # Datenschutzerklärung
 
 ## I. Verantwortlicher
-Verantwortlich für die Erhebung und Verarbeitung personenbezogener Daten über diesen Dienst ist John Weeder, ul. Polna 7, 00-234 Warschau, Polen, NIP: 111-111-11-11, E-Mail: j.weeder@example.com. In Fragen des Datenschutzes können sich Nutzer unter der oben genannten E-Mail-Adresse an den Verantwortlichen wenden.
+Verantwortlich für die Erhebung und Verarbeitung personenbezogener Daten über diesen Dienst ist John Weeder, ul. Polna 7, 00-234 Warschau, Polen, USt-IdNr.: 111-111-11-11, E-Mail: j.weeder@example.com. In Fragen des Datenschutzes können sich Nutzer unter der oben genannten E-Mail-Adresse an den Verantwortlichen wenden.
 
 ## II. Art und Zweck der Datenverarbeitung
 Die Datenverarbeitung erfolgt zur Erbringung von Dienstleistungen im Zusammenhang mit botanischen Interessen:

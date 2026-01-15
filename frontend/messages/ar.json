@@ -1,96 +1,112 @@
 {
-	"HomePage": {
-		"title": "بوابة النباتات",
-		"description": "قاعدة معرفتك الشاملة ومعرضك للنباتات.",
-		"recommended": "موصى به:",
-		"search": "بحث عن النباتات...",
-		"login": "تسجيل الدخول",
-		"successRegistrationInfo": "تم إنشاء الحساب بنجاح! يمكنك تسجيل الدخول الآن.",
-		"nick": "الاسم:",
-		"password": "كلمة المرور:",
-		"loginBtn": "دخول",
-		"cancel": "إلغاء",
-		"noAccount": "ليس لديك حساب؟",
-		"register": "سجل الآن!",
-		"author": "المؤلف:",
-		"rating": "التقييم:",
-		"showMore": "عرض المزيد من النباتات",
-		"nav": ["الصفحة الرئيسية", "معرض الصور", "من نحن", "الشروط", "اتصل بنا"],
-		"searchPlaceholder": "البحث نشط",
-		"searchInfo": "ستكون منطق البحث الكامل هنا.",
-		"rights": "جميع الحقوق محفوظة.",
-		"privacy": "سياسة الخصوصية",
-		"terms": "الشروط",
-		"aria": {
-			"close": "إغلاق",
-			"homePageLink": "الصفحة الرئيسية",
-			"openMenu": "افتح القائمة",
-			"closeMenu": "أغلق القائمة",
-			"mainNavigation": "التنقل الرئيسي",
-			"footerNavigation": "تنقل التذييل",
-			"selectLanguage": "اختر اللغة",
-			"searchBtn": "بحث",
-			"add": "أضف نباتاً جديداً",
-			"profile": "ملف المستخدم",
-			"userTools": "أدوات المستخدم"
-		}
-	},
-	"ProfilePage": {
-		"title": "ملف المستخدم",
-		"joinedLabel": "انضم في",
-		"userPlantsTitle": "مجموعة نباتاتك",
-		"stats": {
-			"gardens": "الحدائق",
-			"plants": "النباتات"
-		},
-		"settings": {
-			"title": "الإعدادات",
-			"edit": {
-				"label": "تعديل الملف الشخصي",
-				"desc": "قم بتغيير معلوماتك الشخصية وصورة ملفك الشخصي."
-			},
-			"notifications": {
-				"label": "الإشعارات",
-				"desc": "خصص الإشعارات التي ترغب في تلقيها."
-			},
-			"privacy": {
-				"label": "الخصوصية",
-				"desc": "إدارة ظهور حدائقك للآخرين."
-			}
-		},
-		"aria": {
-			"avatarAlt": "صورة الملف الشخصي لـ {name}",
-			"gardensLink": "انتقل إلى حدائقي",
-			"plantsLink": "انتقل إلى نباتاتي"
-		}
-	},
-	"RegisterPage": {
-		"title": "إنشاء حساب",
-		"firstName": "الاسم الأول",
-		"lastName": "اسم العائلة",
-		"nick": "اسم المستخدم",
-		"avatar": "الصورة الشخصية",
-		"email": "البريد الإلكتروني",
-		"chooseFile": "اختر ملفًا",
-		"noFileSelected": "لم يتم اختيار ملف",
-		"password": "كلمة المرور",
-		"passwordRequirements": "٨ أحرف على الأقل (حرف كبير، حرف صغير، رقم، رمز خاص).",
-		"confirmPassword": "تأكيد كلمة المرور",
-		"acceptTerms": "أوافق على",
-		"termsLink": "الشروط والأحكام",
-		"registerBtn": "تسجيل",
-		"alreadyHaveAccount": "هل لديك حساب بالفعل؟",
-		"errorPasswordMatch": "كلمات المرور غير متطابقة",
-		"errorRegistrationFailed": "فشل التسجيل. يرجى المحاولة مرة أخرى.",
-		"successMessage": "تم إنشاء الحساب بنجاح!",
-		"serverError": "خطأ في الاتصال بالخادم. يرجى المحاولة مرة أخرى لاحقاً.",
-		"showPassword": "عرض كلمة المرور",
-		"hidePassword": "إخفاء كلمة المرور",
-		"avatarRequirements": "التنسيقات المسموح بها: JPG، JPEG، PNG, WEBP.",
-		"errorInvalidFormat": "تنسيق ملف غير صالح. يرجى اختيار JPG أو PNG أو WebP."
-	},
-	"errors": {
-		"connectionError": "خطأ w الاتصال. حاول مرة أخرى لاحقًا.",
-		"invalidCredentials": "اسم المستخدم أو كلمة المرور غير صالحة."
-	}
+  "HomePage": {
+    "title": "بوابة النباتات",
+    "description": "قاعدة معرفتك الشاملة ومعرضك للنباتات.",
+    "recommended": "موصى به:",
+    "search": "بحث عن النباتات...",
+    "login": "تسجيل الدخول",
+    "email": "البريد الإلكتروني",
+    "nick": "الاسم:",
+    "password": "كلمة المرور:",
+    "loginBtn": "دخول",
+    "cancel": "إلغاء",
+    "noAccount": "ليس لديك حساب؟",
+    "register": "سجل الآن!",
+    "author": "المؤلف:",
+    "rating": "التقييم:",
+    "showMore": "عرض المزيد من النباتات",
+    "nav": ["الصفحة الرئيسية", "معرض الصور", "من نحن", "الشروط", "اتصل بنا"],
+    "searchPlaceholder": "البحث نشط",
+    "searchInfo": "ستكون منطق البحث الكامل هنا.",
+    "rights": "جميع الحقوق محفوظة.",
+    "privacy": "سياسة الخصوصية",
+    "terms": "الشروط",
+    "aria": {
+      "close": "إغلاق",
+      "homePageLink": "الصفحة الرئيسية",
+      "openMenu": "افتح القائمة",
+      "closeMenu": "أغلق القائمة",
+      "mainNavigation": "التنقل الرئيسي",
+      "skipToContent": "الانتقال إلى المحتوى الرئيسي",
+      "footerNavigation": "تنقل التذييل",
+      "selectLanguage": "اختر اللغة",
+      "searchBtn": "بحث",
+      "add": "أضف نباتاً جديداً",
+      "profile": "ملف المستخدم",
+      "userTools": "أدوات المستخدم"
+    },
+    "contact": {
+      "name": "John Weeder",
+      "nipLabel": "الرقم الضريبي",
+      "address": "شارع بولنا ٧، ٠٠-٢٣٤ وارسو، بولندا",
+      "emailTitle": "البريد الإلكتروني",
+      "emailDescription": "لديك أسئلة؟ يسعدنا الرد عليها!",
+      "officeOpen": "ساعات العمل",
+      "officeHours": "الاثنين - الجمعة 9:00 صباحًا - 5:00 مساءً"
+    }
+  },
+  "ProfilePage": {
+    "title": "ملف المستخدم",
+    "joinedLabel": "انضم في",
+    "userPlantsTitle": "مجموعة نباتاتك",
+    "stats": {
+      "gardens": "الحدائق",
+      "plants": "النباتات"
+    },
+    "settings": {
+      "title": "الإعدادات",
+      "edit": {
+        "label": "تعديل الملف الشخصي",
+        "desc": "قم بتغيير معلوماتك الشخصية وصورة ملفك الشخصي."
+      },
+      "notifications": {
+        "label": "الإشعارات",
+        "desc": "خصص الإشعارات التي ترغب في تلقيها."
+      },
+      "privacy": {
+        "label": "الخصوصية",
+        "desc": "إدارة ظهور حدائقك للآخرين."
+      }
+    },
+    "aria": {
+      "avatarAlt": "صورة الملف الشخصي لـ {name}",
+      "gardensLink": "انتقل إلى حدائقي",
+      "plantsLink": "انتقل إلى نباتاتي"
+    }
+  },
+  "RegisterPage": {
+    "title": "إنشاء حساب",
+    "firstName": "الاسم الأول",
+    "lastName": "اسم العائلة",
+    "nick": "اسم المستخدم",
+    "avatar": "الصورة الشخصية",
+    "email": "البريد الإلكتروني",
+    "chooseFile": "اختر ملفًا",
+    "noFileSelected": "لم يتم اختيار ملف",
+    "removeFile": "حذف الملف",
+    "password": "كلمة المرور",
+    "passwordRequirements": "٨ أحرف على الأقل (حرف كبير، حرف صغير، رقم، رمز خاص).",
+    "confirmPassword": "تأكيد كلمة المرور",
+    "acceptTerms": "أوافق على",
+    "termsLink": "الشروط والأحكام",
+    "registerBtn": "تسجيل",
+    "alreadyHaveAccount": "هل لديك حساب بالفعل؟",
+    "errorPasswordMatch": "كلمات المرور غير متطابقة",
+    "errorRegistrationFailed": "فشل التسجيل. يرجى المحاولة مرة أخرى.",
+    "usernameExists": "اسم المستخدم هذا مستخدم بالفعل.",
+    "emailExists": "البريد الإلكتروني هذا مستخدم بالفعل.",
+    "successMessage": "تم إنشاء الحساب بنجاح!",
+    "registrationSuccessDescription": "شكراً لتسجيلك. يمكنك الآن تسجيل الدخول إلى حسابك.",
+    "goToLogin": "الذهاب إلى تسجيل الدخول",
+    "serverError": "خطأ في الاتصال بالخادم. يرجى المحاولة مرة أخرى لاحقاً.",
+    "showPassword": "عرض كلمة المرور",
+    "hidePassword": "إخفاء كلمة المرور",
+    "avatarRequirements": "التنسيقات المسموح بها: JPG، JPEG، PNG, WEBP.",
+    "errorInvalidFormat": "تنسيق ملف غير صالح. يرجى اختيار JPG أو PNG أو WebP."
+  },
+  "errors": {
+    "connectionError": "خطأ w الاتصال. حاول مرة أخرى لاحقًا.",
+    "invalidCredentials": "اسم المستخدم أو كلمة المرور غير صالحة.",
+    "invalidImage": "يرجى تحميل صورة صالحة. الملف الذي قمت بتحميله إما أنه ليس صورة أو أنه ملف تالف."
+  }
 }

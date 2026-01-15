@@ -1,97 +1,119 @@
 {
-	"HomePage": {
-		"title": "Plant Portal",
-		"description": "Ihre ultimative Wissensdatenbank und Galerie für Pflanzen.",
-		"recommended": "EMPFOHLEN:",
-		"search": "Pflanzen suchen...",
-		"login": "Anmelden",
-		"successRegistrationInfo": "Konto erfolgreich erstellt! Sie können sich jetzt anmelden.",
-		"nick": "Benutzername:",
-		"password": "Passwort:",
-		"loginBtn": "Einloggen",
-		"cancel": "Abbrechen",
-		"noAccount": "Kein Konto?",
-		"register": "Registrieren!",
-		"author": "Autor:",
-		"rating": "Bewertung:",
-		"showMore": "Mehr Pflanzen anzeigen",
-		"nav": ["Startseite", "Galerie", "Über uns", "Nutzungsbedingungen", "Kontakt"],
-		"searchPlaceholder": "Suche ist aktiv",
-		"searchInfo": "Hier wird die vollständige Suchlogik sein.",
-		"rights": "Alle Rechte vorbehalten.",
-		"privacy": "Datenschutz",
-		"terms": "Nutzungsbedingungen",
-		"aria": {
-			"close": "Schließen",
-			"homePageLink": "Startseite",
-			"openMenu": "Menü öffnen",
-			"closeMenu": "Menü schließen",
-			"mainNavigation": "Hauptnavigation",
-			"footerNavigation": "Fußzeilen-Navigation",
-			"selectLanguage": "Sprache wählen",
-			"searchBtn": "Suche",
-			"add": "Neue Pflanze hinzufügen",
-			"profile": "Benutzerprofil",
-			"userTools": "Benutzer-Tools"
-		}
-	},
-	"ProfilePage": {
-		"title": "Benutzerprofil",
-		"joinedLabel": "Beigetreten",
-		"userPlantsTitle": "Deine Pflanzensammlung",
-		"stats": {
-			"gardens": "Gärten",
-			"plants": "Pflanzen"
-		},
-		"settings": {
-			"title": "Einstellungen",
-			"edit": {
-				"label": "Profil bearbeiten",
-				"desc": "Ändere deine persönlichen Daten und dein Profilbild."
-			},
-			"notifications": {
-				"label": "Benachrichtigungen",
-				"desc": "Passe an, welche Benachrichtigungen du erhalten möchtest."
-			},
-			"privacy": {
-				"label": "Privatsphäre",
-				"desc": "Verwalte die Sichtbarkeit deiner Gärten für andere."
-			}
-		},
-		"aria": {
-			"avatarAlt": "Profilbild von {name}",
-			"gardensLink": "Zu meinen Gärten gehen",
-			"plantsLink": "Zu meinen Pflanzen gehen"
-		}
-	},
-	"RegisterPage": {
-		"title": "Konto erstellen",
-		"firstName": "Vorname",
-		"lastName": "Nachname",
-		"nick": "Benutzername",
-		"avatar": "Profilbild",
-		"email": "E-Mail-Adresse",
-		"chooseFile": "Datei auswählen",
-		"noFileSelected": "Keine Datei ausgewählt",
-		"password": "Passwort",
-		"passwordRequirements": "Mind. 8 Zeichen (Groß- und Kleinschreibung, Zahl, Sonderzeichen).",
-		"confirmPassword": "Passwort bestätigen",
-		"acceptTerms": "Ich akzeptiere die",
-		"termsLink": "Allgemeinen Geschäftsbedingungen",
-		"registerBtn": "Registrieren",
-		"alreadyHaveAccount": "Hast du schon ein Konto?",
-		"errorPasswordMatch": "Die Passwörter stimmen nicht überein",
-		"errorRegistrationFailed": "Registrierung fehlgeschlagen. Bitte versuchen Sie es erneut.",
-		"successMessage": "Konto erfolgreich erstellt!",
-		"serverError": "Verbindungsfehler zum Server. Bitte versuchen Sie es später erneut.",
-		"showPassword": "Passwort anzeigen",
-		"hidePassword": "Passwort ausblenden",
-		"avatarRequirements": "Zulässige Formate: JPG, JPEG, PNG, WEBP.",
-		"errorInvalidFormat": "Ungültiges Dateiformat. Bitte wählen Sie JPG, PNG oder WebP."
-	},
-	"errors": {
-		"connectionError": "Verbindungsfehler. Der Server antwortet nicht.",
-		"invalidCredentials": "Ungültiger Benutzername oder Passwort.",
-		"generic": "Ein unerwarteter Fehler jest aufgetreten. Bitte versuchen Sie es erneut."
-	}
+  "HomePage": {
+    "title": "Plant Portal",
+    "description": "Ihre ultimative Wissensdatenbank und Galerie für Pflanzen.",
+    "recommended": "EMPFOHLEN:",
+    "search": "Pflanzen suchen...",
+    "login": "Anmelden",
+    "email": "E-Mail-Adresse",
+    "nick": "Benutzername:",
+    "password": "Passwort:",
+    "loginBtn": "Einloggen",
+    "cancel": "Abbrechen",
+    "noAccount": "Kein Konto?",
+    "register": "Registrieren!",
+    "author": "Autor:",
+    "rating": "Bewertung:",
+    "showMore": "Mehr Pflanzen anzeigen",
+    "nav": [
+      "Startseite",
+      "Galerie",
+      "Über uns",
+      "Nutzungsbedingungen",
+      "Kontakt"
+    ],
+    "searchPlaceholder": "Suche ist aktiv",
+    "searchInfo": "Hier wird die vollständige Suchlogik sein.",
+    "rights": "Alle Rechte vorbehalten.",
+    "privacy": "Datenschutz",
+    "terms": "Nutzungsbedingungen",
+    "aria": {
+      "close": "Schließen",
+      "homePageLink": "Startseite",
+      "openMenu": "Menü öffnen",
+      "closeMenu": "Menü schließen",
+      "mainNavigation": "Hauptnavigation",
+      "skipToContent": "Zum Hauptinhalt springen",
+      "footerNavigation": "Fußzeilen-Navigation",
+      "selectLanguage": "Sprache wählen",
+      "searchBtn": "Suche",
+      "add": "Neue Pflanze hinzufügen",
+      "profile": "Benutzerprofil",
+      "userTools": "Benutzer-Tools"
+    },
+    "contact": {
+      "name": "John Weeder",
+      "nipLabel": "USt-IdNr.",
+      "address": "Polna Str. 7, 00-234 Warschau, Polen",
+      "emailTitle": "E-Mail",
+      "emailDescription": "Haben Sie Fragen? Wir antworten Ihnen gerne!",
+      "officeOpen": "Bürozeiten",
+      "officeHours": "Montag - Freitag 9:00 - 17:00 Uhr"
+    }
+  },
+  "ProfilePage": {
+    "title": "Benutzerprofil",
+    "joinedLabel": "Beigetreten",
+    "userPlantsTitle": "Deine Pflanzensammlung",
+    "stats": {
+      "gardens": "Gärten",
+      "plants": "Pflanzen"
+    },
+    "settings": {
+      "title": "Einstellungen",
+      "edit": {
+        "label": "Profil bearbeiten",
+        "desc": "Ändere deine persönlichen Daten und dein Profilbild."
+      },
+      "notifications": {
+        "label": "Benachrichtigungen",
+        "desc": "Passe an, welche Benachrichtigungen du erhalten möchtest."
+      },
+      "privacy": {
+        "label": "Privatsphäre",
+        "desc": "Verwalte die Sichtbarkeit deiner Gärten für andere."
+      }
+    },
+    "aria": {
+      "avatarAlt": "Profilbild von {name}",
+      "gardensLink": "Zu meinen Gärten gehen",
+      "plantsLink": "Zu meinen Pflanzen gehen"
+    }
+  },
+  "RegisterPage": {
+    "title": "Konto erstellen",
+    "firstName": "Vorname",
+    "lastName": "Nachname",
+    "nick": "Benutzername",
+    "avatar": "Profilbild",
+    "email": "E-Mail-Adresse",
+    "chooseFile": "Datei auswählen",
+    "noFileSelected": "Keine Datei ausgewählt",
+    "removeFile": "Datei entfernen",
+    "password": "Passwort",
+    "passwordRequirements": "Mind. 8 Zeichen (Groß- und Kleinschreibung, Zahl, Sonderzeichen).",
+    "confirmPassword": "Passwort bestätigen",
+    "acceptTerms": "Ich akzeptiere die",
+    "termsLink": "Allgemeinen Geschäftsbedingungen",
+    "registerBtn": "Registrieren",
+    "alreadyHaveAccount": "Hast du schon ein Konto?",
+    "errorPasswordMatch": "Die Passwörter stimmen nicht überein",
+    "errorRegistrationFailed": "Registrierung fehlgeschlagen. Bitte versuchen Sie es erneut.",
+    "usernameExists": "Ein Benutzer mit diesem Benutzernamen existiert bereits.",
+    "emailExists": "Ein Benutzer mit dieser E-Mail-Adresse existiert bereits.",
+    "successMessage": "Konto erfolgreich erstellt!",
+    "registrationSuccessDescription": "Vielen Dank für Ihre Registrierung. Sie können sich teraz anmelden.",
+    "goToLogin": "Zum Login",
+    "serverError": "Verbindungsfehler zum Server. Bitte versuchen Sie es später erneut.",
+    "showPassword": "Passwort anzeigen",
+    "hidePassword": "Passwort ausblenden",
+    "avatarRequirements": "Zulässige Formate: JPG, JPEG, PNG, WEBP.",
+    "errorInvalidFormat": "Ungültiges Dateiformat. Bitte wählen Sie JPG, PNG oder WebP."
+  },
+  "errors": {
+    "connectionError": "Verbindungsfehler. Der Server antwortet nicht.",
+    "invalidCredentials": "Ungültiger Benutzername oder Passwort.",
+    "generic": "Ein unerwarteter Fehler jest aufgetreten. Bitte versuchen Sie es erneut.",
+    "invalidImage": "Bitte laden Sie ein gültiges Bild hoch. Die Datei war entweder kein Bild oder sie ist beschädigt."
+  }
 }

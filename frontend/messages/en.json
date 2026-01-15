@@ -1,97 +1,113 @@
 {
   "HomePage": {
-		"title": "Plant Portal",
-		"description": "Your ultimate plant knowledge base and gallery.",
-		"recommended": "RECOMMENDED:",
-		"search": "Search plants...",
-		"login": "Login",
-		"successRegistrationInfo": "Account created successfully! You can now log in.",
-		"nick": "Username:",
-		"password": "Password:",
-		"loginBtn": "Login",
-		"cancel": "Cancel",
-		"noAccount": "Don't have an account?",
-		"register": "Register here!",
-		"author": "Author:",
-		"rating": "Rating:",
-		"showMore": "Show more plants",
-		"nav": ["Home", "Gallery", "About Us", "Terms", "Contact"],
-		"searchPlaceholder": "Search is active",
-		"searchInfo": "Full search logic will be here.",
-		"rights": "All rights reserved.",
-		"privacy": "Privacy Policy",
-		"terms": "Terms",
-		"aria": {
-		"close": "Close",
-			"homePageLink": "home page",
-			"openMenu": "Open menu",
-			"closeMenu": "Close menu",
-			"mainNavigation": "Main navigation",
-			"footerNavigation": "Footer navigation",
-			"selectLanguage": "Select language",
-			"searchBtn": "Search",
-			"add": "Add new plant",
-			"profile": "User profile",
-			"userTools": "User tools"
-		}
-	},
-	"ProfilePage": {
-		"title": "User Profile",
-		"joinedLabel": "Joined",
-		"userPlantsTitle": "Your Plant Collection",
-		"stats": {
-			"gardens": "Gardens",
-			"plants": "Plants"
-		},
-		"settings": {
-			"title": "Settings",
-			"edit": {
-				"label": "Edit Profile",
-				"desc": "Change your personal information and profile picture."
-			},
-			"notifications": {
-				"label": "Notifications",
-				"desc": "Choose which notifications you want to receive."
-			},
-			"privacy": {
-				"label": "Privacy",
-				"desc": "Manage the visibility of your gardens to others."
-			}
-		},
-		"aria": {
-			"avatarAlt": "Profile picture of {name}",
-			"gardensLink": "Go to my gardens",
-			"plantsLink": "Go to my plants"
-		}
-	},
-	"RegisterPage": {
-		"title": "Create Account",
-		"firstName": "First Name",
-		"lastName": "Last Name",
-		"nick": "Username",
-		"avatar": "Profile Picture",
-		"email": "Email Address",
-		"chooseFile": "Choose file",
-		"noFileSelected": "No file selected",
-		"password": "Password",
-		"passwordRequirements": "Min. 8 characters (uppercase, lowercase, number, special character).",
-		"confirmPassword": "Confirm Password",
-		"acceptTerms": "I agree to the",
-		"termsLink": "terms and conditions",
-		"registerBtn": "Register",
-		"alreadyHaveAccount": "Already have an account?",
-		"errorPasswordMatch": "Passwords do not match",
-		"errorRegistrationFailed": "Registration failed. Please try again.",
-		"successMessage": "Account created successfully!",
-		"serverError": "Server connection error. Please try again later.",
-		"showPassword": "Show password",
-		"hidePassword": "Hide password",
-		"avatarRequirements": "Accepted formats: JPG, JPEG, PNG, WEBP.",
-		"errorInvalidFormat": "Invalid file format. Please choose JPG, PNG, or WebP."
-	},
-	"errors": {
-		"connectionError": "Connection error. Try again later.",
-		"invalidCredentials": "Invalid username or password.",
-		"genericError": "Something went wrong."
-	}
+    "title": "Plant Portal",
+    "description": "Your ultimate plant knowledge base and gallery.",
+    "recommended": "RECOMMENDED:",
+    "search": "Search plants...",
+    "login": "Login",
+    "email": "Email Address",
+    "nick": "Username:",
+    "password": "Password:",
+    "loginBtn": "Login",
+    "cancel": "Cancel",
+    "noAccount": "Don't have an account?",
+    "register": "Register here!",
+    "author": "Author:",
+    "rating": "Rating:",
+    "showMore": "Show more plants",
+    "nav": ["Home", "Gallery", "About Us", "Terms", "Contact"],
+    "searchPlaceholder": "Search is active",
+    "searchInfo": "Full search logic will be here.",
+    "rights": "All rights reserved.",
+    "privacy": "Privacy Policy",
+    "terms": "Terms",
+    "aria": {
+      "close": "Close",
+      "homePageLink": "home page",
+      "openMenu": "Open menu",
+      "closeMenu": "Close menu",
+      "mainNavigation": "Main navigation",
+      "skipToContent": "Skip to main content",
+      "footerNavigation": "Footer navigation",
+      "selectLanguage": "Select language",
+      "searchBtn": "Search",
+      "add": "Add new plant",
+      "profile": "User profile",
+      "userTools": "User tools"
+    },
+    "contact": {
+      "name": "John Weeder",
+      "nipLabel": "VAT ID",
+      "address": "7 Polna Street, 00-234 Warsaw, Poland",
+      "emailTitle": "Email",
+      "emailDescription": "Have questions? We'd love to hear from you!",
+      "officeOpen": "Office open",
+      "officeHours": "Monday - Friday 9:00 AM - 5:00 PM"
+    }
+  },
+  "ProfilePage": {
+    "title": "User Profile",
+    "joinedLabel": "Joined",
+    "userPlantsTitle": "Your Plant Collection",
+    "stats": {
+      "gardens": "Gardens",
+      "plants": "Plants"
+    },
+    "settings": {
+      "title": "Settings",
+      "edit": {
+        "label": "Edit Profile",
+        "desc": "Change your personal information and profile picture."
+      },
+      "notifications": {
+        "label": "Notifications",
+        "desc": "Choose which notifications you want to receive."
+      },
+      "privacy": {
+        "label": "Privacy",
+        "desc": "Manage the visibility of your gardens to others."
+      }
+    },
+    "aria": {
+      "avatarAlt": "Profile picture of {name}",
+      "gardensLink": "Go to my gardens",
+      "plantsLink": "Go to my plants"
+    }
+  },
+  "RegisterPage": {
+    "title": "Create Account",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "nick": "Username",
+    "avatar": "Profile Picture",
+    "email": "Email Address",
+    "chooseFile": "Choose file",
+    "noFileSelected": "No file selected",
+    "removeFile": "Remove file",
+    "password": "Password",
+    "passwordRequirements": "Min. 8 characters (uppercase, lowercase, number, special character).",
+    "confirmPassword": "Confirm Password",
+    "acceptTerms": "I agree to the",
+    "termsLink": "terms and conditions",
+    "registerBtn": "Register",
+    "alreadyHaveAccount": "Already have an account?",
+    "errorPasswordMatch": "Passwords do not match",
+    "errorRegistrationFailed": "Registration failed. Please try again.",
+    "usernameExists": "User with this username already exists.",
+    "emailExists": "User with this email already exists.",
+    "successMessage": "Account created successfully!",
+    "registrationSuccessDescription": "Thank you for registering. You can now log in to your account.",
+    "goToLogin": "Go to login",
+    "serverError": "Server connection error. Please try again later.",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "avatarRequirements": "Accepted formats: JPG, JPEG, PNG, WEBP.",
+    "errorInvalidFormat": "Invalid file format. Please choose JPG, PNG, or WebP."
+  },
+  "errors": {
+    "connectionError": "Connection error. Try again later.",
+    "invalidCredentials": "Invalid username or password.",
+    "genericError": "Something went wrong.",
+    "invalidImage": "Upload a valid image. The file you uploaded was either not an image or a corrupted image."
+  }
 }

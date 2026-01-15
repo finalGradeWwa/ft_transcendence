@@ -1,7 +1,7 @@
 # Privacy Policy
 
 ## I. Data Controller
-The controller of personal data collected through the service is John Weeder, Polna 7 Str., 00-234 Warsaw, Poland, NIP: 111-111-11-11, e-mail: j.weeder@example.com. For matters related to personal data protection, users may contact the controller via the e-mail address provided above.
+The controller of personal data collected through the service is John Weeder, Polna 7 Str., 00-234 Warsaw, Poland, VAT ID: 111-111-11-11, e-mail: j.weeder@example.com. For matters related to personal data protection, users may contact the controller via the e-mail address provided above.
 
 ## II. Type and Purpose of Data Processing
 Data is processed to provide services related to botanical interests:

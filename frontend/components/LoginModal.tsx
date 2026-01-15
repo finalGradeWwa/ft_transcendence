@@ -9,6 +9,7 @@
 
 import { useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
+import { useRouter, usePathname } from '@/i18n/navigation';
 import { ModalContent } from './ModalContent';
 
 /**
@@ -22,6 +23,14 @@ const LoginModal = ({ isVisible, onClose, t }: any) => {
   /** PL: Hook do pobierania tłumaczeń błędów. EN: Hook for fetching error translations. */
   const tError = useTranslations();
 
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const handleClose = () => {
+    onClose();
+    router.replace(pathname);
+  };
+
   /**
    * PL: Efekt obsługujący fokusowanie pierwszego pola oraz nasłuchiwanie klawisza Escape.
    * EN: Effect handling autofocus on the first field and listening for the Escape key.
@@ -33,7 +42,7 @@ const LoginModal = ({ isVisible, onClose, t }: any) => {
     usernameInputRef.current?.focus();
 
     /** PL: Funkcja zamykająca modal po naciśnięciu ESC. EN: Function closing the modal on ESC press. */
-    const handleEsc = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
+    const handleEsc = (e: KeyboardEvent) => e.key === 'Escape' && handleClose();
 
     window.addEventListener('keydown', handleEsc);
     return () => window.removeEventListener('keydown', handleEsc);
@@ -45,7 +54,7 @@ const LoginModal = ({ isVisible, onClose, t }: any) => {
     <div
       /** PL: Półprzezroczyste tło z efektem rozmycia. EN: Semi-transparent background with blur effect. */
       className="fixed inset-0 bg-black/50 flex justify-center items-center z-50 backdrop-blur-sm p-4"
-      onClick={onClose}
+      onClick={handleClose}
     >
       <div
         /** PL: Zatrzymanie bąbelkowania zdarzenia, aby kliknięcie wewnątrz modalu go nie zamykało. 
@@ -56,7 +65,7 @@ const LoginModal = ({ isVisible, onClose, t }: any) => {
         <ModalContent
           t={t}
           tError={tError}
-          onClose={onClose}
+          onClose={handleClose}
           usernameRef={usernameInputRef}
         />
       </div>

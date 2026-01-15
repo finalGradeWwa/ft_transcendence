@@ -18,7 +18,7 @@ interface UserProfileProps {
     joined: string;
     gardens: number;
     plants: number;
-    avatar: string;
+    avatar_photo: string;
   } | null;
 }
 
@@ -68,7 +68,7 @@ const PersonalInfo = ({
     <div className="lg:col-span-2 flex flex-col md:flex-row items-center md:items-start gap-8 md:gap-12 p-6 sm:p-10 bg-container-light/70 rounded-xl shadow-md border border-subtle-gray/30 overflow-hidden">
       <div className="relative w-40 h-40 sm:w-48 sm:h-48 overflow-hidden rounded-full border-4 border-secondary-beige shadow-lg flex-shrink-0">
         <Image
-          src={getAvatarUrl(user.avatar)}
+          src={getAvatarUrl(user.avatar_photo)}
           alt={t('aria.avatarAlt', { name: user.username })}
           fill
           className="object-cover"

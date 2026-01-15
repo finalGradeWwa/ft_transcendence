@@ -1,7 +1,7 @@
 # Nutzungsbedingungen
 
 ## I. Definitionen
-1. **Dienstanbieter** – John Weeder, mit Sitz in Warschau (00-234), Polna‑Straße 7, NIP: 111‑111‑11‑11.
+1. **Dienstanbieter** – John Weeder, mit Sitz in Warschau (00-234), Polna‑Straße 7, USt-IdNr.: 111‑111‑11‑11.
 2. **Benutzer** – Jede Person, die den Dienst nutzt.
 3. **Konto** – Ein personalisierter Bereich im Dienst, gesichert durch Login und Passwort.
 4. **Inhalt** – Fotos, Pflanzenbeschreibungen, Kommentare und Nachrichten, die vom Benutzer gepostet werden.

@@ -1,7 +1,6 @@
 import fs from 'fs';
 import path from 'path';
 import { notFound } from 'next/navigation';
-import { Navigation } from '@/components/Navigation';
 import ReactMarkdown from 'react-markdown';
 
 interface TermsPageProps {
@@ -13,7 +12,6 @@ async function getTermsContent(locale: string) {
   try {
     if (!fs.existsSync(filePath)) return null;
     let content = fs.readFileSync(filePath, 'utf8');
-
     content = content.replace(/^#?\s*Regulamin\s*\n/i, '');
     content = content.replace(/^(\d+[\.\)])/gm, '\n\n**$1**');
 
@@ -33,9 +31,7 @@ export default async function TermsPage({ params }: TermsPageProps) {
 
   return (
     <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8">
-      <Navigation />
-
-      <div className="py-12 flex justify-center" id="main-content">
+      <div className="py-12 flex justify-center">
         <div className="bg-dark-bg/80 min-[600px]:bg-dark-bg/50 backdrop-blur-md p-6 sm:p-12 rounded-xl shadow-2xl w-full border border-primary-green/50">
           <article
             dir={locale === 'ar' ? 'rtl' : 'ltr'}
