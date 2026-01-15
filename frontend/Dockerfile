@@ -19,13 +19,11 @@ RUN npm run build
 # PL: Etap końcowy (Runner): Minimalistyczny obraz produkcyjny zoptymalizowany pod kątem bezpieczeństwa.
 # EN: Final stage (Runner): Minimalist production image optimized for security.
 FROM node:20-alpine AS runner
-WORKDIR /app
 
 # PL: Konfiguracja zmiennych środowiskowych dla środowiska produkcyjnego.
 # EN: Environment variable configuration for the production environment.
 ENV NODE_ENV production
 ENV PORT 3000
-ENV HOSTNAME "0.0.0.0"
 
 # PL: Utworzenie użytkownika systemowego w celu uniknięcia uruchamiania procesu jako root.
 # EN: Creating a system user to avoid running the process as root.
@@ -33,18 +31,17 @@ RUN addgroup --system --gid 1001 nextjs
 RUN adduser --system --uid 1001 nextjs
 
 # PL: Kopiowanie wyłącznie artefaktów niezbędnych do działania aplikacji (output: standalone).
-# PL: Ważne: standalone zawiera już w sobie zminimalizowane node_modules.
 # EN: Copying only the artifacts necessary for the application to run (output: standalone).
-# EN: Note: standalone already includes minimized node_modules.
 COPY --from=builder /app/public ./public
-COPY --from=builder --chown=nextjs:nextjs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nextjs /app/.next/static ./.next/static
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
+COPY --from=builder /app/node_modules ./node_modules
 
 # PL: Zmiana uprawnień i wystawienie portu.
 # EN: Changing permissions and exposing the port.
 USER nextjs
 EXPOSE 3000
 
-# PL: Uruchomienie zoptymalizowanego serwera Node.js (bezpośrednio plik server.js).
-# EN: Starting the optimized Node.js server (running server.js directly).
+# PL: Uruchomienie zoptymalizowanego serwera Node.js.
+# EN: Starting the optimized Node.js server.
 CMD ["node", "server.js"]
