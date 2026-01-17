@@ -1,7 +1,7 @@
 from .models import Plant
 from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404
-from .models import Plant, Garden
+from gardens.models import Garden
 
 def create_plant(*, creator, data):
     allowed_fields = {
