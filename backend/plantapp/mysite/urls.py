@@ -25,7 +25,7 @@ urlpatterns = [
 	path('', include('users.urls')),
     path('api/garden/', include('gardens.urls')),
     path('api/plant/', include('plants.urls')),
-    path('api/image/', include('core.urls'))
+    # path('api/image/', include('core.urls'))
 ]
 
 if settings.DEBUG:
