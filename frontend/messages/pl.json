@@ -1,12 +1,12 @@
 {
   "HomePage": {
     "title": "Plant Portal",
-	"description": "Twoja baza wiedzy o roślinach, galeria zdjęć i społeczność pasjonatów botaniki.",
+    "description": "Twoja baza wiedzy o roślinach, galeria zdjęć i społeczność pasjonatów botaniki.",
     "recommended": "POLECANE:",
     "search": "Wyszukaj rośliny...",
     "login": "Logowanie",
+    "email": "Adres E-mail",
     "nick": "Nick:",
-    "email": "Adres E-mail:",
     "password": "Hasło:",
     "loginBtn": "Zaloguj",
     "cancel": "Anuluj",
@@ -20,36 +20,70 @@
     "searchInfo": "Tutaj będzie pełna logika wyszukiwania.",
     "rights": "Wszelkie prawa zastrzeżone.",
     "privacy": "Polityka Prywatności",
-    "terms": "Warunki Użytkowania",
+    "terms": "Regulamin",
     "aria": {
-	  "close": "Zamknij",
+      "close": "Zamknij",
       "homePageLink": "strona główna",
       "openMenu": "Otwórz menu",
       "closeMenu": "Zamknij menu",
       "mainNavigation": "Główna nawigacja",
-	  "footerNavigation": "Nawigacja w stopce",
+      "skipToContent": "Przejdź do treści głównej",
+      "footerNavigation": "Nawigacja w stopce",
       "selectLanguage": "Wybierz język strony",
       "searchBtn": "Szukaj",
       "add": "Dodaj nową roślinę",
       "profile": "Profil użytkownika",
       "userTools": "Narzędzia użytkownika"
+    },
+    "contact": {
+      "name": "John Weeder",
+      "nipLabel": "NIP",
+      "address": "ul. Polna 7, 00-234 Warszawa, Polska",
+      "emailTitle": "E-mail",
+      "emailDescription": "Masz pytania? Chętnie na nie odpowiemy!",
+      "officeOpen": "Biuro czynne",
+      "officeHours": "Poniedziałek - Piątek 9:00 - 17:00"
     }
   },
   "ProfilePage": {
-	"plantsCount": "Liczba roślin",
-	"friendsCount": "Znajomi",
-	"userPlantsTitle": "Twoja kolekcja roślin",
-	"editProfile": "Edytuj profil"
+    "title": "Profil użytkownika",
+    "joinedLabel": "Dołączono",
+    "userPlantsTitle": "Twoja kolekcja roślin",
+    "stats": {
+      "gardens": "Ogrody",
+      "plants": "Rośliny"
+    },
+    "settings": {
+      "title": "Ustawienia",
+      "edit": {
+        "label": "Edytuj profil",
+        "desc": "Zmień swoje dane osobowe oraz zdjęcie profilowe."
+      },
+      "notifications": {
+        "label": "Powiadomienia",
+        "desc": "Dostosuj jakie powiadomienia chcesz otrzymywać."
+      },
+      "privacy": {
+        "label": "Prywatność",
+        "desc": "Zarządzaj widocznością Twoich ogrodów dla innych."
+      }
+    },
+    "aria": {
+      "avatarAlt": "Zdjęcie profilowe użytkownika {name}",
+      "gardensLink": "Przejdź do moich ogrodów",
+      "plantsLink": "Przejdź do moich roślin"
+    }
   },
   "RegisterPage": {
     "title": "Stwórz konto",
     "firstName": "Imię",
     "lastName": "Nazwisko",
     "nick": "Pseudonim (Nick)",
-    "avatar": "Zdjęcie profilowe (Avatar)",
+    "avatar": "Zdjęcie profilowe",
     "email": "Adres E-mail",
     "chooseFile": "Wybierz plik",
     "noFileSelected": "Nie wybrano pliku",
+    "removeFile": "Usuń plik",
     "password": "Hasło",
     "passwordRequirements": "Min. 8 znaków (duża litera, mała litera, cyfra, znak specjalny).",
     "confirmPassword": "Powtórz hasło",
@@ -59,16 +93,21 @@
     "alreadyHaveAccount": "Masz już konto?",
     "errorPasswordMatch": "Hasła nie są identyczne",
     "errorRegistrationFailed": "Rejestracja nie powiodła się. Spróbuj ponownie.",
+    "usernameExists": "Użytkownik o tej nazwie już istnieje.",
+    "emailExists": "Użytkownik z tym adresem e-mail już istnieje.",
     "successMessage": "Konto zostało pomyślnie utworzone!",
-	"serverError": "Błąd połączenia z serwerem. Spróbuj ponownie później.",
-	"showPassword": "Pokaż hasło",
-	"hidePassword": "Ukryj hasło",
-	"avatarRequirements": "Dopuszczalne formaty: JPG, JPEG, PNG, WEBP.",
-	"errorInvalidFormat": "Nieprawidłowy format pliku. Wybierz JPG, PNG lub WebP."
+    "registrationSuccessDescription": "Dziękujemy za rejestrację. Możesz się teraz zalogować.",
+    "goToLogin": "Przejdź do logowania",
+    "serverError": "Błąd połączenia z serwerem. Spróbuj ponownie później.",
+    "showPassword": "Pokaż hasło",
+    "hidePassword": "Ukryj hasło",
+    "avatarRequirements": "Dopuszczalne formaty: JPG, JPEG, PNG, WEBP.",
+    "errorInvalidFormat": "Nieprawidłowy format pliku. Wybierz JPG, PNG lub WebP."
   },
   "errors": {
-	"connectionError": "Błąd połączenia. Spróbuj ponownie później.",
-	"invalidCredentials": "Nieprawidłowy login lub hasło.",
-	"genericError": "Coś poszło nie tak."
+    "connectionError": "Błąd połączenia. Spróbuj ponownie później.",
+    "invalidCredentials": "Nieprawidłowy login lub hasło.",
+    "genericError": "Coś poszło nie tak.",
+    "invalidImage": "Przesłany plik jest nieprawidłowy. Wybrany plik nie jest obrazem lub jest uszkodzony."
   }
 }

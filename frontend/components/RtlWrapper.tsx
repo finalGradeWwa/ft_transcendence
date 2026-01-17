@@ -19,16 +19,27 @@ import { PlantType } from '../app/types/plantTypes';
 interface RtlWrapperProps {
   plants: Array<PlantType>;
   locale: string;
+  showLogin?: boolean;
+  isRegistered?: boolean;
 }
 
-export const RtlWrapper = ({ plants, locale }: RtlWrapperProps) => {
+export const RtlWrapper = ({
+  plants,
+  locale,
+  showLogin,
+  isRegistered,
+}: RtlWrapperProps) => {
   return (
     /**
      * PL: Kontener ustawiający atrybut 'dir' dla całej zawartości strony głównej.
      * EN: Container setting the 'dir' attribute for the entire home page content.
      */
     <div dir={locale === 'ar' ? 'rtl' : 'ltr'}>
-      <HomePageClient plants={plants} />
+      <HomePageClient
+        plants={plants}
+        showLogin={showLogin}
+        isRegistered={isRegistered}
+      />
     </div>
   );
 };

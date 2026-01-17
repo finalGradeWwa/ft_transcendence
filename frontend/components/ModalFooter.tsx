@@ -12,15 +12,16 @@ export const ModalFooter = ({ t, onClose }: ModalFooterProps) => {
     <div className="mt-6 flex flex-col items-center gap-4 border-t border-subtle-gray pt-4">
       <button
         onClick={onClose}
-        className="text-sm text-neutral-900 hover:text-red-800 transition-colors underline-offset-4 hover:underline"
+        className="text-sm text-neutral-900 hover:text-red-800 transition-colors underline-offset-4 hover:underline rounded px-1 focus:outline focus:outline-2 focus:outline-gray-600 focus:outline-offset-0"
       >
         {t('cancel')}
       </button>
+
       <p className="text-sm text-neutral-900 text-center">
         {t('noAccount')}{' '}
         <Link
           href="/register"
-          className="font-bold text-primary-green hover:underline decoration-2"
+          className="font-bold text-primary-green hover:underline decoration-2 rounded px-1 focus:outline focus:outline-2 focus:outline-gray-600 focus:outline-offset-0"
           onClick={onClose}
         >
           {t('register')}

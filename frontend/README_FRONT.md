@@ -20,7 +20,7 @@
 
 # ------------------------------------------------
 
-## Stara wersja bez konteneryzacji: Instalacja zależności
+## Szybkie uruchamianie bez konteneryzacji:
 	Projekt używa node_modules i pliku package.json, więc do instalacji potrzebne jest środowisko Node.js i npm
 		npm install
 

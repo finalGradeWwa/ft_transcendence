@@ -1,12 +1,8 @@
 'use client';
 
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
 import { useTranslations } from 'next-intl';
 
-/**
- * PL: Globalny komponent stopki. Zawiera informacje o prawach autorskich oraz linki prawne.
- * * EN: Global footer component. Contains copyright information and legal links.
- */
 export function Footer() {
   const t = useTranslations('HomePage');
 
@@ -16,22 +12,18 @@ export function Footer() {
         &copy; {new Date().getFullYear()} Plant Portal. {t('rights')}
       </p>
       <nav
-        className="flex flex-col sm:flex-row gap-y-2 sm:gap-y-0 sm:gap-x-8"
+        className="flex flex-col sm:flex-row gap-y-2 sm:gap-y-0 sm:gap-x-4"
         aria-label={t('aria.footerNavigation')}
       >
         <Link
-          href="/documents/privacy_policy.pdf"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-primary-green hover:underline transition duration-150 text-center focus-visible:ring-2 focus-visible:ring-primary-green outline-none rounded"
+          href="/privacy-policy"
+          className="text-primary-green hover:underline transition duration-150 text-center focus-visible:ring-2 focus-visible:ring-header-main focus-visible:ring-offset-2 focus-visible:ring-offset-black outline-none rounded-lg break-all px-4 py-2"
         >
           {t('privacy')}
         </Link>
         <Link
-          href="/documents/terms_of_service.pdf"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-primary-green hover:underline transition duration-150 text-center focus-visible:ring-2 focus-visible:ring-primary-green outline-none rounded"
+          href="/terms"
+          className="text-primary-green hover:underline transition duration-150 text-center focus-visible:ring-2 focus-visible:ring-header-main focus-visible:ring-offset-2 focus-visible:ring-offset-black outline-none rounded-lg break-all px-4 py-2"
         >
           {t('terms')}
         </Link>

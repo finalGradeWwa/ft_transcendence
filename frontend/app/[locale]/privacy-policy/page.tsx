@@ -3,27 +3,31 @@ import path from 'path';
 import { notFound } from 'next/navigation';
 import ReactMarkdown from 'react-markdown';
 
-interface TermsPageProps {
+interface PrivacyPolicyPageProps {
   params: Promise<{ locale: string }>;
 }
 
-async function getTermsContent(locale: string) {
-  const filePath = path.join(process.cwd(), 'content/terms', `${locale}.md`);
+async function getPrivacyContent(locale: string) {
+  const filePath = path.join(
+    process.cwd(),
+    'content/privacy-policy',
+    `${locale}.md`
+  );
   try {
     if (!fs.existsSync(filePath)) return null;
     let content = fs.readFileSync(filePath, 'utf8');
-    content = content.replace(/^#?\s*Regulamin\s*\n/i, '');
     content = content.replace(/^(\d+[\.\)])/gm, '\n\n**$1**');
-
     return content;
   } catch {
     return null;
   }
 }
 
-export default async function TermsPage({ params }: TermsPageProps) {
+export default async function PrivacyPolicyPage({
+  params,
+}: PrivacyPolicyPageProps) {
   const { locale } = await params;
-  const content = await getTermsContent(locale);
+  const content = await getPrivacyContent(locale);
 
   if (!content) {
     notFound();
@@ -31,7 +35,7 @@ export default async function TermsPage({ params }: TermsPageProps) {
 
   return (
     <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8">
-      <div className="py-12 flex justify-center">
+      <div className="py-12 flex justify-center" id="main-content">
         <div className="bg-dark-bg/80 min-[600px]:bg-dark-bg/50 backdrop-blur-md p-6 sm:p-12 rounded-xl shadow-2xl w-full border border-primary-green/50">
           <article
             dir={locale === 'ar' ? 'rtl' : 'ltr'}
