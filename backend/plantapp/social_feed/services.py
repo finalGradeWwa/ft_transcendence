@@ -3,12 +3,14 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
+from plants.models import Plant
 
 def create_post(*, creator, data):
     allowed_fields = {
-        "nickname",
+        "description",
         "plant",
-        "species",
+        "image",
     }
 
     clean_data = {
@@ -17,10 +19,10 @@ def create_post(*, creator, data):
         if key in allowed_fields
     }
 
-    garden_id = clean_data.get("garden")
-    if garden_id:
-        garden = get_object_or_404(Garden, id=garden_id)
-        if garden.owner != creator:
+    plant_id = clean_data.get("plant")
+    if plant_id:
+        plant = get_object_or_404(Plant, id=plant_id)
+        if plant.owner != creator:
             raise ValidationError("You don't have permission to create plants in this garden.")
 
     return Plant.objects.create(
