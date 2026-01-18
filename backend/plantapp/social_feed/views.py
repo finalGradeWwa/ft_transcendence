@@ -13,4 +13,6 @@ class PostViewSet(viewsets.ModelViewSet):
 	permission_classes = [IsAuthorOrReadOnly]
 	queryset = Post.objects.all()
 	parser_classes = [MultiPartParser, FormParser]
+	
 	def post(self, request):
+		

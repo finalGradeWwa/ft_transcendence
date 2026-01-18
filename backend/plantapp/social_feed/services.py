@@ -5,6 +5,7 @@ from rest_framework import status
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from plants.models import Plant
+from gardens.models import Garden
 
 def create_post(*, creator, data):
     allowed_fields = {
@@ -24,7 +25,12 @@ def create_post(*, creator, data):
         plant = get_object_or_404(Plant, id=plant_id)
         if plant.owner != creator:
             raise ValidationError("You don't have permission to create plants in this garden.")
-
+   
+    garden_id = clean_data.get("garden")
+    if garden_id:
+        garden = get_object_or_404(Garden, id=garden_id)
+        if garden.owner != creator:
+            raise ValidationError("You don't have permission to create plants in this garden.")
     return Plant.objects.create(
         owner=creator,
         **clean_data

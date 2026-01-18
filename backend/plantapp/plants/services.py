@@ -1,28 +1,23 @@
 from .models import Plant
 from django.core.exceptions import ValidationError
-from django.shortcuts import get_object_or_404
 from gardens.models import Garden
 
 def create_plant(*, creator, data):
-    allowed_fields = {
-        "nickname",
-        "garden",
-        "species",
-    }
+    allowed_fields = {"nickname", "garden", "species"}
 
-    clean_data = {
-        key: value
-        for key, value in data.items()
-        if key in allowed_fields
-    }
+    # Only include allowed fields
+    clean_data = {k: v for k, v in data.items() if k in allowed_fields}
 
-    garden_id = clean_data.get("garden")
-    if garden_id:
-        garden = get_object_or_404(Garden, id=garden_id)
-        if garden.owner != creator:
+    garden_obj = clean_data.pop("garden", None)  # Remove garden from clean_data
+
+    if garden_obj:
+        # Check permission: user must be a member of the garden
+        if not garden_obj.gardenuser_set.filter(user=creator).exists():
             raise ValidationError("You don't have permission to create plants in this garden.")
 
+    # Create plant with explicit garden object
     return Plant.objects.create(
         owner=creator,
+        garden=garden_obj,
         **clean_data
     )

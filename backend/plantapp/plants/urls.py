@@ -1,8 +1,7 @@
-from django.urls import path
-from .views import PlantAPIView, ListMyPlants
+from rest_framework.routers import DefaultRouter
+from .views import PlantViewSet
 
-urlpatterns = [
-    path("", PlantAPIView.as_view(), name="create-plant"),
-    path("<int:pk>/", PlantAPIView.as_view(), name="get-plant"),
-	path("my-plants", ListMyPlants.as_view(), name="get-my-plants"),
-]
+router = DefaultRouter()
+router.register(r"plants", PlantViewSet, basename="plant")
+
+urlpatterns = router.urls
