@@ -7,12 +7,11 @@ from .models import Post
 from .permissions import IsAuthorOrReadOnly
 from rest_framework.parsers import FormParser, MultiPartParser
 
-# Create your views here.
-
-class PostViewSet(viewsets.ModelViewSet):
-	permission_classes = [IsAuthorOrReadOnly]
-	queryset = Post.objects.all()
-	parser_classes = [MultiPartParser, FormParser]
+# TO BE CONTINUED 
+# class PostViewSet(viewsets.ModelViewSet):
+# 	permission_classes = [IsAuthorOrReadOnly]
+# 	queryset = Post.objects.all()
+# 	parser_classes = [MultiPartParser, FormParser]
 	
-	def post(self, request):
+# 	def post(self, request):
 		
