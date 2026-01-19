@@ -35,12 +35,12 @@ class PlantAPITests(APITestCase):
         )
 
     def test_get_requires_authentication(self):
-        url = reverse("get-plant", args=[self.plant.pk])
+        url = reverse("plant-detail", args=[self.plant.pk])
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_get_returns_owned_plant(self):
-        url = reverse("get-plant", args=[self.plant.pk])
+        url = reverse("plant-detail", args=[self.plant.pk])
         self.client.force_authenticate(self.user)
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -48,24 +48,42 @@ class PlantAPITests(APITestCase):
         self.assertEqual(response.data.get("nickname"), self.plant.nickname)
 
     def test_get_returns_404_for_non_member(self):
-        url = reverse("get-plant", args=[self.plant.pk])
+        url = reverse("plant-list", args=[self.plant.pk])
         self.client.force_authenticate(self.other_user)
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_create_plant_succeeds_for_authenticated_user(self):
-        url = reverse("create-plant")
         self.client.force_authenticate(self.user)
+
+        garden = Garden.objects.create(
+            name="My Garden",
+            garden_name="My Garden",
+            slug="my-garden"
+        )
+
+        GardenUser.objects.create(
+            organization=garden,
+            user=self.user
+        )
+
+        url = reverse("plant-list")
+
         payload = {
             "nickname": "NewFern",
             "species": "Fern",
+            "garden": garden.pk,
         }
         response = self.client.post(url, payload)
+
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertTrue(Plant.objects.filter(nickname="NewFern").exists())
+        self.assertTrue(
+            Plant.objects.filter(nickname="NewFern", garden=garden).exists()
+        )
+
 
     def test_delete_removes_owned_plant(self):
-        url = reverse("get-plant", args=[self.plant.pk])
+        url = reverse("plant-detail", args=[self.plant.pk])
         self.client.force_authenticate(self.user)
         response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)

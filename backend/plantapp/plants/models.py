@@ -9,6 +9,7 @@ class Plant(models.Model):
         on_delete=models.CASCADE, 
         related_name="plants",
     )
+    image = models.ImageField(upload_to='plant-images/', null=True, blank=True)
     plant_id = models.AutoField(primary_key=True)
     species = models.CharField(max_length=25, blank=True, null=True)
     garden = models.ForeignKey(
