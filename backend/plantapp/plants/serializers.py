@@ -5,7 +5,7 @@ from gardens.models import Garden
 class PlantListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Plant
-        fields = ["id", "name"]
+        fields = ["id", "name", "image"]
 
 class PlantSerializer(serializers.ModelSerializer):
 	class Meta:
@@ -16,6 +16,7 @@ class PlantSerializer(serializers.ModelSerializer):
 			"species",
 			"created_at",
 			"owner",
+            "image",
 		)
 
 class PlantDetailSerializer(serializers.ModelSerializer):
@@ -39,7 +40,7 @@ class PlantCreateSerializer(serializers.ModelSerializer):
 
     #garden = serializers.PrimaryKeyRelatedField(
     #queryset=Garden.objects.all()  # BAD - evaluated at class definition
-    #) -> BAD SOLUTION -> assignement evaluated at class definition 
+    #) -> BAD SOLUTION -> assignment evaluated at class definition 
     class Meta:
         model = Plant
         fields = ("nickname", "species", "garden")

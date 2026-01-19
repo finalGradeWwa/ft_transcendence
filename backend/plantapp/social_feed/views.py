@@ -7,11 +7,8 @@ from .models import Post
 from .permissions import IsAuthorOrReadOnly
 from rest_framework.parsers import FormParser, MultiPartParser
 
-# TO BE CONTINUED 
-# class PostViewSet(viewsets.ModelViewSet):
-# 	permission_classes = [IsAuthorOrReadOnly]
-# 	queryset = Post.objects.all()
-# 	parser_classes = [MultiPartParser, FormParser]
-	
-# 	def post(self, request):
-		
+# TODO: Implement a PostViewSet for handling Post objects.
+# Design notes (for future implementation):
+# - Use a ModelViewSet subclass with IsAuthorOrReadOnly permissions.
+# - Configure queryset to return all Post instances.
+# - Support multipart/form-data uploads via MultiPartParser and FormParser.

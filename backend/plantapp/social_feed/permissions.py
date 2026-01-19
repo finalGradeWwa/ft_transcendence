@@ -11,4 +11,3 @@ class IsAuthorOrReadOnly(BasePermission):
         if request.method in permissions.SAFE_METHODS: # read only methods
             return True
         return obj.creator == request.user
-z
