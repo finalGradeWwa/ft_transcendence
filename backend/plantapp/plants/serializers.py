@@ -5,7 +5,7 @@ from gardens.models import Garden
 class PlantListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Plant
-        fields = ["id", "name", "image"]
+        fields = ["id", "nickname", "image"]
 
 class PlantSerializer(serializers.ModelSerializer):
 	class Meta:
