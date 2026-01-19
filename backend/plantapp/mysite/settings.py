@@ -223,6 +223,8 @@ AUTHENTICATION_BACKENDS = (
 SOCIAL_AUTH_GITHUB_KEY = os.environ.get('GITHUB_OAUTH_KEY')
 SOCIAL_AUTH_GITHUB_SECRET = os.environ.get('GITHUB_OAUTH_SECRET')
 
+SOCIAL_AUTH_GITHUB_SCOPE = ['user:email']
+
 SOCIAL_AUTH_URL_NAMESPACE = 'social'
 
 SOCIAL_AUTH_PIPELINE = (
@@ -231,9 +233,12 @@ SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.social_auth.auth_allowed',
     'social_core.pipeline.social_auth.social_user',
     'social_core.pipeline.user.get_username',
+    'authentication.pipeline.set_email_for_new_user',
     'social_core.pipeline.user.create_user',
     'social_core.pipeline.social_auth.associate_user',
     'social_core.pipeline.social_auth.load_extra_data',
     'social_core.pipeline.user.user_details',
     'authentication.pipeline.get_tokens_for_user',
 )
+
+SOCIAL_AUTH_LOGIN_ERROR_URL = 'http://localhost:3000/pl/login?error=access_denied'

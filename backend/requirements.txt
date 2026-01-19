@@ -7,3 +7,4 @@ django-cors-headers
 channels~=4.3.2
 daphne~=4.2.1
 django-organizations~=2.5.0
+social-auth-app-django
