@@ -32,7 +32,9 @@ class Garden(Organization):
     )
     is_public = models.BooleanField(default=False)
     objects = GardenQuerySet.as_manager()
-
+    def __str__(self):
+        return self.garden_name
+    
 class GardenUser(OrganizationUserBase):
     organization = models.ForeignKey(
         Garden,
