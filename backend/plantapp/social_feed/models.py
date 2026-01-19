@@ -6,7 +6,6 @@ from gardens.models import Garden
 User = get_user_model()
 
 class Post(models.Model):
-
 	content = models.TextField(max_length=150)
 	image = models.ImageField(upload_to='media/')
 	created_at = models.DateTimeField(auto_now_add=True)

@@ -21,6 +21,8 @@ interface TextProps {
   className?: string;
   /** PL: Treść tekstowa lub elementy potomne. EN: Text content or child elements. */
   children: React.ReactNode;
+  /** PL: Unikalny identyfikator elementu. EN: Unique identifier for the element. */
+  id?: string;
 }
 
 /**
@@ -32,6 +34,7 @@ export const Text = ({
   as: Component = 'p',
   className = '',
   children,
+  id,
 }: TextProps) => {
   /**
    * PL: Mapa stylów przypisana do konkretnych wariantów projektowych.
@@ -45,7 +48,7 @@ export const Text = ({
   };
 
   return (
-    <Component className={`${styles[variant]} ${className}`.trim()}>
+    <Component id={id} className={`${styles[variant]} ${className}`.trim()}>
       {children}
     </Component>
   );

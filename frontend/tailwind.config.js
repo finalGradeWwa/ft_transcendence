@@ -7,6 +7,8 @@
  * used in the user interface.
  */
 
+import typography from '@tailwindcss/typography';
+
 /** @type {import('tailwindcss').Config} */
 const tailwindConfig = {
   /**
@@ -27,8 +29,9 @@ const tailwindConfig = {
        */
       colors: {
         'light-bg': '#F8F8F8',
+        'dark-bg': '#131513ff',
         'dark-text': '#333333',
-        'container-light': '#dad5d0',
+        'container-light': '#ebddd0ff',
         'container-light2': '#c7c1bc',
         'primary-green': '#186618',
         'secondary-beige': '#e7dcc7',
@@ -38,7 +41,9 @@ const tailwindConfig = {
       },
     },
   },
-  plugins: [],
+  plugins: [typography],
 };
 
-module.exports = tailwindConfig;
+// PL: Eksport domyślny zgodny ze standardem ES Modules (pasuje do "import" na górze pliku).
+// EN: Default export compatible with ES Modules standard (matches "import" at the top).
+export default tailwindConfig;

@@ -34,18 +34,26 @@ const dummyPlants: Array<PlantType> = Array.from({ length: 20 }, (_, i) => ({
  */
 export default async function FinalPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   /**
-   * PL: Oczekiwanie na parametry ścieżki (wymagane w Next.js 15+).
-   * EN: Awaiting path parameters (required in Next.js 15+).
+   * PL: Oczekiwanie na parametry ścieżki i parametry wyszukiwania (wymagane w Next.js 15+).
+   * EN: Awaiting path parameters and search parameters (required in Next.js 15+).
    */
   const { locale } = await params;
+  const { showLogin, registered } = await searchParams;
 
   return (
     <Background>
-      <RtlWrapper plants={dummyPlants} locale={locale} />
+      <RtlWrapper
+        plants={dummyPlants}
+        locale={locale}
+        showLogin={showLogin === 'true'}
+        isRegistered={registered === 'true'}
+      />
     </Background>
   );
 }
