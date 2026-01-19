@@ -25,7 +25,7 @@
       "first_name": "Test",
       "last_name": "User2",
       "bio": "This is test user 2",
-      "avatar_photo": "avatars/user2.jpg",
+      "avatar_photo": "avatars/user2.png",
       "is_active": true,
       "is_staff": false,
       "is_superuser": false
