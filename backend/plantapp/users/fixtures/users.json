@@ -5,11 +5,11 @@
     "fields": {
       "username": "testuser1",
       "email": "testuser1@example.com",
-      "password": "haslomaslo1234!@#$",
+      "password": "pbkdf2_sha256$870000$8vT5xKq3Ft9L2Np1Wr6Yd4$kH3pL9mNxVz2Qw7Rf6Sg8Tj5Uk4Vl1Wm3Xn2Yo9Zp0=",
       "first_name": "Test",
       "last_name": "User1",
       "bio": "This is test user 1",
-      "avatar_photo": "avatars/user1.jpg",
+      "avatar_photo": "avatars/user1.png",
       "is_active": true,
       "is_staff": false,
       "is_superuser": false
@@ -21,11 +21,11 @@
     "fields": {
       "username": "testuser2",
       "email": "testuser2@example.com",
-      "password": "haslomaslo1234!@#$",
+      "password": "pbkdf2_sha256$870000$8vT5xKq3Ft9L2Np1Wr6Yd4$kH3pL9mNxVz2Qw7Rf6Sg8Tj5Uk4Vl1Wm3Xn2Yo9Zp0=",
       "first_name": "Test",
       "last_name": "User2",
       "bio": "This is test user 2",
-      "avatar_photo": "avatars/user2.jpg",
+      "avatar_photo": "avatars/user2.png",
       "is_active": true,
       "is_staff": false,
       "is_superuser": false
@@ -37,11 +37,11 @@
     "fields": {
       "username": "testuser3",
       "email": "testuser3@example.com",
-      "password": "haslomaslo1234!@#$",
+      "password": "pbkdf2_sha256$870000$8vT5xKq3Ft9L2Np1Wr6Yd4$kH3pL9mNxVz2Qw7Rf6Sg8Tj5Uk4Vl1Wm3Xn2Yo9Zp0=",
       "first_name": "Test",
       "last_name": "User3",
       "bio": "This is test user 3",
-      "avatar_photo": "avatars/user3.jpg",
+      "avatar_photo": "avatars/user3.png",
       "is_active": true,
       "is_staff": false,
       "is_superuser": false
@@ -53,11 +53,11 @@
     "fields": {
       "username": "testuser4",
       "email": "testuser4@example.com",
-      "password": "haslomaslo1234!@#$",
+      "password": "pbkdf2_sha256$870000$8vT5xKq3Ft9L2Np1Wr6Yd4$kH3pL9mNxVz2Qw7Rf6Sg8Tj5Uk4Vl1Wm3Xn2Yo9Zp0=",
       "first_name": "Test",
       "last_name": "User4",
       "bio": "This is test user 4",
-      "avatar_photo": "avatars/user4.jpg",
+      "avatar_photo": "avatars/user4.png",
       "is_active": true,
       "is_staff": false,
       "is_superuser": false
@@ -69,11 +69,11 @@
     "fields": {
       "username": "testuser5",
       "email": "testuser5@example.com",
-      "password": "haslomaslo1234!@#$",
+      "password": "pbkdf2_sha256$870000$8vT5xKq3Ft9L2Np1Wr6Yd4$kH3pL9mNxVz2Qw7Rf6Sg8Tj5Uk4Vl1Wm3Xn2Yo9Zp0=",
       "first_name": "Test",
       "last_name": "User5",
       "bio": "This is test user 5",
-      "avatar_photo": "avatars/user5.jpg",
+      "avatar_photo": "avatars/user5.png",
       "is_active": true,
       "is_staff": false,
       "is_superuser": false
