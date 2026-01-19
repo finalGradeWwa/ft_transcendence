@@ -12,7 +12,7 @@ class Post(models.Model):
 	creator = models.ForeignKey(User, on_delete=models.CASCADE, related_name='posts')
 	plant = models.ForeignKey(Plant, on_delete=models.CASCADE, related_name='posts')
 	def __str__(self):
-		return f"{self.user.username} - {self.content[:20]}..."
+		return f"{self.creator.username} - {self.content[:20]}..."
 	
 class Comment(models.Model):
 	content = models.TextField(max_length=40)
