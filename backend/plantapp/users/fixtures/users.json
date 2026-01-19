@@ -1,0 +1,82 @@
+[
+  {
+    "model": "users.user",
+    "pk": 1,
+    "fields": {
+      "username": "testuser1",
+      "email": "testuser1@example.com",
+      "password": "haslomaslo1234!@#$",
+      "first_name": "Test",
+      "last_name": "User1",
+      "bio": "This is test user 1",
+      "avatar_photo": "avatars/user1.jpg",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 2,
+    "fields": {
+      "username": "testuser2",
+      "email": "testuser2@example.com",
+      "password": "haslomaslo1234!@#$",
+      "first_name": "Test",
+      "last_name": "User2",
+      "bio": "This is test user 2",
+      "avatar_photo": "avatars/user2.jpg",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 3,
+    "fields": {
+      "username": "testuser3",
+      "email": "testuser3@example.com",
+      "password": "haslomaslo1234!@#$",
+      "first_name": "Test",
+      "last_name": "User3",
+      "bio": "This is test user 3",
+      "avatar_photo": "avatars/user3.jpg",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 4,
+    "fields": {
+      "username": "testuser4",
+      "email": "testuser4@example.com",
+      "password": "haslomaslo1234!@#$",
+      "first_name": "Test",
+      "last_name": "User4",
+      "bio": "This is test user 4",
+      "avatar_photo": "avatars/user4.jpg",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 5,
+    "fields": {
+      "username": "testuser5",
+      "email": "testuser5@example.com",
+      "password": "haslomaslo1234!@#$",
+      "first_name": "Test",
+      "last_name": "User5",
+      "bio": "This is test user 5",
+      "avatar_photo": "avatars/user5.jpg",
+      "is_active": true,
+      "is_staff": false,
+      "is_superuser": false
+    }
+  }
+]
