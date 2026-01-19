@@ -156,7 +156,10 @@ class GardenAPITests(APITestCase):
         response = self.client.delete(url)
 
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
-
+        self.assertFalse(
+            GardenUser.objects.filter(pk=garden_user.pk).exists()
+        )
+        
     def test_non_owner_cannot_remove_garden_user(self):
         garden_user = GardenUser.objects.create(
             organization=self.garden,

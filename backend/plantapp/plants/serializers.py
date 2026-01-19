@@ -36,10 +36,14 @@ class PlantCreateSerializer(serializers.ModelSerializer):
     garden = serializers.PrimaryKeyRelatedField(
         queryset=Garden.objects.none()
     )
-    
+
+    #garden = serializers.PrimaryKeyRelatedField(
+    #queryset=Garden.objects.all()  # BAD - evaluated at class definition
+    #) -> BAD SOLUTION -> assignement evaluated at class definition 
     class Meta:
         model = Plant
         fields = ("nickname", "species", "garden")
+    
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

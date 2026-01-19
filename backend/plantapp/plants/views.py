@@ -75,6 +75,5 @@ class PlantViewSet(viewsets.ViewSet):
             pk=pk,
             garden__gardenuser__user=request.user
         )
-
         plant.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)

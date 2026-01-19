@@ -10,6 +10,7 @@ from gardens.models import Garden
 def create_post(*, creator, data):
     allowed_fields = {
         "description",
+        "garden",
         "plant",
         "image",
     }

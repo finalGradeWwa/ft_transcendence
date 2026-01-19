@@ -31,7 +31,7 @@ class GardenViewSet(viewsets.ViewSet):
         serializer = GardenContentSerializer(garden)
         return Response(serializer.data)
 
-
+    # POST /gardens/
     def create(self, request):
         garden = create_garden(
             creator=request.user,
