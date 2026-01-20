@@ -175,3 +175,77 @@ class GardenAPITests(APITestCase):
         response = self.client.delete(url)
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+class AutomaticGardenCreationTests(APITestCase):
+    """Test that a garden is automatically created when a user is registered."""
+
+    def test_garden_created_on_user_creation(self):
+        """Test that a garden is automatically created when a new user is created."""
+        user = User.objects.create_user(
+            username="newuser",
+            email="newuser@example.com",
+            password="password123"
+        )
+
+        # Check that a garden was created
+        garden = Garden.objects.filter(gardenuser__user=user).first()
+        self.assertIsNotNone(garden)
+        self.assertEqual(garden.garden_name, f"{user.username}'s Garden")
+
+    def test_user_is_member_of_default_garden(self):
+        """Test that the user is added as a member of the default garden."""
+        user = User.objects.create_user(
+            username="testuser",
+            email="testuser@example.com",
+            password="password123"
+        )
+
+        # Check that a GardenUser entry exists
+        garden_user = GardenUser.objects.filter(user=user).first()
+        self.assertIsNotNone(garden_user)
+
+    def test_user_is_owner_of_default_garden(self):
+        """Test that the user becomes the owner of the default garden."""
+        user = User.objects.create_user(
+            username="owneruser",
+            email="owneruser@example.com",
+            password="password123"
+        )
+
+        # Check that a GardenOwner entry exists
+        garden_owner = GardenOwner.objects.filter(
+            organization_user__user=user
+        ).first()
+        self.assertIsNotNone(garden_owner)
+
+    def test_default_garden_settings(self):
+        """Test that the default garden has correct settings."""
+        user = User.objects.create_user(
+            username="settingsuser",
+            email="settingsuser@example.com",
+            password="password123"
+        )
+
+        garden = Garden.objects.get(gardenuser__user=user)
+        self.assertEqual(garden.environment, 'I')  # Indoor
+        self.assertFalse(garden.is_public)
+
+    def test_multiple_users_have_separate_gardens(self):
+        """Test that each user gets their own garden."""
+        user1 = User.objects.create_user(
+            username="user1",
+            email="user1@example.com",
+            password="password123"
+        )
+        user2 = User.objects.create_user(
+            username="user2",
+            email="user2@example.com",
+            password="password123"
+        )
+
+        garden1 = Garden.objects.get(gardenuser__user=user1)
+        garden2 = Garden.objects.get(gardenuser__user=user2)
+
+        self.assertNotEqual(garden1.pk, garden2.pk)
+        self.assertEqual(garden1.garden_name, "user1's Garden")
+        self.assertEqual(garden2.garden_name, "user2's Garden")
