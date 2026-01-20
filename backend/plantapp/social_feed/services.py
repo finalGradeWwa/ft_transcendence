@@ -3,7 +3,7 @@ from .models import Post
 def create_post(creator, data):
 
     post = Post.objects.create(
-        author=creator,
+        creator=creator,
         content=data.get("content"),
         image=data.get("image"),
         garden=data.get("garden"),
