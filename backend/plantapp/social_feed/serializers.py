@@ -26,7 +26,7 @@ class PostWriteModeSerializer(serializers.ModelSerializer):
 
 class PostDetailReadModeSerializer(serializers.ModelSerializer):
     garden = serializers.StringRelatedField(read_only=True)
-    plant = serializers.StringRelatedField(read_only=True)
+    plant = serializers.StringRelatedField(read_only=True, required=False, allow_null=True)
     creator = serializers.StringRelatedField(read_only=True)
     class Meta:
         model = Post
