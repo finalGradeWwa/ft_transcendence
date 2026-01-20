@@ -5,6 +5,6 @@ plantapp/users/migrations/__pycache__
 plantapp/users/__pycache__
 plantapp/.env
 *.sqlite3
-__pycache__/
+/__pycache__/
 .DS_Store
 .env
