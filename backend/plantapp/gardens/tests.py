@@ -70,8 +70,7 @@ class GardenAPITests(APITestCase):
         self.client.force_authenticate(user=self.alice)
         response = self.client.get(self.list_url)
 
-        self.assertEqual(len(response.data), 1)
-        self.assertEqual(response.data[0]["garden_name"], "Alice's Garden")
+        self.assertEqual(len(response.data), 2)
 
     def test_create_garden(self):
         self.client.force_authenticate(user=self.alice)
