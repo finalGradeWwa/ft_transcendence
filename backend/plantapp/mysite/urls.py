@@ -25,6 +25,7 @@ urlpatterns = [
 	path('', include('users.urls')),
     path('api/garden/', include('gardens.urls')),
     path('api/plant/', include('plants.urls')),
+    path('chat/', include('chat_app.urls')),
     # path('api/image/', include('core.urls'))
 ]
 
