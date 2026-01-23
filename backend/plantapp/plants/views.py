@@ -1,5 +1,5 @@
 from rest_framework import viewsets, status
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 
@@ -9,7 +9,8 @@ from .services import create_plant
 
 
 class PlantViewSet(viewsets.ViewSet):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    queryset = Plant.objects.all()
 
     # GET /plants/
     # GET /plants/?garden=3
@@ -21,7 +22,7 @@ class PlantViewSet(viewsets.ViewSet):
         garden_id = request.query_params.get("garden")
 
         plants = Plant.objects.filter(
-            garden__gardenuser__user=request.user
+            garden__gardenuser__user=request.user.id
         )
 
         if garden_id:
@@ -38,7 +39,7 @@ class PlantViewSet(viewsets.ViewSet):
         plant = get_object_or_404(
             Plant,
             pk=pk,
-            garden__gardenuser__user=request.user
+            garden__gardenuser__user=request.user.id
         )
 
         serializer = PlantSerializer(plant)
