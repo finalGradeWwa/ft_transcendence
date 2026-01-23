@@ -5,7 +5,7 @@
     "fields": {
       "username": "testuser1",
       "email": "testuser1@example.com",
-      "password": "pbkdf2_sha256$870000$8vT5xKq3Ft9L2Np1Wr6Yd4$kH3pL9mNxVz2Qw7Rf6Sg8Tj5Uk4Vl1Wm3Xn2Yo9Zp0=",
+      "password": "${TEST_USER_PASSWORD}",
       "first_name": "Test",
       "last_name": "User1",
       "bio": "This is test user 1",
@@ -21,7 +21,7 @@
     "fields": {
       "username": "testuser2",
       "email": "testuser2@example.com",
-      "password": "pbkdf2_sha256$870000$8vT5xKq3Ft9L2Np1Wr6Yd4$kH3pL9mNxVz2Qw7Rf6Sg8Tj5Uk4Vl1Wm3Xn2Yo9Zp0=",
+      "password": "${TEST_USER_PASSWORD}",
       "first_name": "Test",
       "last_name": "User2",
       "bio": "This is test user 2",
@@ -37,7 +37,7 @@
     "fields": {
       "username": "testuser3",
       "email": "testuser3@example.com",
-      "password": "pbkdf2_sha256$870000$8vT5xKq3Ft9L2Np1Wr6Yd4$kH3pL9mNxVz2Qw7Rf6Sg8Tj5Uk4Vl1Wm3Xn2Yo9Zp0=",
+      "password": "${TEST_USER_PASSWORD}",
       "first_name": "Test",
       "last_name": "User3",
       "bio": "This is test user 3",
@@ -53,7 +53,7 @@
     "fields": {
       "username": "testuser4",
       "email": "testuser4@example.com",
-      "password": "pbkdf2_sha256$870000$8vT5xKq3Ft9L2Np1Wr6Yd4$kH3pL9mNxVz2Qw7Rf6Sg8Tj5Uk4Vl1Wm3Xn2Yo9Zp0=",
+      "password": "${TEST_USER_PASSWORD}",
       "first_name": "Test",
       "last_name": "User4",
       "bio": "This is test user 4",
@@ -69,7 +69,7 @@
     "fields": {
       "username": "testuser5",
       "email": "testuser5@example.com",
-      "password": "pbkdf2_sha256$870000$8vT5xKq3Ft9L2Np1Wr6Yd4$kH3pL9mNxVz2Qw7Rf6Sg8Tj5Uk4Vl1Wm3Xn2Yo9Zp0=",
+      "password": "${TEST_USER_PASSWORD}",
       "first_name": "Test",
       "last_name": "User5",
       "bio": "This is test user 5",
