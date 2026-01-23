@@ -1,19 +1,16 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.conf import settings
 from django.utils import timezone
 
 
 class Message(models.Model):
-	"""
-	Model representing a private message between two users.
-	"""
 	sender = models.ForeignKey(
-		User,
+		settings.AUTH_USER_MODEL,
 		on_delete=models.CASCADE,
 		related_name='sent_messages'
 	)
 	recipient = models.ForeignKey(
-		User,
+		settings.AUTH_USER_MODEL,
 		on_delete=models.CASCADE,
 		related_name='received_messages'
 	)
@@ -29,11 +26,9 @@ class Message(models.Model):
 
 
 class UserProfile(models.Model):
-	"""
-	Model extending User with chat-specific profile information.
-	"""
+
 	user = models.OneToOneField(
-		User,
+		settings.AUTH_USER_MODEL,
 		on_delete=models.CASCADE,
 		related_name='chat_profile'
 	)
