@@ -23,8 +23,9 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('authentication.urls')),
 	path('', include('users.urls')),
-    path('api/', include('gardens.urls')),
-    path('api/', include('plants.urls')),
+    path('api/garden/', include('gardens.urls')),
+    path('api/plant/', include('plants.urls')),
+    path('chat/', include('chat_app.urls')),
     # path('api/image/', include('core.urls'))
 ]
 

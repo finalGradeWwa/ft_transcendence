@@ -6,10 +6,13 @@ from rest_framework_simplejwt.views import (
 	TokenVerifyView,
 )
 
-from .views import RegisterView, ChangePasswordView, LogoutView , LoginView
+from .views import RegisterView, ChangePasswordView, LogoutView, LoginView, api_root
 
 
 urlpatterns = [
+	# Root endpoint
+	path('', api_root, name='api_root'),
+	
 	# JWT Token endpoints
 	path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),

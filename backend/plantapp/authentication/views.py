@@ -4,9 +4,41 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError
+from rest_framework.decorators import api_view, permission_classes
 
 from .serializers import UserRegistrationSerializer, ChangePasswordSerializer, LoginSerializer
 from users.serializers import UserSerializer
+
+
+# GET /
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def api_root(request):
+	"""API Root - Welcome endpoint with available routes"""
+	return Response({
+		"message": "Welcome to the Plant App API",
+		"endpoints": {
+			"authentication": {
+				"register": "/api/register/",
+				"login": "/api/auth/login/",
+				"logout": "/api/auth/logout/",
+				"change_password": "/api/auth/change-password/",
+				"token_obtain": "/api/token/",
+				"token_refresh": "/api/token/refresh/",
+				"token_verify": "/api/token/verify/",
+				"current_user": "/api/auth/me/"
+			},
+			"users": {
+				"follow": "/users/<user_id>/follow/",
+				"unfollow": "/users/<user_id>/unfollow/",
+				"followers": "/users/<user_id>/followers/",
+				"following": "/users/<user_id>/following/"
+			},
+			"gardens": "/api/garden/",
+			"plants": "/api/plant/",
+			"admin": "/admin/"
+		}
+	})
 
 # POST /api/auth/register/
 class RegisterView(APIView):
