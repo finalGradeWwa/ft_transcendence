@@ -24,13 +24,11 @@ class GardenEnv(models.TextChoices):
 
 class Garden(Organization):
     garden_id = models.AutoField(primary_key=True)
-    garden_name = models.CharField(max_length=30)
     environment = models.CharField(
         max_length=1,
         choices=GardenEnv.choices,
         default=GardenEnv.INDOOR,
     )
-    is_public = models.BooleanField(default=False)
     objects = GardenQuerySet.as_manager()
     def __str__(self):
         return self.garden_name

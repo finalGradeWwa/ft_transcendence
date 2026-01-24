@@ -9,5 +9,5 @@ def create_post(creator, data):
         garden=data.get("garden"),
         plant=data.get("plant")
     )
-    print(f"Created post: {post}")  # Uses __str__()
+    # print(f"Created post: {post}")  # Uses __str__()
     return post

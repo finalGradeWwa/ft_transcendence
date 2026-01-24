@@ -15,7 +15,7 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
     
 class GardenViewSet(viewsets.ViewSet):
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticated]
 
     # GET /gardens/5/
     def retrieve(self, request, pk):
@@ -34,12 +34,12 @@ class GardenViewSet(viewsets.ViewSet):
     # POST /gardens/
     def create(self, request):
         garden = create_garden(
-            creator=request.user.id,
+            creator=request.user,
             data=request.data
         )
         return Response(
         {
-            "detail": f"Your new {garden.garden_name} garden has been created.",
+            "detail": f"Your new {garden.name} garden has been created.",
             "garden_id": garden.id,
         },
             status=status.HTTP_201_CREATED,

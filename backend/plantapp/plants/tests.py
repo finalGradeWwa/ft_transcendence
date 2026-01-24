@@ -22,7 +22,6 @@ class PlantAPITests(APITestCase):
 
         self.garden = Garden.objects.create(
             name="My Garden",
-            garden_name="My Garden",
             slug="my-garden",
         )
         GardenUser.objects.create(organization=self.garden, user=self.user)
@@ -58,7 +57,6 @@ class PlantAPITests(APITestCase):
 
         garden = Garden.objects.create(
             name="My Garden",
-            garden_name="My Garden",
             slug="my-garden"
         )
 

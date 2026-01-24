@@ -70,7 +70,7 @@ INSTALLED_APPS = [
     'plants', 
     'gardens',
     'organizations',
-    'chat_app',
+    'social_feed',
 ]
 
 MIDDLEWARE = [

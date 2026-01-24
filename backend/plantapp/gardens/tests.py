@@ -23,7 +23,6 @@ class GardenAPITests(APITestCase):
         )
 
         self.garden = Garden.objects.create(
-            garden_name="Alice's Garden",
             name="Alice's Garden",
         )
 
@@ -51,7 +50,7 @@ class GardenAPITests(APITestCase):
         response = self.client.get(self.detail_url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["garden_name"], "Alice's Garden")
+        self.assertEqual(response.data["name"], "Alice's Garden")
 
     def test_owner_and_user_count_in_detail(self):
         self.client.force_authenticate(user=self.alice)
@@ -77,12 +76,12 @@ class GardenAPITests(APITestCase):
 
         response = self.client.post(
             self.create_url,
-            {"garden_name": "New Garden"}
+            {"name": "New Garden"}
         )
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertTrue(
-            Garden.objects.filter(garden_name="New Garden").exists()
+            Garden.objects.filter(name="New Garden").exists()
         )
 
     def test_owner_can_delete_garden(self):
@@ -189,7 +188,7 @@ class AutomaticGardenCreationTests(APITestCase):
         # Check that a garden was created
         garden = Garden.objects.filter(gardenuser__user=user).first()
         self.assertIsNotNone(garden)
-        self.assertEqual(garden.garden_name, f"{user.username}'s Garden")
+        self.assertEqual(garden.name, f"{user.username}'s Garden")
 
     def test_user_is_member_of_default_garden(self):
         """Test that the user is added as a member of the default garden."""
@@ -227,7 +226,6 @@ class AutomaticGardenCreationTests(APITestCase):
 
         garden = Garden.objects.get(gardenuser__user=user)
         self.assertEqual(garden.environment, 'I')  # Indoor
-        self.assertFalse(garden.is_public)
 
     def test_multiple_users_have_separate_gardens(self):
         """Test that each user gets their own garden."""
@@ -246,5 +244,5 @@ class AutomaticGardenCreationTests(APITestCase):
         garden2 = Garden.objects.get(gardenuser__user=user2)
 
         self.assertNotEqual(garden1.pk, garden2.pk)
-        self.assertEqual(garden1.garden_name, "user1's Garden")
-        self.assertEqual(garden2.garden_name, "user2's Garden")
+        self.assertEqual(garden1.name, "user1's Garden")
+        self.assertEqual(garden2.name, "user2's Garden")

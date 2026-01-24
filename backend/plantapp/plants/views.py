@@ -9,7 +9,7 @@ from .services import create_plant
 
 
 class PlantViewSet(viewsets.ViewSet):
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticated]
     queryset = Plant.objects.all()
 
     # GET /plants/
@@ -22,7 +22,7 @@ class PlantViewSet(viewsets.ViewSet):
         garden_id = request.query_params.get("garden")
 
         plants = Plant.objects.filter(
-            garden__gardenuser__user=request.user.id
+            garden__gardenuser__user=request.user
         )
 
         if garden_id:

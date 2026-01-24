@@ -19,9 +19,8 @@ def create_default_garden(sender, instance, created, **kwargs):
     if created:
         # Create the garden
         garden = Garden.objects.create(
-            garden_name=f"{instance.username}'s Garden",
+            name=f"{instance.username}'s Garden",
             environment='I',  # Default to indoor
-            is_public=False,
         )
         
         # Add the user to the garden
