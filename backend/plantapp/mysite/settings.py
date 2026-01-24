@@ -71,6 +71,7 @@ INSTALLED_APPS = [
     'gardens',
     'organizations',
     'social_feed',
+    'chat_app',
 ]
 
 MIDDLEWARE = [
