@@ -82,6 +82,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'authentication.middleware.JWTCookieMiddleware',
 ]
 
 ROOT_URLCONF = 'mysite.urls'
@@ -222,6 +223,12 @@ AUTHENTICATION_BACKENDS = (
 
 SOCIAL_AUTH_GITHUB_KEY = os.environ.get('GITHUB_OAUTH_KEY')
 SOCIAL_AUTH_GITHUB_SECRET = os.environ.get('GITHUB_OAUTH_SECRET')
+if not SOCIAL_AUTH_GITHUB_KEY or not SOCIAL_AUTH_GITHUB_SECRET:
+    raise RuntimeError(
+        "GitHub OAuth credentials are not configured. "
+        "Set GITHUB_OAUTH_KEY and GITHUB_OAUTH_SECRET in your environment or .env file "
+        "before running the project."
+    )
 
 SOCIAL_AUTH_GITHUB_SCOPE = ['user:email']
 
@@ -241,4 +248,9 @@ SOCIAL_AUTH_PIPELINE = (
     'authentication.pipeline.get_tokens_for_user',
 )
 
-SOCIAL_AUTH_LOGIN_ERROR_URL = 'http://localhost:3000/pl/login?error=access_denied'
+FRONTEND_URL = os.getenv("FRONTEND_BASE_URL", "http://localhost:3000")
+SOCIAL_AUTH_LOGIN_ERROR_URL = f"{FRONTEND_URL.rstrip('/')}/pl/login?error=access_denied"
+
+CSRF_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_HTTPONLY = True
+CSRF_COOKIE_SAMESITE = 'Lax'
