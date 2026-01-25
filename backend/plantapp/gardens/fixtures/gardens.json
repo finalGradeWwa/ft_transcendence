@@ -1,0 +1,203 @@
+[
+  {
+    "model": "organizations.organization",
+    "pk": 1,
+    "fields": {
+      "name": "Test Indoor Garden",
+      "slug": "test-indoor-garden",
+      "is_active": true,
+      "created": "2026-01-01T12:00:00Z",
+      "modified": "2026-01-01T12:00:00Z"
+    }
+  },
+  {
+    "model": "gardens.gardenuser",
+    "pk": 1,
+    "fields": {
+      "organization": 1,
+      "user": 1
+    }
+  },
+  {
+    "model": "gardens.gardenowner",
+    "pk": 1,
+    "fields": {
+      "organization": 1,
+      "organization_user": 1
+    }
+  },
+  {
+    "model": "gardens.garden",
+    "pk": 1,
+    "fields": {
+      "organization_ptr": 1,
+      "garden_name": "Test Indoor Garden",
+      "environment": "I",
+      "is_public": true
+    }
+  },
+  {
+    "model": "organizations.organization",
+    "pk": 2,
+    "fields": {
+      "name": "Test Outdoor Garden",
+      "slug": "test-outdoor-garden",
+      "is_active": true,
+      "created": "2026-01-02T12:00:00Z",
+      "modified": "2026-01-02T12:00:00Z"
+    }
+  },
+  {
+    "model": "gardens.gardenuser",
+    "pk": 2,
+    "fields": {
+      "organization": 2,
+      "user": 2
+    }
+  },
+  {
+    "model": "gardens.gardenowner",
+    "pk": 2,
+    "fields": {
+      "organization": 2,
+      "organization_user": 2
+    }
+  },
+  {
+    "model": "gardens.garden",
+    "pk": 2,
+    "fields": {
+      "organization_ptr": 2,
+      "garden_name": "Test Outdoor Garden",
+      "environment": "O",
+      "is_public": true
+    }
+  },
+  {
+    "model": "organizations.organization",
+    "pk": 3,
+    "fields": {
+      "name": "Community Greenhouse",
+      "slug": "community-greenhouse",
+      "is_active": true,
+      "created": "2026-01-03T12:00:00Z",
+      "modified": "2026-01-03T12:00:00Z"
+    }
+  },
+  {
+    "model": "gardens.gardenuser",
+    "pk": 3,
+    "fields": {
+      "organization": 3,
+      "user": 3
+    }
+  },
+  {
+    "model": "gardens.gardenuser",
+    "pk": 4,
+    "fields": {
+      "organization": 3,
+      "user": 1
+    }
+  },
+  {
+    "model": "gardens.gardenowner",
+    "pk": 3,
+    "fields": {
+      "organization": 3,
+      "organization_user": 3
+    }
+  },
+  {
+    "model": "gardens.garden",
+    "pk": 3,
+    "fields": {
+      "organization_ptr": 3,
+      "garden_name": "Community Greenhouse",
+      "environment": "G",
+      "is_public": true
+    }
+  },
+  {
+    "model": "organizations.organization",
+    "pk": 4,
+    "fields": {
+      "name": "Private Collection",
+      "slug": "private-collection",
+      "is_active": true,
+      "created": "2026-01-04T12:00:00Z",
+      "modified": "2026-01-04T12:00:00Z"
+    }
+  },
+  {
+    "model": "gardens.gardenuser",
+    "pk": 5,
+    "fields": {
+      "organization": 4,
+      "user": 4
+    }
+  },
+  {
+    "model": "gardens.gardenowner",
+    "pk": 4,
+    "fields": {
+      "organization": 4,
+      "organization_user": 5
+    }
+  },
+  {
+    "model": "gardens.garden",
+    "pk": 4,
+    "fields": {
+      "organization_ptr": 4,
+      "garden_name": "Private Collection",
+      "environment": "I",
+      "is_public": false
+    }
+  },
+  {
+    "model": "organizations.organization",
+    "pk": 5,
+    "fields": {
+      "name": "Rooftop Paradise",
+      "slug": "rooftop-paradise",
+      "is_active": true,
+      "created": "2026-01-05T12:00:00Z",
+      "modified": "2026-01-05T12:00:00Z"
+    }
+  },
+  {
+    "model": "gardens.gardenuser",
+    "pk": 6,
+    "fields": {
+      "organization": 5,
+      "user": 5
+    }
+  },
+  {
+    "model": "gardens.gardenuser",
+    "pk": 7,
+    "fields": {
+      "organization": 5,
+      "user": 2
+    }
+  },
+  {
+    "model": "gardens.gardenowner",
+    "pk": 5,
+    "fields": {
+      "organization": 5,
+      "organization_user": 6
+    }
+  },
+  {
+    "model": "gardens.garden",
+    "pk": 5,
+    "fields": {
+      "organization_ptr": 5,
+      "garden_name": "Rooftop Paradise",
+      "environment": "O",
+      "is_public": true
+    }
+  }
+]
