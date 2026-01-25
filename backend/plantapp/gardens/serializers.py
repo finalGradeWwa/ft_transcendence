@@ -8,9 +8,8 @@ class GardenListSerializer(serializers.ModelSerializer):
         model = Garden
         fields = (
             "garden_id",
-            "garden_name",
+            "name",
             "environment",
-            "is_public",
             "user_count"
         )
         read_only_fields = fields
@@ -27,9 +26,8 @@ class GardenContentSerializer(serializers.ModelSerializer):
         model = Garden
         fields = [
             "garden_id",
-            "garden_name",
+            "name",
             "environment",
-            "is_public",
             "plants",
             "owner",
             "user_count",

@@ -70,6 +70,7 @@ INSTALLED_APPS = [
     'plants', 
     'gardens',
     'organizations',
+    'social_feed',
     'chat_app',
 ]
 

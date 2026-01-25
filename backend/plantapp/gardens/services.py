@@ -2,8 +2,8 @@ from .models import Garden, GardenOwner, GardenUser
 
 def create_garden(*, creator, data):
     garden = Garden.objects.create(
-        name=data["garden_name"],
-        garden_name=data["garden_name"],
+        name=data["name"],
+        environment=data.get("environment", "I"),
     )
     garden_user = GardenUser.objects.create(
         organization=garden,

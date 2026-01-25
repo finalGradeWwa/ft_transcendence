@@ -1,7 +1,7 @@
 from .models import Garden, GardenUser, GardenOwner
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated,IsAuthenticatedOrReadOnly
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
@@ -26,7 +26,7 @@ class GardenViewSet(viewsets.ViewSet):
                 "owners__organization_user__user"
             ),
             pk=pk,
-            gardenuser__user=request.user,
+            gardenuser__user=request.user.id,
         )
         serializer = GardenContentSerializer(garden)
         return Response(serializer.data)
@@ -39,7 +39,7 @@ class GardenViewSet(viewsets.ViewSet):
         )
         return Response(
         {
-            "detail": f"Your new {garden.garden_name} garden has been created.",
+            "detail": f"Your new {garden.name} garden has been created.",
             "garden_id": garden.id,
         },
             status=status.HTTP_201_CREATED,
@@ -56,7 +56,7 @@ class GardenViewSet(viewsets.ViewSet):
     def list(self, request):
         gardens = (
             Garden.objects
-                .filter(gardenuser__user=request.user)
+                .filter(gardenuser__user=request.user.id)
                 .distinct()
                 .annotate(user_count=Count("gardenuser"))
         )
