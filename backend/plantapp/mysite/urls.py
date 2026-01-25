@@ -26,6 +26,7 @@ urlpatterns = [
     path('api/garden/', include('gardens.urls')),
     path('api/plant/', include('plants.urls')),
     path('api/auth/', include('social_django.urls', namespace='social')),
+    path('chat/', include('chat_app.urls')),
     # path('api/image/', include('core.urls'))
 ]
 
