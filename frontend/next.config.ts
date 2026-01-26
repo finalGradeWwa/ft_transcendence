@@ -1,12 +1,3 @@
-/**
- * PL: Główna konfiguracja Next.js rozszerzona o plugin next-intl.
- * Integruje bibliotekę i18n z procesem budowania aplikacji oraz definiuje
- * ustawienia wyjściowe dla środowiska produkcyjnego (standalone).
- * * EN: Main Next.js configuration extended with the next-intl plugin.
- * Integrates the i18n library with the build process and defines
- * output settings for the production environment (standalone).
- */
-
 import createNextIntlPlugin from 'next-intl/plugin';
 import type { NextConfig } from 'next';
 
@@ -23,6 +14,8 @@ const withNextIntl = createNextIntlPlugin();
 const nextConfig: NextConfig = {
   output: 'standalone',
   images: {
+    deviceSizes: [480, 828, 1200, 1920],
+    imageSizes: [96, 256, 384],
     remotePatterns: [
       {
         protocol: 'http',
