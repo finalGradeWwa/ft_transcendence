@@ -6,21 +6,24 @@ updated PLANTS system - plants belong to owner and garden (optionally), appropri
 
 
 ### BACKEND REQUEST MAP
-GET    /plants/
-→ list all plants user has access to
+GET    /api/plant/
+-> list all plants user has access to
 
-GET    /plants/?garden=3
-→ list plants only from garden 3
+GET    /api/plant/?garden=3
+-> list plants only from garden 3
 
-GET    /plants/5/
-→ get details for plant with id 5
+GET    /api/plant/5/
+-> get details for plant with id 5
 
-POST   /plants/
-→ create a new plant
+POST   /api/plant/
+-> create a new plant
   body: { name, garden, image, ... }
 
-DELETE /plants/5/
-→ delete plant 5
+DELETE /api/plant/5/
+-> delete plant 5
 
-PUT /plants/5/ & PATCH /plants/5/
+PUT /api/plant/5/ 
 -> updates object's properties
+
+PATCH /api/plant/5/
+-> updates object's properties (partially)

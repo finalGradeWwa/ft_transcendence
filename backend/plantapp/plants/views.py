@@ -94,7 +94,7 @@ class PlantViewSet(viewsets.ViewSet):
             data=request.data,
             context={"request": request},
         )
-        if serializer.is_valid(raise_exception=True):
+        if serializer.is_valid():
             serializer.save()
             return Response(PlantSerializer(serializer.instance).data)
         return Response(status=status.HTTP_400_BAD_REQUEST)
@@ -115,7 +115,7 @@ class PlantViewSet(viewsets.ViewSet):
             context={"request": request},
             partial=True
         )
-        if serializer.is_valid(raise_exception=True):
+        if serializer.is_valid():
             serializer.save()
             return Response(PlantSerializer(serializer.instance).data)
         return Response(status=status.HTTP_400_BAD_REQUEST)

@@ -79,7 +79,6 @@ class PlantAPITests(APITestCase):
             Plant.objects.filter(nickname="NewFern", garden=garden).exists()
         )
 
-
     def test_delete_removes_owned_plant(self):
         url = reverse("plant-detail", args=[self.plant.pk])
         self.client.force_authenticate(self.user)
@@ -113,17 +112,32 @@ class PlantAPITests(APITestCase):
         self.assertEqual(self.plant.nickname, "New Fern Name")
         self.assertEqual(self.plant.species, "Fern Updated")
 
-    def test_update_requires_authentication(self):
+    def test_patch_requires_authentication(self):
         """Test that unauthenticated users cannot update"""
         url = reverse("plant-detail", args=[self.plant.pk])
         payload = {"nickname": "Hacked"}
         response = self.client.patch(url, payload)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-    def test_update_denies_non_garden_member(self):
+    def test_put_requires_authentication(self):
+        """Test that unauthenticated users cannot update"""
+        url = reverse("plant-detail", args=[self.plant.pk])
+        payload = {"nickname": "Hacked"}
+        response = self.client.put(url, payload)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_patch_denies_non_garden_member(self):
         """Test that users not in garden cannot update plant"""
         url = reverse("plant-detail", args=[self.plant.pk])
         self.client.force_authenticate(self.other_user)
         payload = {"nickname": "Hacked"}
         response = self.client.patch(url, payload)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_put_denies_non_garden_member(self):
+        """Test that users not in garden cannot update plant"""
+        url = reverse("plant-detail", args=[self.plant.pk])
+        self.client.force_authenticate(self.other_user)
+        payload = {"nickname": "Hacked"}
+        response = self.client.put(url, payload)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
