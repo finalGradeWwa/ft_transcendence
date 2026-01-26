@@ -78,3 +78,44 @@ class PlantViewSet(viewsets.ViewSet):
         )
         plant.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+    # PUT /plants/5/ 
+    def update(self, request, pk=None):
+        """
+        Update a plant (PUT/PATCH). User must have access to its garden.
+        """
+        plant = get_object_or_404(
+            Plant,
+            pk=pk,
+            garden__gardenuser__user=request.user
+        )
+        serializer = PlantCreateSerializer(
+            plant,
+            data=request.data,
+            context={"request": request},
+        )
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response(PlantSerializer(serializer.instance).data)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+    
+    # & PATCH /plants/5/
+    def partial_update(self, request, pk=None):
+        """
+        Update a plant (PUT/PATCH). User must have access to its garden.
+        """
+        plant = get_object_or_404(
+            Plant,
+            pk=pk,
+            garden__gardenuser__user=request.user
+        )
+        serializer = PlantCreateSerializer(
+            plant,
+            data=request.data,
+            context={"request": request},
+            partial=True
+        )
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response(PlantSerializer(serializer.instance).data)
+        return Response(status=status.HTTP_400_BAD_REQUEST)

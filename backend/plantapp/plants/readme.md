@@ -21,3 +21,6 @@ POST   /plants/
 
 DELETE /plants/5/
 → delete plant 5
+
+PUT /plants/5/ & PATCH /plants/5/
+-> updates object's properties
