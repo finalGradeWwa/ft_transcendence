@@ -39,7 +39,7 @@ class PlantCreateSerializer(serializers.ModelSerializer):
     )
     class Meta:
         model = Plant
-        fields = ("nickname", "species", "garden")
+        fields = ("nickname", "species", "garden", "image")
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

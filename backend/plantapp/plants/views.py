@@ -12,8 +12,8 @@ class PlantViewSet(viewsets.ViewSet):
     permission_classes = [IsAuthenticated]
     queryset = Plant.objects.all()
 
-    # GET /plants/
-    # GET /plants/?garden=3
+    # GET api/plant/
+    # GET api/plant/?garden=3
     def list(self, request):
         """
         List plants the user has access to.
@@ -31,7 +31,7 @@ class PlantViewSet(viewsets.ViewSet):
         serializer = PlantListSerializer(plants, many=True)
         return Response(serializer.data)
 
-    # GET /plants/5/
+    # GET /api/plant/5/
     def retrieve(self, request, pk=None):
         """
         Retrieve a single plant if the user is a member of its garden.
@@ -45,7 +45,7 @@ class PlantViewSet(viewsets.ViewSet):
         serializer = PlantSerializer(plant)
         return Response(serializer.data)
 
-    # POST /plants/
+    # POST /api/plant/
     def create(self, request):
         serializer = PlantCreateSerializer(
             data=request.data,
@@ -66,7 +66,7 @@ class PlantViewSet(viewsets.ViewSet):
             status=status.HTTP_201_CREATED,
         )
 
-    # DELETE /plants/5/
+    # DELETE /api/plant/5/
     def destroy(self, request, pk=None):
         """
         Delete a plant if the user has access to its garden.
@@ -79,7 +79,7 @@ class PlantViewSet(viewsets.ViewSet):
         plant.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    # PUT /plants/5/ 
+    # PUT /api/plant/5/ 
     def update(self, request, pk=None):
         """
         Update a plant (PUT). User must have access to its garden.
@@ -94,12 +94,11 @@ class PlantViewSet(viewsets.ViewSet):
             data=request.data,
             context={"request": request},
         )
-        if serializer.is_valid():
+        if serializer.is_valid(raise_exception=True):
             serializer.save()
-            return Response(PlantSerializer(serializer.instance).data)
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+        return Response(PlantSerializer(serializer.instance).data)
     
-    # & PATCH /plants/5/
+    # PATCH /api/plant/5/
     def partial_update(self, request, pk=None):
         """
         Update a plant (PATCH). User must have access to its garden.
@@ -115,7 +114,6 @@ class PlantViewSet(viewsets.ViewSet):
             context={"request": request},
             partial=True
         )
-        if serializer.is_valid():
+        if serializer.is_valid(raise_exception=True):
             serializer.save()
-            return Response(PlantSerializer(serializer.instance).data)
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+        return Response(PlantSerializer(serializer.instance).data)
