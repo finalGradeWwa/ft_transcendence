@@ -3,7 +3,7 @@ from django.core.exceptions import ValidationError
 from gardens.models import Garden
 
 def create_plant(*, creator, data):
-    allowed_fields = {"nickname", "garden", "species"}
+    allowed_fields = {"nickname", "garden", "species", "image"}
 
     # Only include allowed fields
     clean_data = {key: value for (key, value) in data.items() if key in allowed_fields}

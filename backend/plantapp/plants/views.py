@@ -12,8 +12,8 @@ class PlantViewSet(viewsets.ViewSet):
     permission_classes = [IsAuthenticated]
     queryset = Plant.objects.all()
 
-    # GET api/plant/
-    # GET api/plant/?garden=3
+    # GET /api/plant/
+    # GET /api/plant/?garden=3
     def list(self, request):
         """
         List plants the user has access to.
