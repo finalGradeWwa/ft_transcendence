@@ -82,7 +82,7 @@ class PlantViewSet(viewsets.ViewSet):
     # PUT /plants/5/ 
     def update(self, request, pk=None):
         """
-        Update a plant (PUT/PATCH). User must have access to its garden.
+        Update a plant (PUT). User must have access to its garden.
         """
         plant = get_object_or_404(
             Plant,
@@ -102,7 +102,7 @@ class PlantViewSet(viewsets.ViewSet):
     # & PATCH /plants/5/
     def partial_update(self, request, pk=None):
         """
-        Update a plant (PUT/PATCH). User must have access to its garden.
+        Update a plant (PATCH). User must have access to its garden.
         """
         plant = get_object_or_404(
             Plant,
