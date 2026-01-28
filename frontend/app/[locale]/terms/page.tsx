@@ -1,3 +1,10 @@
+/**
+ * PL: Strona regulaminu obsługująca dynamiczne wczytywanie plików Markdown.
+ * Wykorzystuje Tailwind Typography (prose) do renderowania sformatowanej treści.
+ * EN: Terms and conditions page supporting dynamic Markdown file loading.
+ * Utilizes Tailwind Typography (prose) for rendering formatted content.
+ */
+
 import fs from 'fs';
 import path from 'path';
 import { notFound } from 'next/navigation';
@@ -7,12 +14,24 @@ interface TermsPageProps {
   params: Promise<{ locale: string }>;
 }
 
+/**
+ * PL: Pobiera treść regulaminu z pliku Markdown na podstawie języka.
+ * Czyści nagłówek i formatuje numerację punktów.
+ * EN: Fetches terms and conditions content from a Markdown file based on locale.
+ * Cleans the header and formats list numbering.
+ */
 async function getTermsContent(locale: string) {
   const filePath = path.join(process.cwd(), 'content/terms', `${locale}.md`);
   try {
     if (!fs.existsSync(filePath)) return null;
     let content = fs.readFileSync(filePath, 'utf8');
+
+    // PL: Usuwanie redundantnego tytułu "Regulamin" z pliku MD.
+    // EN: Removing redundant "Terms and Conditions" title from MD file.
     content = content.replace(/^#?\s*Regulamin\s*\n/i, '');
+
+    // PL: Dodawanie pogrubienia do numerowanych punktów (np. 1. -> **1.**).
+    // EN: Adding bold formatting to numbered points (e.g., 1. -> **1.**).
     content = content.replace(/^(\d+[\.\)])/gm, '\n\n**$1**');
 
     return content;
@@ -21,6 +40,12 @@ async function getTermsContent(locale: string) {
   }
 }
 
+/**
+ * PL: Strona regulaminu renderująca treść Markdown.
+ * Wykorzystuje klasy 'prose' (Tailwind Typography) do stylowania czystego HTML.
+ * EN: Terms page rendering Markdown content.
+ * Uses 'prose' classes (Tailwind Typography) to style raw HTML elements.
+ */
 export default async function TermsPage({ params }: TermsPageProps) {
   const { locale } = await params;
   const content = await getTermsContent(locale);
@@ -33,6 +58,12 @@ export default async function TermsPage({ params }: TermsPageProps) {
     <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8">
       <div className="py-12 flex justify-center">
         <div className="bg-dark-bg/80 min-[600px]:bg-dark-bg/50 backdrop-blur-md p-6 sm:p-12 rounded-xl shadow-2xl w-full border border-primary-green/50">
+          {/**
+           * PL: 'prose' to wtyczka Tailwind Typography, która automatycznie styluje elementy
+           * wewnątrz kontenera (np. p, h1, ul), które normalnie są resetowane przez Tailwinda.
+           * EN: 'prose' is the Tailwind Typography plugin that automatically styles elements
+           * inside the container (e.g., p, h1, ul) which are normally reset by Tailwind.
+           */}
           <article
             dir={locale === 'ar' ? 'rtl' : 'ltr'}
             lang={locale}

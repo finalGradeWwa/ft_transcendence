@@ -4,7 +4,6 @@
  * EN: Modern profile component (7xl). Dynamically displays data from Django backend and supports i18n.
  */
 
-import { Navigation } from '@/components/Navigation';
 import { Heading } from '@/components/Heading';
 import { Text } from '@/components/typography/Text';
 import { Link } from '@/i18n/navigation';
@@ -30,10 +29,10 @@ const getAvatarUrl = (path?: string) => {
   return path.startsWith('http') ? path : `http://localhost:8000${path}`;
 };
 
-const formatDate = (dateString?: string) => {
-  if (!dateString) return '';
+const formatDate = (dateString: string) => {
   try {
-    return new Date(dateString).toISOString().split('T')[0];
+    const date = new Date(dateString);
+    return date.toISOString().split('T')[0];
   } catch {
     return dateString;
   }
@@ -107,7 +106,8 @@ const PersonalInfo = ({
             </svg>
             <Text className="text-base sm:text-lg font-medium">
               <span className="sr-only">{t('joinedLabel')}: </span>
-              {formatDate(user.joined)}
+              {/* Wywołaj tylko jeśli user i user.joined istnieją */}
+              {user?.joined ? formatDate(user.joined) : ''}
             </Text>
           </div>
         </div>
@@ -155,64 +155,62 @@ export default function UserProfileClient({ user }: UserProfileProps) {
   const t = useTranslations('ProfilePage');
 
   return (
-    <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8">
-      <Navigation />
-      <main className="py-12 flex justify-center">
-        <div className="bg-container-light/10 backdrop-blur-md p-6 sm:p-10 rounded-xl shadow-2xl w-full border border-primary-green/50">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <PersonalInfo user={user} t={t} />
+    <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pt-4 pb-12 flex flex-col justify-center h-full flex-grow">
+      <div className="bg-container-light/10 backdrop-blur-md p-6 sm:p-10 rounded-xl shadow-2xl w-full border border-primary-green/50 mt-12">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <PersonalInfo user={user} t={t} />
 
-            <div className="flex flex-col gap-4">
-              <StatCard
-                count={user?.gardens}
-                label={t('stats.gardens')}
-                href="/my-gardens"
-                aria={t('aria.gardensLink')}
-                isLoading={!user}
-              />
-              <StatCard
-                count={user?.plants}
-                label={t('stats.plants')}
-                href="/my-plants"
-                aria={t('aria.plantsLink')}
-                isLoading={!user}
-              />
-            </div>
-          </div>
-
-          <div className="mt-8 pt-8 border-t border-white/20">
-            <Heading
-              as="h3"
-              className="text-xl font-black !text-white uppercase mb-6 tracking-widest drop-shadow-sm break-words whitespace-normal"
-            >
-              {t('settings.title')}
-            </Heading>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {[
-                { key: 'edit', href: '/profile/edit' },
-                { key: 'notifications', href: '/profile/notifications' },
-                { key: 'privacy', href: '/profile/privacy' },
-              ].map(({ key, href }) => (
-                <Link
-                  key={key}
-                  href={href}
-                  className="group block p-6 sm:p-8 bg-container-light/90 rounded-xl border border-transparent shadow-sm transition-all duration-300 hover:bg-white hover:border-primary-green hover:shadow-md overflow-hidden"
-                >
-                  <Text className="font-black text-primary-green uppercase text-base sm:text-lg tracking-wider mb-3 break-words whitespace-normal">
-                    {t(`settings.${key}.label`)}
-                  </Text>
-                  <Text
-                    variant="small"
-                    className="text-neutral-700 font-medium leading-relaxed break-words whitespace-normal"
-                  >
-                    {t(`settings.${key}.desc`)}
-                  </Text>
-                </Link>
-              ))}
-            </div>
+          <div className="flex flex-col gap-4">
+            <StatCard
+              count={user?.gardens}
+              label={t('stats.gardens')}
+              href={user ? `/profiles/${user.username}/gardens` : '#'}
+              aria={user ? t('aria.gardensLink', { name: user.username }) : ''}
+              isLoading={!user}
+            />
+            <StatCard
+              count={user?.plants}
+              label={t('stats.plants')}
+              /* Użyj backticków i znaku dolara dla zmiennej */
+              href={user ? `/profiles/${user.username}/plants` : '#'}
+              aria={user ? t('aria.plantsLink', { name: user.username }) : ''}
+              isLoading={!user}
+            />
           </div>
         </div>
-      </main>
+
+        <div className="mt-8 pt-8 border-t border-white/20">
+          <Heading
+            as="h3"
+            className="text-xl font-black !text-white uppercase mb-6 tracking-widest drop-shadow-sm break-words whitespace-normal"
+          >
+            {t('settings.title')}
+          </Heading>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[
+              { key: 'edit', href: '/profile/edit' },
+              { key: 'notifications', href: '/profile/notifications' },
+              { key: 'privacy', href: '/profile/privacy' },
+            ].map(({ key, href }) => (
+              <Link
+                key={key}
+                href={href}
+                className="group block p-6 sm:p-8 bg-container-light/90 rounded-xl border border-transparent shadow-sm transition-all duration-300 hover:bg-white hover:border-primary-green hover:shadow-md overflow-hidden"
+              >
+                <Text className="font-black text-primary-green uppercase text-base sm:text-lg tracking-wider mb-3 break-words whitespace-normal">
+                  {t(`settings.${key}.label`)}
+                </Text>
+                <Text
+                  variant="small"
+                  className="text-neutral-700 font-medium leading-relaxed break-words whitespace-normal"
+                >
+                  {t(`settings.${key}.desc`)}
+                </Text>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
