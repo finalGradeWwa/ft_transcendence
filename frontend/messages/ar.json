@@ -49,6 +49,7 @@
     "title": "ملف المستخدم",
     "joinedLabel": "انضم في",
     "userPlantsTitle": "مجموعة نباتاتك",
+    "userCollection": "مجموعة نباتات المستخدم {name}",
     "profileDescription": "لنشارك جمال النباتات.",
     "stats": {
       "gardens": "الحدائق",
@@ -70,9 +71,9 @@
       }
     },
     "aria": {
-      "avatarAlt": "Profilbild von Benutzer {name}",
-      "gardensLink": "Gehe zu den Gärten von {name}",
-      "plantsLink": "Gehe zu den Pflanzen von {name}"
+      "avatarAlt": "صورة الملف الشخصي للمستخدم {name}",
+      "gardensLink": "الذهاب إلى حدائق {name}",
+      "plantsLink": "الذهاب إلى نباتات {name}"
     }
   },
   "RegisterPage": {
@@ -124,8 +125,14 @@
       "nickname": "اسم نباتك",
       "garden": "اختر الحديقة",
       "garden_belong": "الحديقة:",
+      "no_garden": "بدون حديقة",
       "selectGarden": "-- اختر الحديقة --",
       "photo": "صورة النبات"
+    },
+    "errors": {
+      "fillAllFields": "يرجى ملء جميع الحقول وإضافة صورة.",
+      "addPlantFailed": "حدث خطأ أثناء إضافة النبتة.",
+      "unexpectedError": "حدث خطأ غير متوقع."
     },
     "success": {
       "title": "تمت إضافة النبات!",

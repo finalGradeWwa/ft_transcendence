@@ -64,7 +64,6 @@ export default function AddGardenPage({ params }: AddGardenPageProps) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Zapisywanie ogrodu:', gardenName);
   };
 
   return (

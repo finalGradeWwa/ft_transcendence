@@ -49,6 +49,7 @@
     "title": "User Profile",
     "joinedLabel": "Joined",
     "userPlantsTitle": "Your Plant Collection",
+    "userCollection": "{name}'s plant collection",
     "profileDescription": "Let's share the beauty of plants.",
     "stats": {
       "gardens": "Gardens",
@@ -125,8 +126,14 @@
       "nickname": "Your plant's name",
       "garden": "Select garden",
       "garden_belong": "Garden:",
+      "no_garden": "No garden",
       "selectGarden": "-- Select garden --",
       "photo": "Plant photo"
+    },
+    "errors": {
+      "fillAllFields": "Please fill in all fields and add a photo.",
+      "addPlantFailed": "Error while adding the plant.",
+      "unexpectedError": "An unexpected error occurred."
     },
     "success": {
       "title": "Plant added!",

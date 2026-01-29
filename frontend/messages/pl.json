@@ -49,6 +49,7 @@
     "title": "Profil użytkownika",
     "joinedLabel": "Dołączono",
     "userPlantsTitle": "Twoja kolekcja roślin",
+    "userCollection": "Kolekcja roślin użytkownika {name}",
     "profileDescription": "Podzielmy się pięknem roślin.",
     "stats": {
       "gardens": "Ogrody",
@@ -125,8 +126,14 @@
       "nickname": "Nazwa Twojej rośliny",
       "garden": "Wybierz ogród",
       "garden_belong": "Ogród:",
+      "no_garden": "Brak ogrodu",
       "selectGarden": "-- Wybierz ogród --",
       "photo": "Zdjęcie rośliny"
+    },
+    "errors": {
+      "fillAllFields": "Proszę wypełnić wszystkie pola i dodać zdjęcie.",
+      "addPlantFailed": "Błąd podczas dodawania rośliny.",
+      "unexpectedError": "Wystąpił nieoczekiwany błąd."
     },
     "success": {
       "title": "Roślina dodana!",

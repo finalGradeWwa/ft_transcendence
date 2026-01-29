@@ -6,6 +6,7 @@
  */
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 
 interface UseAddPlantFormProps {
   username: string;
@@ -16,6 +17,8 @@ export const useAddPlantForm = ({
   username,
   onSuccess,
 }: UseAddPlantFormProps) => {
+  const t = useTranslations('Plants');
+
   const [species, setSpecies] = useState('');
   const [nickname, setNickname] = useState('');
   const [garden, setGarden] = useState('');
@@ -58,7 +61,7 @@ export const useAddPlantForm = ({
     e.preventDefault();
 
     if (!species.trim() || !nickname.trim() || !garden || !photo) {
-      setError('Proszę wypełnić wszystkie pola i dodać zdjęcie.');
+      setError(t('errors.fillAllFields'));
       return;
     }
 
@@ -85,13 +88,12 @@ export const useAddPlantForm = ({
       });
 
       if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.detail || 'Błąd podczas dodawania rośliny');
+        throw new Error(t('errors.addPlantFailed'));
       }
 
       onSuccess();
     } catch (err: any) {
-      setError(err.message || 'Wystąpił nieoczekiwany błąd.');
+      setError(err.message || t('errors.unexpectedError'));
     } finally {
       setIsLoading(false);
     }

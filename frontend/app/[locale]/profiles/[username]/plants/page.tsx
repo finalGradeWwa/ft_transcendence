@@ -64,7 +64,7 @@ export default async function UserPlantsPage({ params }: UserPlantsPageProps) {
             </h1>
             <div className="accent-bar h-2 w-24 bg-primary-green mt-6 rounded-full" />
             <p className="collection-description text-neutral-600 mt-4 font-bold uppercase tracking-[0.3em] text-xs block whitespace-normal overflow-wrap-anywhere">
-              Kolekcja roślin użytkownika
+              {t('userCollection', { name: username })}
             </p>
           </div>
 
