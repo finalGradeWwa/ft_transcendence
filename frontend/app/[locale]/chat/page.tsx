@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
-import { Heading } from '@/components/Heading';
+import { useState, useRef, useEffect, FormEvent } from 'react';
+
 
 // same as models.py
 type User = {
@@ -50,7 +50,7 @@ export default function ChatPage() {
   //-----
 
   // Handles sending a new message when the form is submitted
-  const handleSendMessage = (e: React.FormEvent) => {
+  const handleSendMessage = (e: FormEvent) => {
     e.preventDefault();
 
     // Ignore empty messages
