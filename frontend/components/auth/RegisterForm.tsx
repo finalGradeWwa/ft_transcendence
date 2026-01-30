@@ -59,10 +59,14 @@ export const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
     setError(null);
 
     const formData = new FormData(e.currentTarget);
-    const password = formData.get('password') as string;
-    const passwordConfirm = formData.get('password_confirm') as string;
-    const avatarFile = formData.get('avatar_photo') as File;
 
+    // Poprawka bezpieczeństwa typów (Type Safety)
+    const password = (formData.get('password') as string) || '';
+    const passwordConfirm = (formData.get('password_confirm') as string) || '';
+    const avatarEntry = formData.get('avatar_photo');
+    const avatarFile = avatarEntry instanceof File ? avatarEntry : null;
+
+    /** PL: Walidacja formatu zdjęcia. EN: Image format validation. */
     if (avatarFile && avatarFile.size > 0) {
       const allowedTypes = [
         'image/jpeg',
@@ -78,7 +82,7 @@ export const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
     }
 
     const passwordRegex =
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&./\\()|{}[\]#^_-]).{8,}$/;
 
     if (!passwordRegex.test(password)) {
       setError(tr('passwordRequirements'));
@@ -99,7 +103,9 @@ export const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
         headers: { Accept: 'application/json' },
       });
 
-      const data = await response.json();
+      // Defensywne parsowanie JSON (zgodnie z sugestią Copilota)
+      const text = await response.text();
+      const data = text ? JSON.parse(text) : null;
 
       if (!response.ok) {
         let serverErrorMessage = tr('errorRegistrationFailed');
@@ -117,7 +123,7 @@ export const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
           }
         }
         setError(serverErrorMessage);
-        setIsLoading(false);
+        // setIsLoading(false) usunięte - obsłużone przez finally
         return;
       }
 
