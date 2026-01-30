@@ -94,8 +94,10 @@ class GardenViewSet(viewsets.ViewSet):
         return Response(
         {  
             "detail": f"new garden member has been added.",
-            "garden_id": user_id,
+            "garden_id": garden.id,
+            "added_user_id": user_id,
         },
+        status=status.HTTP_200_OK
        )
 
     # DELETE /gardens/5/users/12/
