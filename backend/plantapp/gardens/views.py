@@ -6,7 +6,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from .services import create_garden, add_garden_user
-from .serializers import GardenListSerializer, GardenContentSerializer
+from .serializers import GardenListSerializer, GardenContentSerializer, GardenCreateSerializer
 from django.db.models import Count
 from django.contrib.auth import get_user_model
 
@@ -33,9 +33,12 @@ class GardenViewSet(viewsets.ViewSet):
 
     # POST /gardens/
     def create(self, request):
+        serializer = GardenCreateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        
         garden = create_garden(
             creator=request.user,
-            data=request.data
+            data=serializer.validated_data
         )
         return Response(
         {
@@ -88,9 +91,12 @@ class GardenViewSet(viewsets.ViewSet):
                 {"detail": "You are not a garden owner"},
                 status=status.HTTP_403_FORBIDDEN,
             )
-
-        return Response(status=status.HTTP_201_CREATED)
-
+        return Response(
+        {  
+            "detail": f"new garden member has been added.",
+            "garden_id": user_id,
+        },
+       )
 
     # DELETE /gardens/5/users/12/
     @action(detail=True, methods=["delete"], url_path="users/(?P<user_pk>[^/.]+)")

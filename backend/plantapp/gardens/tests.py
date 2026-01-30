@@ -131,7 +131,7 @@ class GardenAPITests(APITestCase):
             {"user_id": self.bob.pk}
         )
 
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertTrue(
             GardenUser.objects.filter(
                 organization=self.garden,
@@ -151,7 +151,7 @@ class GardenAPITests(APITestCase):
             {"user_id": self.bob.pk}
         )
 
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(
             GardenUser.objects.filter(
                 organization=self.garden,

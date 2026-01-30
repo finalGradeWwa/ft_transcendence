@@ -1,190 +1,279 @@
 # Gardens App
 
-A Django REST Framework application for managing gardens with multi-user collaboration. Users can create and manage gardens, invite other users, and organize their plants by environment type (indoor, outdoor, greenhouse).
-
 ## Overview
 
-The Gardens app is built on top of the Django-organizations package, providing:
-- **Garden Management**: Create, retrieve, update, and delete gardens
-- **Multi-user Collaboration**: Add and manage garden members
-- **Ownership Model**: Track garden owners separately from members
-- **Environment Types**: Categorize gardens by location (indoor, outdoor, greenhouse)
-- **Access Control**: Automatic garden creation on user registration, permission-based operations
+The Gardens app provides a collaborative space management system where users can create and manage gardens, add members, and organize plants. Each garden acts as a shared workspace with owner-based access control, visible only to its members.
+
+## Purpose
+
+- **Collaborative Plant Management**: Multiple users can share a single garden and manage plants together
+- **User Organization**: Gardens serve as organizational units for grouping plants and users
+- **Access Control**: Owners have full control over membership and garden settings
+- **Automatic Setup**: Every new user automatically gets a personal garden created via Django signals
 
 ## Models
 
 ### Garden
-The main model representing a garden organization.
 
-**Fields:**
-- `garden_id` (AutoField): Primary key, auto-generated
-- `name` (CharField): Garden name (inherited from Organization)
-- `environment` (CharField): Garden environment type
-  - `"I"` - Indoor (default)
-  - `"O"` - Outdoor
-  - `"G"` - Greenhouse
+Extends `Organization` from django-organizations, providing the core garden entity.
 
-**QuerySet Methods:**
-- `visible_to(user)`: Returns gardens that are public or where the user is a member
+#### Fields
+
+| Field | Type | Description | Default |
+|-------|------|-------------|---------|
+| `garden_id` | AutoField | Primary key | Auto-generated |
+| `name` | CharField | Garden name (inherited) | Required |
+
+| `environment` | CharField | Garden environment type | "I" (Indoor) |
+
+#### Environment Choices
+
+- **`I` (Indoor)**: Plants kept inside buildings
+- **`O` (Outdoor)**: Plants in outdoor spaces
+- **`G` (Greenhouse)**: Plants in greenhouse structures
 
 ### GardenUser
-Represents membership of a user in a garden.
 
-**Fields:**
-- `organization` (ForeignKey): Reference to Garden
-- `user` (ForeignKey): Reference to User
-- `created_at` (DateTimeField): When the user joined
+Links users to gardens (membership relationship).
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `organization` | ForeignKey | Reference to Garden |
+| `user` | ForeignKey | Reference to User model |
+
+**Related name**: `user.memberships` - Access all garden memberships for a user
 
 ### GardenOwner
-Represents ownership relationship of a user in a garden.
 
-**Fields:**
-- `organization` (ForeignKey): Reference to Garden
-- `organization_user` (ForeignKey): Reference to GardenUser
+Designates garden owners with full administrative privileges.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `organization` | ForeignKey | Reference to Garden |
+| `organization_user` | ForeignKey | Reference to GardenUser |
+
+**Related name**: `gardenuser.ownerships` - Access ownership records
 
 ### GardenInvitation
-Handles invitation system for gardens (optional feature).
 
-**Fields:**
-- `organization` (ForeignKey): Reference to Garden
+Handles garden invitation system (extends django-organizations).
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `organization` | ForeignKey | Reference to Garden |
 
 ## API Endpoints
 
-### CRUD Operations
+### Authentication
 
-| Method | Endpoint | Name | Permission | Description |
-|--------|----------|------|-----------|-------------|
-| GET | `/api/garden/` | garden-list | Authenticated | List all user's gardens |
-| POST | `/api/garden/` | garden-list | Authenticated | Create new garden |
-| GET | `/api/garden/{id}/` | garden-detail | Authenticated | Get garden details |
-| DELETE | `/api/garden/{id}/` | garden-detail | Owner | Delete garden |
+All endpoints require authentication (`IsAuthenticated` permission).
 
-### Custom Actions
+### List Gardens
 
-| Method | Endpoint | Name | Permission | Description |
-|--------|----------|------|-----------|-------------|
-| POST | `/api/garden/{id}/add-user/` | garden-add-user | Owner | Add user to garden |
-| DELETE | `/api/garden/{id}/users/{user_pk}/` | garden-remove-user | Owner | Remove user from garden |
+**`GET /api/garden/`**
 
-## Permissions
+Returns all gardens the authenticated user is a member of.
 
-- **Garden List**: Only authenticated users can view their own gardens
-- **Garden Detail**: Users can only view gardens they are members of
-- **Create Garden**: Authenticated users can create gardens
-- **Delete Garden**: Only garden owner can delete
-- **Add User**: Only garden owner can add users to the garden
-- **Remove User**: Only garden owner can remove users from the garden
+**Response Fields**:
+- `garden_id`: Garden identifier
+- `name`: Garden name
+- `environment`: Environment type (I/O/G)
+- `user_count`: Number of members
 
-## Usage
+**Access**: Any authenticated user (returns only their gardens)
 
-### Create a Garden
+---
 
-**Request:**
-```
-POST /api/garden/
-Content-Type: application/json
+### Create Garden
 
-{
-  "name": "Outdoor Garden",
-  "environment": "O"
-}
-```
+**`POST /api/garden/`**
 
-**Response:**
+Creates a new garden with the authenticated user as owner.
+
+**Request Body**:
 ```json
 {
-  "detail": "Your new Outdoor Garden garden has been created.",
-  "garden_id": 1
+  "name": "My Garden",
+  "environment": "I"  // Optional, defaults to "I"
 }
 ```
 
-### List User's Gardens
-
-**Request:**
-```
-GET /api/garden/
-```
-
-**Response:**
-```json
-[
-  {
-    "id": 1,
-    "name": "Outdoor Garden",
-    "environment": "O",
-    "user_count": 2
-  }
-]
-```
-
-### Get Garden Details
-
-**Request:**
-```
-GET /api/garden/1/
-```
-
-**Response:**
+**Response**:
 ```json
 {
-  "id": 1,
-  "name": "Outdoor Garden",
-  "environment": "O",
-  "owner": "alice",
-  "user_count": 2
+  "detail": "Your new My Garden garden has been created.",
+  "garden_id": 123
 }
 ```
 
-### Add User to Garden
+**Access**: Any authenticated user
 
-**Request:**
-```
-POST /api/garden/1/add-user/
-Content-Type: application/json
+**Note**: User automatically becomes the garden owner
 
+---
+
+### Retrieve Garden Details
+
+**`GET /api/garden/{id}/`**
+
+Returns detailed information about a specific garden.
+
+**Response Fields**:
+- `garden_id`: Garden identifier
+- `name`: Garden name
+- `environment`: Environment type
+- `plants`: Array of plants in the garden
+- `owner`: Username of garden owner
+- `user_count`: Number of members
+
+**Access**: Garden members only (404 if not a member)
+
+---
+
+### Delete Garden
+
+**`DELETE /api/garden/{id}/`**
+
+Permanently deletes a garden and all associated data.
+
+**Response**: 204 No Content
+
+**Access**: Garden owners only (404 if not an owner)
+
+---
+
+### Add Garden Member
+
+**`POST /api/garden/{id}/add_user/`**
+
+Adds a new member to the garden.
+
+**Request Body**:
+```json
 {
-  "user_id": 2
+  "user_id": 456
 }
 ```
 
-**Response:** Status 201 Created
-
-### Remove User from Garden
-
-**Request:**
+**Response**:
+```json
+{
+  "detail": "new garden member has been added.",
+  "garden_id": 456
+}
 ```
-DELETE /api/garden/1/users/1/
+
+**Access**: Garden owners only (403 if not an owner)
+
+**Note**: Operation is idempotent - adding an existing member succeeds without duplicates
+
+---
+
+### Remove Garden Member
+
+**`DELETE /api/garden/{id}/users/{user_id}/`**
+
+Removes a member from the garden.
+
+**Response**: 204 No Content
+
+**Access**: Garden owners only (403 if not an owner)
+
+## User Access & Permissions
+
+### Permission Levels
+
+1. **Non-members**: Cannot access gardens at all (404 response)
+2. **Members**: Can view garden details and plants
+3. **Owners**: Full control including:
+   - Adding/removing members
+   - Deleting the garden
+   - All member privileges
+
+### Access Matrix
+
+| Action | Non-member | Member | Owner |
+|--------|------------|--------|-------|
+| View garden details | ❌ | ✅ | ✅ |
+| List own gardens | - | ✅ | ✅ |
+| Create new garden | ✅ | ✅ | ✅ |
+| Delete garden | ❌ | ❌ | ✅ |
+| Add members | ❌ | ❌ | ✅ |
+| Remove members | ❌ | ❌ | ✅ |
+
+## Automatic Garden Creation
+
+When a new user registers, a Django signal automatically:
+1. Creates a garden named `"{username}'s Garden"`
+2. Sets environment to Indoor (`I`)
+3. Adds user as a member
+4. Makes user the owner
+5. Garden is only visible to its members
+
+**Implementation**: See [signals.py](signals.py#L7-L30)
+
+## Service Functions
+
+### `create_garden(creator, data)`
+
+Creates a new garden with proper ownership setup.
+
+**Parameters**:
+- `creator`: User instance who will own the garden
+- `data`: Dictionary with `name` (required) and `environment` (optional)
+
+**Returns**: Garden instance
+
+---
+
+### `add_garden_user(owner, garden, user_to_add)`
+
+Adds a user to a garden with permission checking.
+
+**Parameters**:
+- `owner`: User instance requesting the action
+- `garden`: Garden instance to add user to
+- `user_to_add`: User instance to be added
+
+**Raises**: `PermissionError` if owner is not a garden owner
+
+**Returns**: GardenUser instance (or existing if already a member)
+
+## Usage Examples
+
+### Creating a Garden
+```python
+from gardens.services import create_garden
+
+garden = create_garden(
+    creator=request.user,
+    data={"name": "Community Garden", "environment": "O"}
+)
 ```
 
-**Response:** Status 204 No Content
+### Adding a Member
+```python
+from gardens.services import add_garden_user
 
-## Features
+garden_user = add_garden_user(
+    owner=request.user,
+    garden=garden_instance,
+    user_to_add=user_to_add_instance
+)
+```
 
-### Automatic Garden Creation
-When a new user registers, a default garden is automatically created:
-- Garden name: `"{username}'s Garden"`
-- Environment: Indoor (default)
-- User is automatically added as member and owner
+## Related Models
 
-### Idempotent User Addition
-Adding an existing member to a garden returns 201 Created without creating duplicates.
-
-### Visibility Control
-The `visible_to()` queryset method allows filtering gardens based on:
-- Public gardens (anyone can see)
-- Private gardens (only members can see)
+- **User**: Django authentication user model
+- **Plant**: Plants belong to gardens (see plants app)
+- **Organization**: Base model from django-organizations package
 
 ## Testing
 
-Run tests with:
-```bash
-python manage.py test plantapp.gardens
-```
-
-Test coverage includes:
+Comprehensive test coverage in [tests.py](tests.py) includes:
 - Authentication requirements
-- CRUD operations
 - Permission checks
-- Automatic garden creation on user registration
-- Multi-user garden management
-- Environment type verification
+- CRUD operations
+- Member management
+- Automatic garden creation
+- Environment field handling

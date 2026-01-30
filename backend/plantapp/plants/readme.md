@@ -1,248 +1,358 @@
 # Plants App
 
-A Django REST Framework application for managing plants within gardens. Plants represent individual plants that belong to a garden and are owned by a user. Each plant can have metadata like species, nickname, and an optional image.
-
 ## Overview
 
-The Plants app enables users to:
-- **Create and Manage Plants**: Add plants to their gardens with species information
-- **Track Plant Metadata**: Store plant nickname, species, creation date, and optional images
-- **Organize by Garden**: Plants are organized within gardens and inherit garden membership permissions
-- **Upload Images**: Support for plant photos with automatic upload handling
-- **Access Control**: Only garden members can view or modify plants in their garden
+The Plants app manages individual plant records within gardens. Plants belong to gardens and can only be accessed by users who are members of the containing garden. Each plant tracks its owner, species, nickname, and other metadata.
 
-## Models
+## Purpose
+
+- **Plant Management**: Track individual plants with nicknames, species, and images
+- **Garden Integration**: All plants must belong to a garden for access control
+- **Auto-assignment**: Plants automatically assign to user's default garden if not specified
+- **Member-based Access**: Only garden members can view and manage plants in that garden
+
+## Model
 
 ### Plant
 
-Represents an individual plant in a garden.
+#### Fields
 
-**Fields:**
-- `plant_id` (AutoField): Primary key, auto-generated
-- `owner` (ForeignKey): Reference to User who owns the plant
-- `image` (ImageField): Optional plant photo, uploaded to `plant-images/`
-- `species` (CharField): Plant species, max 25 characters (optional)
-- `garden` (ForeignKey): Reference to Garden the plant belongs to
-- `nickname` (CharField): Unique name for the plant, max 25 characters
-- `created_at` (DateTimeField): Timestamp of plant creation
+| Field | Type | Description | Constraints |
+|-------|------|-------------|-------------|
+| `plant_id` | AutoField | Primary key | Auto-generated |
+| `owner` | ForeignKey(User) | Plant creator/owner | Required, CASCADE delete |
+| `garden` | ForeignKey(Garden) | Garden containing the plant | Optional, CASCADE delete, auto-assigned |
+| `nickname` | CharField | Plant's nickname | Required, max 25 chars, **unique** |
+| `species` | CharField | Plant species name | Optional, max 25 chars |
+| `image` | ImageField | Plant photo | Optional, stored in `plant-images/` |
+| `created_at` | DateTimeField | Creation timestamp | Auto-set to current time |
 
-**Methods:**
-- `save()`: Auto-assigns plant to owner's default garden if no garden is specified
+#### Related Names
 
-**Relationships:**
-- Belongs to one User (owner)
-- Belongs to one Garden
-- One garden has many plants
+- `user.plants` - Access all plants owned by a user
+- `garden.plants` - Access all plants in a garden
+
+#### Key Features
+
+**Auto-assignment to Default Garden**:
+- If no garden is specified when creating a plant, the `save()` method automatically assigns it to the user's first garden
+- This ensures every plant belongs to a garden for proper access control
+- Implementation in [models.py](models.py#L22-L27)
+
+**Unique Nicknames**:
+- Plant nicknames must be globally unique across all plants
+- Prevents confusion and enables easy plant identification
+
+## Access Control
+
+### Permission Model
+
+Plants inherit their access control from gardens:
+- **Garden Members Only**: Only users who are members of a plant's garden can access that plant
+- **No Direct Plant Permissions**: Access is determined entirely by garden membership
+- **Owner vs Member**: Both the plant owner and other garden members have equal access to view/edit plants
+
+### Access Rules
+
+| Action | Requirement |
+|--------|-------------|
+| View plant | Must be member of plant's garden |
+| Create plant | Must be member of target garden |
+| Update plant | Must be member of plant's garden |
+| Delete plant | Must be member of plant's garden |
+| List plants | Returns only plants from user's gardens |
+
+**Important**: Even the plant owner cannot access their own plant if they are removed from the garden.
 
 ## API Endpoints
 
-| Method | Endpoint | Name | Permission | Description |
-|--------|----------|------|-----------|-------------|
-| GET | `/api/plant/` | plant-list | Authenticated | List all accessible plants |
-| GET | `/api/plant/?garden={id}` | plant-list | Authenticated | List plants in specific garden |
-| GET | `/api/plant/{id}/` | plant-detail | Authenticated | Get plant details |
-| POST | `/api/plant/` | plant-list | Authenticated | Create new plant |
-| PUT | `/api/plant/{id}/` | plant-detail | Authenticated | Update plant (full) |
-| PATCH | `/api/plant/{id}/` | plant-detail | Authenticated | Update plant (partial) |
-| DELETE | `/api/plant/{id}/` | plant-detail | Authenticated | Delete plant |
+### Authentication
 
-## Permissions
+All endpoints require authentication (`IsAuthenticated` permission).
 
-- **List Plants**: Authenticated users can only see plants in gardens they are members of
-- **View Plant**: Users can only view plants in gardens they have access to
-- **Create Plant**: Authenticated users can create plants in gardens they are members of
-- **Update Plant**: Users can only update plants they own in accessible gardens
-- **Delete Plant**: Users can only delete plants they own
+---
 
-## Usage
+### List Plants
 
-### Create a Plant
+**`GET /api/plant/`**
 
-**Request:**
-```
-POST /api/plant/
-Content-Type: application/json
+Returns all plants from gardens the user is a member of.
 
+**Query Parameters**:
+- `garden` (optional): Filter by garden ID
+
+**Examples**:
+- `/api/plant/` - All accessible plants
+- `/api/plant/?garden=3` - Only plants in garden 3
+
+**Response Fields**:
+- `plant_id`: Plant identifier
+- `nickname`: Plant nickname
+- `species`: Plant species (or null)
+- `image`: Image URL (or null)
+- `garden`: Garden ID
+- `created_at`: Creation timestamp
+
+**Access**: Any authenticated user (filtered to their gardens)
+
+---
+
+### Retrieve Plant
+
+**`GET /api/plant/{id}/`**
+
+Returns detailed information about a specific plant.
+
+**Response Fields**:
+- `plant_id`: Plant identifier
+- `nickname`: Plant nickname
+- `species`: Plant species
+- `image`: Image URL
+- `garden`: Garden ID
+- `owner`: Owner user ID
+- `created_at`: Creation timestamp
+
+**Access**: Garden members only (404 if not a member)
+
+---
+
+### Create Plant
+
+**`POST /api/plant/`**
+
+Creates a new plant.
+
+**Request Body**:
+```json
 {
-  "nickname": "Monstera Deliciosa",
-  "species": "Monstera",
-  "garden": 1
+  "nickname": "Freddy",
+  "species": "Fern",
+  "garden": 5,
+  "image": "<file>"
 }
 ```
 
-**Response:**
+**Fields**:
+- `nickname` (required): Unique plant nickname
+- `species` (optional): Plant species name
+- `garden` (optional): Garden ID - defaults to user's first garden if omitted
+- `image` (optional): Image file upload
+
+**Response**:
 ```json
 {
-  "detail": "Your plant 42 has been added.",
+  "detail": "Your plant 123 has been added.",
   "plant": {
-    "plant_id": 42,
-    "nickname": "Monstera Deliciosa",
-    "species": "Monstera",
-    "garden": 1,
-    "owner": 1,
-    "created_at": "2026-01-29T10:30:00Z",
-    "image": null
+    "plant_id": 123,
+    "nickname": "Freddy",
+    "species": "Fern",
+    "garden": 5,
+    "owner": 42,
+    "image": "/media/plant-images/photo.jpg",
+    "created_at": "2026-01-30T10:30:00Z"
   }
 }
 ```
 
-### Create a Plant with Image
+**Access**: User must be a member of the target garden
 
-**Request:**
-```
-POST /api/plant/
-Content-Type: multipart/form-data
+**Validation**:
+- Nickname must be unique
+- Garden must exist
+- User must be a garden member
 
-nickname=Pothos&species=Epipremnum&garden=1&image=<file>
-```
+---
 
-### List All Accessible Plants
+### Update Plant (Full)
 
-**Request:**
-```
-GET /api/plant/
-```
+**`PUT /api/plant/{id}/`**
 
-**Response:**
-```json
-[
-  {
-    "plant_id": 42,
-    "nickname": "Monstera Deliciosa",
-    "species": "Monstera",
-    "garden": 1,
-    "created_at": "2026-01-29T10:30:00Z"
-  },
-  {
-    "plant_id": 43,
-    "nickname": "Snake Plant",
-    "species": "Sansevieria",
-    "garden": 1,
-    "created_at": "2026-01-29T11:00:00Z"
-  }
-]
-```
+Completely updates a plant (all fields required).
 
-### List Plants in Specific Garden
+**Request Body**: Same as create, all fields required
 
-**Request:**
-```
-GET /api/plant/?garden=1
-```
+**Response**: Updated plant data
 
-**Response:**
-```json
-[
-  {
-    "plant_id": 42,
-    "nickname": "Monstera Deliciosa",
-    "species": "Monstera",
-    "garden": 1,
-    "created_at": "2026-01-29T10:30:00Z"
-  }
-]
-```
+**Access**: Garden members only
 
-### Get Plant Details
+---
 
-**Request:**
-```
-GET /api/plant/42/
-```
+### Update Plant (Partial)
 
-**Response:**
+**`PATCH /api/plant/{id}/`**
+
+Partially updates a plant (only specified fields).
+
+**Request Body**: Any subset of plant fields
+
+**Example**:
 ```json
 {
-  "plant_id": 42,
-  "nickname": "Monstera Deliciosa",
-  "species": "Monstera",
-  "garden": 1,
-  "owner": 1,
-  "image": "https://example.com/media/plant-images/monstera.jpg",
-  "created_at": "2026-01-29T10:30:00Z"
+  "species": "Boston Fern"
 }
 ```
 
-### Update Plant (Full Update - PUT)
+**Response**: Updated plant data
 
-**Request:**
-```
-PUT /api/plant/42/
-Content-Type: application/json
+**Access**: Garden members only
 
-{
-  "nickname": "Big Monstera",
-  "species": "Monstera Deliciosa",
-  "garden": 1
-}
-```
-
-**Response:** Returns updated plant object with status 200 OK
-
-### Update Plant (Partial Update - PATCH)
-
-**Request:**
-```
-PATCH /api/plant/42/
-Content-Type: application/json
-
-{
-  "nickname": "Monstera (Repotted)"
-}
-```
-
-**Response:** Returns updated plant object with status 200 OK (other fields unchanged)
+---
 
 ### Delete Plant
 
-**Request:**
+**`DELETE /api/plant/{id}/`**
+
+Permanently deletes a plant.
+
+**Response**: 204 No Content
+
+**Access**: Garden members only
+
+## Relationships
+
+### Garden Integration
+
+- **Required Relationship**: Every plant must belong to a garden
+- **Cascade Deletion**: When a garden is deleted, all its plants are deleted
+- **Access Inheritance**: Plants can only be accessed by garden members
+- **Default Assignment**: Plants auto-assign to user's first garden if not specified
+
+### User Ownership
+
+- **Owner Field**: Tracks who created the plant
+- **No Special Privileges**: Owner has no extra permissions beyond garden membership
+- **Cascade Deletion**: When user is deleted, their plants are deleted
+
+## Service Functions
+
+### `create_plant(creator, data)`
+
+Creates a new plant with permission validation.
+
+**Parameters**:
+- `creator`: User instance who is creating the plant
+- `data`: Dictionary with plant fields
+
+**Allowed Fields**:
+- `nickname` (required)
+- `species` (optional)
+- `garden` (optional)
+- `image` (optional)
+
+**Validation**:
+- Checks if user is a member of the specified garden
+- Raises `ValidationError` if user lacks permission
+
+**Returns**: Plant instance
+
+**Example**:
+```python
+from plants.services import create_plant
+
+plant = create_plant(
+    creator=request.user,
+    data={
+        "nickname": "Monstera",
+        "species": "Monstera deliciosa",
+        "garden": garden_instance
+    }
+)
 ```
-DELETE /api/plant/42/
+
+## Data Validation
+
+### Nickname Uniqueness
+
+Plant nicknames must be unique across the entire database:
+- Prevents duplicate plant names
+- Database-level constraint enforces uniqueness
+- Creation/update fails if nickname already exists
+
+### Garden Membership
+
+The `create_plant` service function validates:
+```python
+if not garden_obj.gardenuser_set.filter(user=creator).exists():
+    raise ValidationError("You don't have permission to create plants in this garden.")
 ```
 
-**Response:** Status 204 No Content
+### Auto-assignment Logic
 
-## Features
+From [models.py](models.py#L22-L27):
+```python
+def save(self, *args, **kwargs):
+    if not self.garden:
+        from gardens.models import Garden
+        self.garden = Garden.objects.filter(gardenuser__user=self.owner).first()
+    super().save(*args, **kwargs)
+```
 
-### Automatic Garden Assignment
-When creating a plant without specifying a garden, the plant is automatically assigned to the user's default garden (created automatically when the user registers).
+## Usage Examples
 
-### Access Control
-- Plants are only visible to members of their garden
-- Non-members attempting to access a plant receive a 404 Not Found response
-- Only the plant owner can modify or delete a plant
+### Creating a Plant in Specific Garden
 
-### Image Upload
-- Optional plant images are uploaded to `media/plant-images/`
-- Images are stored with unique filenames
-- Image URL is included in API responses
+```python
+from plants.services import create_plant
+from gardens.models import Garden
 
-### Filtering by Garden
-Use the `?garden={garden_id}` query parameter to filter plants by garden.
+garden = Garden.objects.get(pk=5)
+plant = create_plant(
+    creator=request.user,
+    data={
+        "nickname": "Basil",
+        "species": "Ocimum basilicum",
+        "garden": garden
+    }
+)
+```
 
-## Serializers
+### Creating a Plant in Default Garden
 
-### PlantSerializer
-Used for detailed plant responses (GET detail, create responses).
+```python
+# Garden will be auto-assigned
+plant = create_plant(
+    creator=request.user,
+    data={
+        "nickname": "Mystery Plant",
+        "species": "Unknown"
+        # No garden specified - uses default
+    }
+)
+```
 
-### PlantListSerializer
-Used for list responses (GET list) with minimal information.
+### Querying Plants by Garden
 
-### PlantCreateSerializer
-Used for POST, PUT, and PATCH operations with validation.
+```python
+# Get all plants in a specific garden
+garden_plants = Plant.objects.filter(garden_id=3)
+
+# Get user's accessible plants
+my_plants = Plant.objects.filter(garden__gardenuser__user=request.user)
+
+# Get plants in gardens the user owns
+owned_garden_plants = Plant.objects.filter(
+    garden__owners__organization_user__user=request.user
+)
+```
+
+## Image Handling
+
+- **Upload Path**: Images stored in `media/plant-images/`
+- **Optional Field**: Images are not required
+- **Field Type**: `ImageField` (requires Pillow library)
+- **Usage**: Send as multipart/form-data when uploading
+
+## Related Models
+
+- **User**: Plant owner (from `settings.AUTH_USER_MODEL`)
+- **Garden**: Container for plants, provides access control
+- **GardenUser**: Determines who can access plants via garden membership
 
 ## Testing
 
-Run tests with:
-```bash
-python manage.py test plantapp.plants
-```
-
-Test coverage includes:
-- Authentication requirements
-- Access control for garden members
-- Full CRUD operations (Create, Read, Update, Delete)
-- Partial and full updates (PATCH vs PUT)
-- Image upload
-- Plant retrieval with garden filtering
-- Permission checks for non-members
+See [tests.py](tests.py) for comprehensive test coverage including:
+- CRUD operations
+- Access control validation
+- Garden membership checks
+- Auto-assignment to default garden
+- Nickname uniqueness constraints
