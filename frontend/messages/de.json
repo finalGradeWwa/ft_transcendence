@@ -116,7 +116,7 @@
   "errors": {
     "connectionError": "Verbindungsfehler. Der Server antwortet nicht.",
     "invalidCredentials": "Ungültiger Benutzername oder Passwort.",
-    "generic": "Ein unerwarteter Fehler jest aufgetreten. Bitte versuchen Sie es erneut.",
+    "generic": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
     "invalidImage": "Bitte laden Sie ein gültiges Bild hoch. Die Datei war entweder kein Bild oder sie ist beschädigt."
   },
   "AboutUs": {
