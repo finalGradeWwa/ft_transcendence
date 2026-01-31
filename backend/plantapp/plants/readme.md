@@ -2,14 +2,15 @@
 
 ## Overview
 
-The Plants app manages individual plant records within gardens. Plants belong to gardens and can only be accessed by users who are members of the containing garden. Each plant tracks its owner, species, nickname, and other metadata.
+The Plants app manages individual plant records within gardens. All authenticated users can view all plants, but only garden members can modify plants in their gardens. Each plant tracks its owner, species, nickname, and other metadata.
 
 ## Purpose
 
 - **Plant Management**: Track individual plants with nicknames, species, and images
-- **Garden Integration**: All plants must belong to a garden for access control
+- **Garden Integration**: All plants must belong to a garden for modification access control
 - **Auto-assignment**: Plants automatically assign to user's default garden if not specified
-- **Member-based Access**: Only garden members can view and manage plants in that garden
+- **Public Viewing**: All authenticated users can view all plants
+- **Member-only Modifications**: Only garden members can create, update, or delete plants in that garden
 
 ## Model
 
@@ -47,22 +48,25 @@ The Plants app manages individual plant records within gardens. Plants belong to
 
 ### Permission Model
 
-Plants inherit their access control from gardens:
-- **Garden Members Only**: Only users who are members of a plant's garden can access that plant
-- **No Direct Plant Permissions**: Access is determined entirely by garden membership
-- **Owner vs Member**: Both the plant owner and other garden members have equal access to view/edit plants
+Plants have a public read, member-only write permission model:
+- **View Access**: All authenticated users can view all plants
+- **Modification Access**: Only garden members can create, update, or delete plants in their gardens
+- **Garden-based Permissions**: Write permissions are determined by garden membership
 
 ### Access Rules
 
 | Action | Requirement |
 |--------|-------------|
-| View plant | Must be member of plant's garden |
+| View plant | Any authenticated user |
+| List plants | Any authenticated user (can filter by owner or garden) |
 | Create plant | Must be member of target garden |
 | Update plant | Must be member of plant's garden |
 | Delete plant | Must be member of plant's garden |
-| List plants | Returns only plants from user's gardens |
 
-**Important**: Even the plant owner cannot access their own plant if they are removed from the garden.
+**Key Points**:
+- Anyone can browse and view all plants across all gardens
+- Only garden members can modify plants in their respective gardens
+- Plant owners without garden membership cannot modify their own plants
 
 ## API Endpoints
 
@@ -76,14 +80,18 @@ All endpoints require authentication (`IsAuthenticated` permission).
 
 **`GET /api/plant/`**
 
-Returns all plants from gardens the user is a member of.
+Returns all plants (visible to all authenticated users).
 
 **Query Parameters**:
 - `garden` (optional): Filter by garden ID
+- `owner` (optional): Filter by owner - use `me` for your own plants or a user ID for specific user's plants
 
 **Examples**:
-- `/api/plant/` - All accessible plants
+- `/api/plant/` - All plants
+- `/api/plant/?owner=me` - Only your plants
+- `/api/plant/?owner=42` - Plants owned by user 42
 - `/api/plant/?garden=3` - Only plants in garden 3
+- `/api/plant/?garden=3&owner=me` - Your plants in garden 3
 
 **Response Fields**:
 - `plant_id`: Plant identifier
@@ -93,7 +101,9 @@ Returns all plants from gardens the user is a member of.
 - `garden`: Garden ID
 - `created_at`: Creation timestamp
 
-**Access**: Any authenticated user (filtered to their gardens)
+**Access**: Any authenticated user
+
+**Note**: By default, this returns **all plants**. Use the `?owner=me` query parameter to see only your own plants.
 
 ---
 
@@ -112,7 +122,7 @@ Returns detailed information about a specific plant.
 - `owner`: Owner user ID
 - `created_at`: Creation timestamp
 
-**Access**: Garden members only (404 if not a member)
+**Access**: Any authenticated user
 
 ---
 
@@ -323,16 +333,20 @@ plant = create_plant(
 ### Querying Plants by Garden
 
 ```python
-# Get all plants in a specific garden
+# Get all plants in a specific garden (visible to all users)
 garden_plants = Plant.objects.filter(garden_id=3)
 
-# Get user's accessible plants
-my_plants = Plant.objects.filter(garden__gardenuser__user=request.user)
+# Get all plants (visible to all users)
+all_plants = Plant.objects.all()
 
-# Get plants in gardens the user owns
-owned_garden_plants = Plant.objects.filter(
-    garden__owners__organization_user__user=request.user
-)
+# Get user's own plants
+my_plants = Plant.objects.filter(owner=request.user)
+
+# Get plants owned by a specific user
+user_plants = Plant.objects.filter(owner_id=42)
+
+# Get plants in gardens the user is a member of (for modification purposes)
+modifiable_plants = Plant.objects.filter(garden__gardenuser__user=request.user)
 ```
 
 ## Image Handling
