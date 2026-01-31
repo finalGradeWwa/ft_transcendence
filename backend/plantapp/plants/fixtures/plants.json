@@ -1,0 +1,112 @@
+[
+  {
+    "model": "plants.plant",
+    "pk": 1,
+    "fields": {
+      "nickname": "My Monstera",
+      "species": "Monstera",
+      "owner": 1,
+      "garden": 1,
+      "created_at": "2026-01-01T12:00:00Z"
+    }
+  },
+  {
+    "model": "plants.plant",
+    "pk": 2,
+    "fields": {
+      "nickname": "Golden Pothos",
+      "species": "Pothos",
+      "owner": 1,
+      "garden": 1,
+      "created_at": "2026-01-01T12:00:00Z"
+    }
+  },
+  {
+    "model": "plants.plant",
+    "pk": 3,
+    "fields": {
+      "nickname": "Snake Plant",
+      "species": "Snake Plant",
+      "owner": 2,
+      "garden": 2,
+      "created_at": "2026-01-01T12:00:00Z"
+    }
+  },
+  {
+    "model": "plants.plant",
+    "pk": 4,
+    "fields": {
+      "nickname": "Fiddle Leaf Fig",
+      "species": "Ficus Lyrata",
+      "owner": 3,
+      "garden": 1,
+      "created_at": "2026-01-02T12:00:00Z"
+    }
+  },
+  {
+    "model": "plants.plant",
+    "pk": 5,
+    "fields": {
+      "nickname": "Aloe Vera",
+      "species": "Aloe",
+      "owner": 4,
+      "garden": 2,
+      "created_at": "2026-01-03T12:00:00Z"
+    }
+  },
+  {
+    "model": "plants.plant",
+    "pk": 6,
+    "fields": {
+      "nickname": "Spider Plant",
+      "species": "Chlorophytum",
+      "owner": 5,
+      "garden": 1,
+      "created_at": "2026-01-04T12:00:00Z"
+    }
+  },
+  {
+    "model": "plants.plant",
+    "pk": 7,
+    "fields": {
+      "nickname": "Peace Lily",
+      "species": "Spathiphyllum",
+      "owner": 1,
+      "garden": 2,
+      "created_at": "2026-01-05T12:00:00Z"
+    }
+  },
+  {
+    "model": "plants.plant",
+    "pk": 8,
+    "fields": {
+      "nickname": "Rubber Plant",
+      "species": "Ficus Elastica",
+      "owner": 2,
+      "garden": 1,
+      "created_at": "2026-01-06T12:00:00Z"
+    }
+  },
+  {
+    "model": "plants.plant",
+    "pk": 9,
+    "fields": {
+      "nickname": "ZZ Plant",
+      "species": "Zamioculcas",
+      "owner": 3,
+      "garden": 1,
+      "created_at": "2026-01-07T12:00:00Z"
+    }
+  },
+  {
+    "model": "plants.plant",
+    "pk": 10,
+    "fields": {
+      "nickname": "Cactus Collection",
+      "species": "Cactus",
+      "owner": 4,
+      "garden": 1,
+      "created_at": "2026-01-08T12:00:00Z"
+    }
+  }
+]
