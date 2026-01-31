@@ -23,7 +23,7 @@ class PostWriteModeSerializer(serializers.ModelSerializer):
 			)
 			
 
-
+# detail on user's wall
 class PostDetailReadModeSerializer(serializers.ModelSerializer):
     garden = serializers.StringRelatedField(read_only=True)
     plant = serializers.StringRelatedField(read_only=True, required=False, allow_null=True)
@@ -38,7 +38,8 @@ class PostDetailReadModeSerializer(serializers.ModelSerializer):
             "plant",
             "created_at",
         )
-        
+
+# list on user's feed
 class PostListReadModeSerializer(serializers.ModelSerializer):
     creator = serializers.StringRelatedField(read_only=True)
     class Meta:

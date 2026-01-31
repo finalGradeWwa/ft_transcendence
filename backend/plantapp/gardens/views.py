@@ -19,6 +19,9 @@ class GardenViewSet(viewsets.ViewSet):
 
     # GET /gardens/5/
     def retrieve(self, request, pk):
+        """
+        Retrieve a single garden (visible to all authenticated users).
+        """
         garden = get_object_or_404(
             Garden.objects # queryset chaining happens below
             .annotate(user_count=Count("gardenuser")) # responsible for returning number of garden users
@@ -26,7 +29,6 @@ class GardenViewSet(viewsets.ViewSet):
                 "owners__organization_user__user"
             ),
             pk=pk,
-            gardenuser__user=request.user.id,
         )
         serializer = GardenContentSerializer(garden)
         return Response(serializer.data)
@@ -45,7 +47,31 @@ class GardenViewSet(viewsets.ViewSet):
             status=status.HTTP_201_CREATED,
         )
 
+    # GET /api/garden/?owner=42
+    # GET /api/garden/?owner=me
+    def list(self, request):
+        """
+        List all gardens (visible to all authenticated users).
+        """
+        owner_param = request.query_params.get("owner")
+
+        gardens = (
+            Garden.objects
+                .distinct()
+                .annotate(user_count=Count("gardenuser"))
+        )
+        if owner_param:
+            if owner_param.lower() == "me":
+                plants = plants.filter(owner=request.user)
+            else:
+                plants = plants.filter(owner_id=owner_param)
+        serializer = GardenListSerializer(gardens, many=True)
+        return Response(serializer.data)
+
     def destroy(self, request, pk):
+        """
+        Delete a garden. Only garden owners can delete.
+        """
         garden = get_object_or_404(
             Garden,
             pk=pk,
@@ -53,19 +79,12 @@ class GardenViewSet(viewsets.ViewSet):
         garden.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
     
-    def list(self, request):
-        gardens = (
-            Garden.objects
-                .filter(gardenuser__user=request.user.id)
-                .distinct()
-                .annotate(user_count=Count("gardenuser"))
-        )
-        serializer = GardenListSerializer(gardens, many=True)
-        return Response(serializer.data)
-    
     # POST /gardens/5/users/
     @action(detail=True, methods=["post"])
     def add_user(self, request, pk=None):
+        """
+        Add a user to a garden. Only garden owners can add users.
+        """
         garden = get_object_or_404(Garden, pk=pk)
         user_id = request.data.get("user_id")
 
@@ -95,6 +114,9 @@ class GardenViewSet(viewsets.ViewSet):
     # DELETE /gardens/5/users/12/
     @action(detail=True, methods=["delete"], url_path="users/(?P<user_pk>[^/.]+)")
     def remove_user(self, request, pk=None, user_pk=None):
+        """
+        Remove a user from a garden. Only garden owners can remove users.
+        """
         garden_user = get_object_or_404(
             GardenUser,
             pk=user_pk,
