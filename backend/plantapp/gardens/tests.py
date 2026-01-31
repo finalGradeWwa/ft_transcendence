@@ -51,6 +51,7 @@ class GardenAPITests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["name"], "Alice's Garden")
+        self.assertEqual(response.data["environment"], "I")  # Default is indoor
 
     def test_owner_and_user_count_in_detail(self):
         self.client.force_authenticate(user=self.alice)
@@ -58,6 +59,7 @@ class GardenAPITests(APITestCase):
 
         self.assertEqual(response.data["owner"], "alice")
         self.assertEqual(response.data["user_count"], 1)
+        self.assertEqual(response.data["environment"], "I")  # Default is indoor
 
     def test_user_cannot_access_foreign_garden(self):
         self.client.force_authenticate(user=self.bob)
@@ -70,6 +72,8 @@ class GardenAPITests(APITestCase):
         response = self.client.get(self.list_url)
 
         self.assertEqual(len(response.data), 2)
+        for garden in response.data:
+            self.assertEqual(garden["environment"], "I")  # Default is indoor
 
     def test_create_garden(self):
         self.client.force_authenticate(user=self.alice)
@@ -83,6 +87,23 @@ class GardenAPITests(APITestCase):
         self.assertTrue(
             Garden.objects.filter(name="New Garden").exists()
         )
+        garden = Garden.objects.get(name="New Garden")
+        self.assertEqual(garden.environment, "I")  # Default is indoor
+
+    def test_create_garden_with_outdoor_environment(self):
+        self.client.force_authenticate(user=self.alice)
+
+        response = self.client.post(
+            self.create_url,
+            {"name": "Outdoor Garden", "environment": "O"}
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertTrue(
+            Garden.objects.filter(name="Outdoor Garden").exists()
+        )
+        garden = Garden.objects.get(name="Outdoor Garden")
+        self.assertEqual(garden.environment, "O")  # Outdoor environment
 
     def test_owner_can_delete_garden(self):
         self.client.force_authenticate(user=self.alice)
@@ -110,7 +131,7 @@ class GardenAPITests(APITestCase):
             {"user_id": self.bob.pk}
         )
 
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertTrue(
             GardenUser.objects.filter(
                 organization=self.garden,
@@ -130,7 +151,7 @@ class GardenAPITests(APITestCase):
             {"user_id": self.bob.pk}
         )
 
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(
             GardenUser.objects.filter(
                 organization=self.garden,

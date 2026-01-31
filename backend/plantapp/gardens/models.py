@@ -9,14 +9,6 @@ from django.conf import settings
 
 # Create your models here.
 
-# hide private gardens unless member
-class GardenQuerySet(models.QuerySet):
-    def visible_to(self, user):
-        return self.filter(
-            models.Q(is_public=True) |
-            models.Q(gardenuser__user=user)
-        )
-
 class GardenEnv(models.TextChoices):
     INDOOR = "I", "indoor",
     OUTDOOR = "O", "outdoor",
@@ -29,9 +21,8 @@ class Garden(Organization):
         choices=GardenEnv.choices,
         default=GardenEnv.INDOOR,
     )
-    objects = GardenQuerySet.as_manager()
     def __str__(self):
-        return self.garden_name
+        return self.name
     
 class GardenUser(OrganizationUserBase):
     organization = models.ForeignKey(

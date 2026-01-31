@@ -2,6 +2,10 @@ from rest_framework import serializers
 from plants.serializers import PlantListSerializer
 from .models import Garden
 
+class GardenCreateSerializer(serializers.Serializer):
+    name = serializers.CharField(required=True, max_length=255)
+    environment = serializers.CharField(required=False, default="I", max_length=1)
+
 class GardenListSerializer(serializers.ModelSerializer):
     user_count = serializers.IntegerField(read_only=True)
     class Meta:
