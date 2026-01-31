@@ -1,8 +1,8 @@
-from .models import Post
+from .models import Pin
 
-def create_post(creator, data):
+def create_pin(creator, data):
 
-    post = Post.objects.create(
+    pin = Pin.objects.create(
         creator=creator,
         content=data.get("content"),
         image=data.get("image"),
@@ -10,4 +10,4 @@ def create_post(creator, data):
         plant=data.get("plant")
     )
     # print(f"Created post: {post}")  # Uses __str__()
-    return post
+    return pin

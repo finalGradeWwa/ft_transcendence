@@ -2,13 +2,14 @@
 
 ## Overview
 
-The Gardens app provides a collaborative space management system where users can create and manage gardens, add members, and organize plants. Each garden acts as a shared workspace with owner-based access control, visible only to its members.
+The Gardens app provides a collaborative space management system where users can create and manage gardens, add members, and organize plants. All authenticated users can view all gardens, but only owners have administrative control over membership and settings.
 
 ## Purpose
 
 - **Collaborative Plant Management**: Multiple users can share a single garden and manage plants together
 - **User Organization**: Gardens serve as organizational units for grouping plants and users
-- **Access Control**: Owners have full control over membership and garden settings
+- **Public Viewing**: All authenticated users can browse and view all gardens
+- **Owner-based Control**: Owners have full control over membership and garden settings
 - **Automatic Setup**: Every new user automatically gets a personal garden created via Django signals
 
 ## Models
@@ -72,7 +73,7 @@ All endpoints require authentication (`IsAuthenticated` permission).
 
 **`GET /api/garden/`**
 
-Returns all gardens the authenticated user is a member of.
+Returns all gardens (visible to all authenticated users).
 
 **Response Fields**:
 - `garden_id`: Garden identifier
@@ -80,7 +81,7 @@ Returns all gardens the authenticated user is a member of.
 - `environment`: Environment type (I/O/G)
 - `user_count`: Number of members
 
-**Access**: Any authenticated user (returns only their gardens)
+**Access**: Any authenticated user
 
 ---
 
@@ -126,7 +127,7 @@ Returns detailed information about a specific garden.
 - `owner`: Username of garden owner
 - `user_count`: Number of members
 
-**Access**: Garden members only (404 if not a member)
+**Access**: Any authenticated user
 
 ---
 
@@ -183,8 +184,8 @@ Removes a member from the garden.
 
 ### Permission Levels
 
-1. **Non-members**: Cannot access gardens at all (404 response)
-2. **Members**: Can view garden details and plants
+1. **All Users**: Can view all gardens and their details
+2. **Members**: Can create and modify plants within the garden
 3. **Owners**: Full control including:
    - Adding/removing members
    - Deleting the garden
@@ -192,11 +193,12 @@ Removes a member from the garden.
 
 ### Access Matrix
 
-| Action | Non-member | Member | Owner |
-|--------|------------|--------|-------|
-| View garden details | ❌ | ✅ | ✅ |
-| List own gardens | - | ✅ | ✅ |
+| Action | Any User | Member | Owner |
+|--------|----------|--------|-------|
+| View garden details | ✅ | ✅ | ✅ |
+| List all gardens | ✅ | ✅ | ✅ |
 | Create new garden | ✅ | ✅ | ✅ |
+| Modify plants in garden | ❌ | ✅ | ✅ |
 | Delete garden | ❌ | ❌ | ✅ |
 | Add members | ❌ | ❌ | ✅ |
 | Remove members | ❌ | ❌ | ✅ |
@@ -208,7 +210,7 @@ When a new user registers, a Django signal automatically:
 2. Sets environment to Indoor (`I`)
 3. Adds user as a member
 4. Makes user the owner
-5. Garden is only visible to its members
+5. Garden is visible to all users, but only the owner can manage it
 
 **Implementation**: See [signals.py](signals.py#L7-L30)
 
