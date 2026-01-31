@@ -2,7 +2,7 @@
   "HomePage": {
     "title": "Plant Portal",
     "description": "Twoja baza wiedzy o roślinach, galeria zdjęć i społeczność pasjonatów botaniki.",
-    "recommended": "POLECANE:",
+    "recommended": "POLECANE",
     "search": "Wyszukaj rośliny...",
     "login": "Logowanie",
     "email": "Adres E-mail",
@@ -15,7 +15,7 @@
     "author": "Autor:",
     "rating": "Ocena:",
     "showMore": "Pokaż więcej roślin",
-    "nav": ["Strona Główna", "Galeria", "O nas", "Regulamin", "Kontakt"],
+    "nav": ["Strona Główna", "Ogrody", "O nas", "Regulamin", "Kontakt"],
     "searchPlaceholder": "Wyszukiwanie jest aktywne",
     "searchInfo": "Tutaj będzie pełna logika wyszukiwania.",
     "rights": "Wszelkie prawa zastrzeżone.",
@@ -49,6 +49,8 @@
     "title": "Profil użytkownika",
     "joinedLabel": "Dołączono",
     "userPlantsTitle": "Twoja kolekcja roślin",
+    "userCollection": "Kolekcja roślin użytkownika {name}",
+    "profileDescription": "Podzielmy się pięknem roślin.",
     "stats": {
       "gardens": "Ogrody",
       "plants": "Rośliny"
@@ -70,8 +72,8 @@
     },
     "aria": {
       "avatarAlt": "Zdjęcie profilowe użytkownika {name}",
-      "gardensLink": "Przejdź do moich ogrodów",
-      "plantsLink": "Przejdź do moich roślin"
+      "gardensLink": "Przejdź do ogrodów użytkownika {name}",
+      "plantsLink": "Przejdź do roślin użytkownika {name}"
     }
   },
   "RegisterPage": {
@@ -102,12 +104,53 @@
     "showPassword": "Pokaż hasło",
     "hidePassword": "Ukryj hasło",
     "avatarRequirements": "Dopuszczalne formaty: JPG, JPEG, PNG, WEBP.",
-    "errorInvalidFormat": "Nieprawidłowy format pliku. Wybierz JPG, PNG lub WebP."
+    "errorInvalidFormat": "Nieprawidłowy format pliku. Wybierz JPG, PNG lub WebP.",
+    "backToList": "Powrót do listy roślin"
   },
   "errors": {
     "connectionError": "Błąd połączenia. Spróbuj ponownie później.",
     "invalidCredentials": "Nieprawidłowy login lub hasło.",
     "genericError": "Coś poszło nie tak.",
     "invalidImage": "Przesłany plik jest nieprawidłowy. Wybrany plik nie jest obrazem lub jest uszkodzony."
+  },
+  "AboutUs": {
+    "title": "O nas",
+    "description": "Aby ożywić naszą zero-jedynkową przygodę z programowaniem w 42Warsaw postanowiliśmy dodać do niej lekkiego kolorytu w barwach natury. To nasz ostatni projekt w ramach tzw. Common Core, zostawiamy zatem ten portal na pamiątkę wspaniałej przygody. Zdjęcia dla zasięgu. 😏",
+    "footerText": "I Ty zostań ogrodnikiem!"
+  },
+  "AddPlantPage": {
+    "title": "Dodaj nową roślinę",
+    "submit": "Dodaj roślinę do kolekcji",
+    "fields": {
+      "species": "Gatunek",
+      "nickname": "Nazwa Twojej rośliny",
+      "garden": "Wybierz ogród",
+      "garden_belong": "Ogród:",
+      "no_garden": "Brak ogrodu",
+      "selectGarden": "-- Wybierz ogród --",
+      "photo": "Zdjęcie rośliny"
+    },
+    "errors": {
+      "fillAllFields": "Proszę wypełnić wszystkie pola i dodać zdjęcie.",
+      "addPlantFailed": "Błąd podczas dodawania rośliny.",
+      "unexpectedError": "Wystąpił nieoczekiwany błąd."
+    },
+    "success": {
+      "title": "Roślina dodana!",
+      "message": "Twoja nowa roślina została pomyślnie zarejestrowana w ogrodzie.",
+      "button": "Zobacz swoją kolekcję"
+    }
+  },
+  "GardensPage": {
+    "title": "Dodaj nowy ogród",
+    "submit": "Zapisz ogród",
+    "backToList": "Powrót do listy ogrodów",
+    "latestGardens": "Najnowsze Ogrody",
+    "owner": "Właściciel",
+    "plantsAmount": "Roślin",
+    "viewGarden": "Zobacz Ogród",
+    "plantsCountLabel": "Liczba roślin",
+    "gardenNameLabel": "Nazwa ogrodu",
+    "gardenNamePlaceholder": "np. Mój Balkon lub Salon"
   }
 }

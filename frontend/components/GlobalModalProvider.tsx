@@ -1,7 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useSearchParams, usePathname } from 'next/navigation';
+/**
+ * PL: Globalny dostawca modali. Zarządza wyświetlaniem modalu logowania na podstawie parametrów URL.
+ * EN: Global modal provider. Manages login modal display based on URL parameters.
+ */
+
+import { useSearchParams } from 'next/navigation';
+import { useRouter, usePathname } from '@/i18n/navigation';
 import dynamic from 'next/dynamic';
 import { useTranslations } from 'next-intl';
 
@@ -9,22 +14,28 @@ const LoginModal = dynamic(() => import('@/components/LoginModal'), {
   ssr: false,
 });
 
+/**
+ * PL: Komponent zarządzający widocznością modali w skali całej aplikacji.
+ * EN: Component managing modal visibility application-wide.
+ */
 export const GlobalModalProvider = () => {
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const searchParams = useSearchParams();
   const pathname = usePathname();
+  const router = useRouter();
   const t = useTranslations('HomePage');
 
-  useEffect(() => {
-    if (searchParams.get('showLogin') === 'true') {
-      setIsLoginModalOpen(true);
-    }
-  }, [searchParams]);
+  /**
+   * PL: Reaguje na zmianę parametrów w URL i otwiera modal, jeśli showLogin=true.
+   * EN: Reacts to URL parameter changes and opens the modal if showLogin=true.
+   */
+  const isLoginModalOpen = searchParams.get('showLogin') === 'true';
 
+  /**
+   * PL: Zamyka modal i czyści parametry URL przy użyciu routera Next.js.
+   * EN: Closes the modal and clears URL parameters using the Next.js router.
+   */
   const handleClose = () => {
-    setIsLoginModalOpen(false);
-    const newUrl = pathname;
-    window.history.replaceState({}, '', newUrl);
+    router.replace(pathname);
   };
 
   return (

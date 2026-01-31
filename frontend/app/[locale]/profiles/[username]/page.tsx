@@ -11,7 +11,6 @@
  */
 
 import UserProfileClient from '../UserProfileClient';
-import { Background } from '@/components/Background';
 
 export default async function ProfilePage({
   params,
@@ -31,11 +30,8 @@ export default async function ProfilePage({
     gardens: 0,
     plants: 0,
     avatar: '',
+    avatar_photo: '',
   };
 
-  return (
-    <Background>
-      <UserProfileClient user={mockUser} />
-    </Background>
-  );
+  return <UserProfileClient user={mockUser} />;
 }

@@ -2,7 +2,7 @@
   "HomePage": {
     "title": "Plant Portal",
     "description": "Your ultimate plant knowledge base and gallery.",
-    "recommended": "RECOMMENDED:",
+    "recommended": "RECOMMENDED",
     "search": "Search plants...",
     "login": "Login",
     "email": "Email Address",
@@ -15,7 +15,7 @@
     "author": "Author:",
     "rating": "Rating:",
     "showMore": "Show more plants",
-    "nav": ["Home", "Gallery", "About Us", "Terms", "Contact"],
+    "nav": ["Home", "Gardens", "About Us", "Terms", "Contact"],
     "searchPlaceholder": "Search is active",
     "searchInfo": "Full search logic will be here.",
     "rights": "All rights reserved.",
@@ -49,6 +49,8 @@
     "title": "User Profile",
     "joinedLabel": "Joined",
     "userPlantsTitle": "Your Plant Collection",
+    "userCollection": "{name}'s plant collection",
+    "profileDescription": "Let's share the beauty of plants.",
     "stats": {
       "gardens": "Gardens",
       "plants": "Plants"
@@ -69,9 +71,9 @@
       }
     },
     "aria": {
-      "avatarAlt": "Profile picture of {name}",
-      "gardensLink": "Go to my gardens",
-      "plantsLink": "Go to my plants"
+      "avatarAlt": "{name}'s profile picture",
+      "gardensLink": "Go to {name}'s gardens",
+      "plantsLink": "Go to {name}'s plants"
     }
   },
   "RegisterPage": {
@@ -102,12 +104,53 @@
     "showPassword": "Show password",
     "hidePassword": "Hide password",
     "avatarRequirements": "Accepted formats: JPG, JPEG, PNG, WEBP.",
-    "errorInvalidFormat": "Invalid file format. Please choose JPG, PNG, or WebP."
+    "errorInvalidFormat": "Invalid file format. Please choose JPG, PNG, or WebP.",
+    "backToList": "Back to plant list"
   },
   "errors": {
     "connectionError": "Connection error. Try again later.",
     "invalidCredentials": "Invalid username or password.",
     "genericError": "Something went wrong.",
     "invalidImage": "Upload a valid image. The file you uploaded was either not an image or a corrupted image."
+  },
+  "AboutUs": {
+    "title": "About Us",
+    "description": "To spice up our binary programming adventure at 42Warsaw, we decided to add a splash of nature's colors. This is our final project within the so-called Common Core, so we are leaving this portal as a souvenir of a wonderful journey. Photos included for reach. 😏",
+    "footerText": "You can be a gardener too!"
+  },
+  "AddPlantPage": {
+    "title": "Add a new plant",
+    "submit": "Add plant to collection",
+    "fields": {
+      "species": "Species",
+      "nickname": "Your plant's name",
+      "garden": "Select garden",
+      "garden_belong": "Garden:",
+      "no_garden": "No garden",
+      "selectGarden": "-- Select garden --",
+      "photo": "Plant photo"
+    },
+    "errors": {
+      "fillAllFields": "Please fill in all fields and add a photo.",
+      "addPlantFailed": "Error while adding the plant.",
+      "unexpectedError": "An unexpected error occurred."
+    },
+    "success": {
+      "title": "Plant added!",
+      "message": "Your new plant has been successfully registered in the garden.",
+      "button": "View your collection"
+    }
+  },
+  "GardensPage": {
+    "title": "Add new garden",
+    "submit": "Save garden",
+    "backToList": "Back to gardens list",
+    "latestGardens": "Latest Gardens",
+    "owner": "Owner",
+    "plantsAmount": "Plants",
+    "viewGarden": "View Garden",
+    "plantsCountLabel": "Number of plants",
+    "gardenNameLabel": "Garden name",
+    "gardenNamePlaceholder": "e.g., My Balcony or Living Room"
   }
 }

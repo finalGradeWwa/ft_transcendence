@@ -1,7 +1,8 @@
 'use client';
+
 /**
- * PL: Komponent klienta, hooki mogą być używane
- * EN: Client component, hooks can be used
+ * PL: Komponent renderujący treść regulaminu.
+ * EN: Component rendering terms and conditions content.
  */
 
 import { useTranslations } from 'next-intl';
