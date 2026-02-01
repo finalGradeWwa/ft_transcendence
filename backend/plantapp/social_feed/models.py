@@ -9,7 +9,7 @@ class Pin(models.Model):
 	content = models.TextField(max_length=150)
 	image = models.ImageField(upload_to='media/', null=True, blank=True)
 	created_at = models.DateTimeField(auto_now_add=True)
-	creator = models.ForeignKey(User, on_delete=models.CASCADE, related_name='posts')
+	creator = models.ForeignKey(User, on_delete=models.CASCADE, related_name='pins')
 	plant = models.ForeignKey(
 		Plant,
 		on_delete=models.CASCADE,
@@ -20,7 +20,7 @@ class Pin(models.Model):
 	garden = models.ForeignKey(
 		Garden,
 		on_delete=models.CASCADE,
-		related_name='posts',
+		related_name='pins',
 		null=True,
 		blank=True,
 		)

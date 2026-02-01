@@ -65,9 +65,9 @@ class GardenViewSet(viewsets.ViewSet):
         )
         if owner_param:
             if owner_param.lower() == "me":
-                plants = plants.filter(owner=request.user)
+                gardens = gardens.filter(owners__organization_user__user=request.user)
             else:
-                plants = plants.filter(owner_id=owner_param)
+                gardens = gardens.filter(owners__organization_user__user_id=owner_param)
         serializer = GardenListSerializer(gardens, many=True)
         return Response(serializer.data)
 

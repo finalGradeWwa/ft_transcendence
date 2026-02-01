@@ -75,6 +75,14 @@ All endpoints require authentication (`IsAuthenticated` permission).
 
 Returns all gardens (visible to all authenticated users).
 
+**Query Parameters**:
+- `owner` (optional): Filter by owner - use `me` for your own gardens or a user ID for specific user's gardens
+
+**Examples**:
+- `/api/garden/` - All gardens
+- `/api/garden/?owner=me` - Only your gardens
+- `/api/garden/?owner=42` - Gardens owned by user 42
+
 **Response Fields**:
 - `garden_id`: Garden identifier
 - `name`: Garden name
@@ -82,6 +90,8 @@ Returns all gardens (visible to all authenticated users).
 - `user_count`: Number of members
 
 **Access**: Any authenticated user
+
+**Note**: By default, this returns **all gardens**. Use the `?owner=me` query parameter to see only your own gardens.
 
 ---
 
@@ -279,3 +289,10 @@ Comprehensive test coverage in [tests.py](tests.py) includes:
 - Member management
 - Automatic garden creation
 - Environment field handling
+
+### print out debug
+```	print("\n=== Response Data ===")
+	print(f"Status Code: {response.status_code}")
+	print(f"Number of gardens: {len(response.data)}")
+	print(f"Response data: {response.data}")
+	print("=====================\n")```

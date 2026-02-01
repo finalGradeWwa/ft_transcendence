@@ -12,7 +12,6 @@ from .models import Pin
 class PinViewSet(viewsets.ViewSet):
 
     permission_classes = [IsAuthenticated]
-    parser_classes = (MultiPartParser, FormParser)
 
     def create(self, request):
         serializer = PinWriteModeSerializer(
@@ -76,10 +75,7 @@ class PinViewSet(viewsets.ViewSet):
     def destroy(self, request, pk):
         pin = get_object_or_404(Pin, pk=pk, creator=request.user)
         pin.delete()
-        return Response(
-            { "detail": f"your Pin has been deleted." },
-            status=status.HTTP_204_NO_CONTENT
-            )
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     def update(self, request, pk):
         pin = get_object_or_404(

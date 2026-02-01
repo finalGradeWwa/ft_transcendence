@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 from rest_framework.test import APITestCase
 from rest_framework import status
 from plants.models import Plant
-from gardens.models import Garden, GardenUser
+from gardens.models import Garden
 from .models import Pin
 
 User = get_user_model()

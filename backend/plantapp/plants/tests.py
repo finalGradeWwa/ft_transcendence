@@ -141,3 +141,117 @@ class PlantAPITests(APITestCase):
         payload = {"nickname": "Hacked"}
         response = self.client.put(url, payload)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_list_all_plants(self):
+        """Test that all authenticated users can see all plants"""
+        # Create another garden and plant for other_user
+        other_garden = Garden.objects.create(name="Other Garden", slug="other-garden")
+        GardenUser.objects.create(organization=other_garden, user=self.other_user)
+        other_plant = Plant.objects.create(
+            owner=self.other_user,
+            garden=other_garden,
+            nickname="Other Plant",
+            species="Other Species"
+        )
+
+        url = reverse("plant-list")
+        self.client.force_authenticate(self.user)
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # Should see both plants
+        self.assertEqual(len(response.data), 2)
+
+    def test_list_plants_filter_by_owner_me(self):
+        """Test filtering plants by ?owner=me"""
+        # Create another plant for other_user
+        other_garden = Garden.objects.create(name="Other Garden", slug="other-garden")
+        GardenUser.objects.create(organization=other_garden, user=self.other_user)
+        other_plant = Plant.objects.create(
+            owner=self.other_user,
+            garden=other_garden,
+            nickname="Other Plant",
+            species="Other Species"
+        )
+
+        url = reverse("plant-list")
+        self.client.force_authenticate(self.user)
+        response = self.client.get(f'{url}?owner=me')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # Should only see user's plant
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]["nickname"], "Fern")
+
+    def test_list_plants_filter_by_owner_id(self):
+        """Test filtering plants by ?owner=<user_id>"""
+        # Create another plant for other_user
+        other_garden = Garden.objects.create(name="Other Garden", slug="other-garden")
+        GardenUser.objects.create(organization=other_garden, user=self.other_user)
+        other_plant = Plant.objects.create(
+            owner=self.other_user,
+            garden=other_garden,
+            nickname="Other Plant",
+            species="Other Species"
+        )
+
+        url = reverse("plant-list")
+        self.client.force_authenticate(self.user)
+        response = self.client.get(f'{url}?owner={self.other_user.id}')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # Should only see other_user's plant
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]["nickname"], "Other Plant")
+
+    def test_list_plants_filter_by_garden(self):
+        """Test filtering plants by ?garden=<garden_id>"""
+        # Create another plant in the same garden
+        plant2 = Plant.objects.create(
+            owner=self.user,
+            garden=self.garden,
+            nickname="Succulent",
+            species="Cactus"
+        )
+
+        # Create a plant in another garden
+        other_garden = Garden.objects.create(name="Other Garden", slug="other-garden")
+        GardenUser.objects.create(organization=other_garden, user=self.user)
+        plant3 = Plant.objects.create(
+            owner=self.user,
+            garden=other_garden,
+            nickname="Rose",
+            species="Rosa"
+        )
+
+        url = reverse("plant-list")
+        self.client.force_authenticate(self.user)
+        response = self.client.get(f'{url}?garden={self.garden.garden_id}')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # Should only see plants in self.garden
+        self.assertEqual(len(response.data), 2)
+        nicknames = [plant["nickname"] for plant in response.data]
+        self.assertIn("Fern", nicknames)
+        self.assertIn("Succulent", nicknames)
+        self.assertNotIn("Rose", nicknames)
+
+    def test_list_plants_filter_by_garden_and_owner(self):
+        """Test combining ?garden=<id> and ?owner=me filters"""
+        # Create another plant in the same garden by other_user
+        GardenUser.objects.create(organization=self.garden, user=self.other_user)
+        other_plant = Plant.objects.create(
+            owner=self.other_user,
+            garden=self.garden,
+            nickname="Other's Fern",
+            species="Different Fern"
+        )
+
+        url = reverse("plant-list")
+        self.client.force_authenticate(self.user)
+        response = self.client.get(f'{url}?garden={self.garden.garden_id}&owner=me')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # Should only see user's plant in this garden
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]["nickname"], "Fern")
