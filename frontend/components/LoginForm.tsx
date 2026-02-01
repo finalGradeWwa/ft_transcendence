@@ -21,20 +21,20 @@ interface LoginResponse {
     username: string;
     email: string;
   };
-  tokens: {
-    access: string;
-    refresh: string;
-  };
+  /** PL: Tokeny są teraz obsługiwane przez HttpOnly Cookies. EN: Tokens are now handled via HttpOnly Cookies. */
 }
 
 /**
- * PL: Funkcja żądania logowania. EN: Login request function.
+ * PL: Funkcja żądania logowania.
+ * EN: Login request function.
  */
 const loginRequest = async (data: FormData): Promise<LoginResponse> => {
   const res = await fetch('http://localhost:8000/api/auth/login/', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
+    /** PL: Zezwolenie na obsługę ciasteczek HttpOnly. EN: Allowing HttpOnly cookies. */
+    credentials: 'include',
   });
 
   if (!res.ok) throw new Error('LOGIN_FAILED');
@@ -68,14 +68,30 @@ export const LoginForm = ({ t, tError, onLoginSuccess, usernameRef }: any) => {
     try {
       const data = await loginRequest(formData);
 
+      /**
+       * PL: Sprawdzenie, czy backend faktycznie przysłał dane użytkownika.
+       * EN: Checking if the backend actually sent user data.
+       */
+      if (!data || !data.user) {
+        throw new Error('EMPTY_RESPONSE');
+      }
+
       /** PL: Zapis danych do localStorage. EN: Saving data to localStorage. */
       localStorage.setItem('username', data.user.username);
-      localStorage.setItem('accessToken', data.tokens.access);
 
+      /**
+       * PL: Przekierowanie na stronę główną i odświeżenie stanu aplikacji.
+       * EN: Redirect to home page and refresh application state.
+       */
       onLoginSuccess();
-      window.location.reload();
+      window.location.href = '/';
     } catch (err) {
+      /** PL: Wyświetlamy błąd użytkownikowi EN: Displaying error to the user */
       setError(tError('errors.invalidCredentials'));
+
+      /** PL: Logujemy szczegóły dla dewelopera EN: Logging details for the developer */
+      console.error('--- LOGIN ERROR ---');
+      console.error('Details:', err);
     } finally {
       setIsLoading(false);
     }
