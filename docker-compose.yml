@@ -9,17 +9,11 @@ services:
     
     ports:
       - "8000:8000"
-    
-    environment:
-      - DEBUG=True
-      - SECRET_KEY=django-insecure-development-key-change-this-in-production
-      - ALLOWED_HOSTS=localhost,127.0.0.1,backend
-      - DATABASE_URL=sqlite:///db.sqlite3
 
     volumes:
       - ./backend:/app
-
-    command: sh -c "cd plantapp && python manage.py migrate && daphne -b 0.0.0.0 -p 8000 mysite.asgi:application"
+    
+    command: sh -c "python manage.py migrate && daphne -b 0.0.0.0 -p 8000 mysite.asgi:application"
     
     restart: unless-stopped
 

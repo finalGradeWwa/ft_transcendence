@@ -27,5 +27,8 @@ COPY . .
 # Expose port for Django/Daphne
 EXPOSE 8000
 
+# Run from Django project root
+WORKDIR /app/plantapp
+
 # Run Daphne with auto-reload for development
-CMD ["daphne", "-b", "0.0.0.0", "-p", "8000", "--reload", "plantapp.mysite.asgi:application"]
+CMD ["daphne", "-b", "0.0.0.0", "-p", "8000", "--reload", "mysite.asgi:application"]

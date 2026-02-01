@@ -14,7 +14,8 @@ help:
 	@echo "  make logs        - View service logs"
 	@echo "  make restart     - Restart all services"
 	@echo "  make ps          - List running containers"
-	@echo "  make clean       - Remove containers, images, volumes"
+	@echo "  make clean       - Remove containers and volumes"
+	@echo "  make fclean       - Remove containers, images, volumes"
 	@echo "  make backend     - Build and start backend only"
 	@echo "  make frontend    - Build and start frontend only"
 	@echo ""
@@ -43,6 +44,10 @@ ps:
 	docker-compose -f $(COMPOSE_FILE) ps
 
 clean:
+	docker-compose -f $(COMPOSE_FILE) down -v
+	docker-compose down -v --rmi local
+
+fclean:
 	docker-compose -f $(COMPOSE_FILE) down -v
 	docker system prune -af --volumes
 
