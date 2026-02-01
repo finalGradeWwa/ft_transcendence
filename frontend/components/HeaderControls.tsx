@@ -113,9 +113,10 @@ function useUsername() {
     }
 
     localStorage.removeItem('username');
-    router.push('/');
-    window.location.reload();
-  }, [router]);
+    localStorage.removeItem('token');
+
+    window.location.href = '/';
+  }, []);
 
   return { username, logout, isLoading };
 }

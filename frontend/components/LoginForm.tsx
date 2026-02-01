@@ -42,6 +42,19 @@ const loginRequest = async (data: FormData): Promise<LoginResponse> => {
 };
 
 export const LoginForm = ({ t, tError, onLoginSuccess, usernameRef }: any) => {
+  /**
+   * PL: Sprawdzamy, czy użytkownik jest już zalogowany, aby uniknąć ponownego renderowania formularza.
+   * EN: Checking if the user is already logged in to avoid re-rendering the form.
+   */
+  const isAlreadyLoggedIn =
+    typeof window !== 'undefined' && !!localStorage.getItem('username');
+
+  useEffect(() => {
+    if (isAlreadyLoggedIn) {
+      onLoginSuccess();
+    }
+  }, [isAlreadyLoggedIn, onLoginSuccess]);
+
   const [formData, setFormData] = useState<FormData>({
     email: '',
     password: '',
@@ -49,16 +62,6 @@ export const LoginForm = ({ t, tError, onLoginSuccess, usernameRef }: any) => {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-
-  /**
-   * PL: Automatyczne zamknięcie, jeśli użytkownik jest już w sesji.
-   * EN: Auto-close if user is already in session.
-   */
-  useEffect(() => {
-    if (localStorage.getItem('username')) {
-      onLoginSuccess();
-    }
-  }, [onLoginSuccess]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -88,10 +91,6 @@ export const LoginForm = ({ t, tError, onLoginSuccess, usernameRef }: any) => {
     } catch (err) {
       /** PL: Wyświetlamy błąd użytkownikowi EN: Displaying error to the user */
       setError(tError('errors.invalidCredentials'));
-
-      /** PL: Logujemy szczegóły dla dewelopera EN: Logging details for the developer */
-      console.error('--- LOGIN ERROR ---');
-      console.error('Details:', err);
     } finally {
       setIsLoading(false);
     }
@@ -100,6 +99,8 @@ export const LoginForm = ({ t, tError, onLoginSuccess, usernameRef }: any) => {
   const update = ({ target }: React.ChangeEvent<HTMLInputElement>) => {
     setFormData(prev => ({ ...prev, [target.name]: target.value }));
   };
+
+  if (isAlreadyLoggedIn) return null;
 
   return (
     <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
