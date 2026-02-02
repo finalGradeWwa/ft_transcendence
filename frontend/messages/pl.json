@@ -109,5 +109,10 @@
     "invalidCredentials": "Nieprawidłowy login lub hasło.",
     "genericError": "Coś poszło nie tak.",
     "invalidImage": "Przesłany plik jest nieprawidłowy. Wybrany plik nie jest obrazem lub jest uszkodzony."
+  },
+  "ChatPage": {
+    "title": "Czat",
+    "typeMessage": "Wpisz wiadomość...",
+    "send": "Wyślij"
   }
 }

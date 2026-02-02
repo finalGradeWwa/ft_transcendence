@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect, FormEvent } from 'react';
+import { useTranslations } from 'next-intl';
 
 
 // same as models.py
@@ -19,6 +20,8 @@ type Message = {
 };
 
 export default function ChatPage() {
+  const t = useTranslations('ChatPage');
+
   // mock data
   const currentUser: User = { id: 1, username: 'currentUser' };
   const otherUser: User = { id: 2, username: 'otherUser' };
@@ -137,14 +140,14 @@ export default function ChatPage() {
                 type="text"
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
-                placeholder="Type a message..."
+                placeholder={t('typeMessage')}
                 className="flex-1 bg-gray-700 text-white rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500 border border-gray-600"
               />
               <button
                 type="submit"
                 className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-500"
               >
-                Send
+                {t('send')}
               </button>
             </form>
           </div>

@@ -109,5 +109,10 @@
     "invalidCredentials": "Invalid username or password.",
     "genericError": "Something went wrong.",
     "invalidImage": "Upload a valid image. The file you uploaded was either not an image or a corrupted image."
+  },
+  "ChatPage": {
+    "title": "Chat",
+    "typeMessage": "Type a message...",
+    "send": "Send"
   }
 }
