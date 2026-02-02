@@ -1,4 +1,4 @@
-.PHONY: help build up down logs restart clean ps
+.PHONY: help build up down logs restart clean ps fclean backend frontend logs-backend logs-frontend dev-up dev-down
 
 # Docker Compose file
 COMPOSE_FILE = docker-compose.yml
@@ -15,7 +15,7 @@ help:
 	@echo "  make restart     - Restart all services"
 	@echo "  make ps          - List running containers"
 	@echo "  make clean       - Remove containers and volumes"
-	@echo "  make fclean       - Remove containers, images, volumes"
+	@echo "  make fclean      - Remove containers, images, volumes"
 	@echo "  make backend     - Build and start backend only"
 	@echo "  make frontend    - Build and start frontend only"
 	@echo ""
@@ -44,18 +44,17 @@ ps:
 	docker-compose -f $(COMPOSE_FILE) ps
 
 clean:
-	docker-compose -f $(COMPOSE_FILE) down -v
-	docker-compose down -v --rmi local
+	docker-compose -f $(COMPOSE_FILE) down -v --rmi local
 
 fclean:
 	docker-compose -f $(COMPOSE_FILE) down -v
 	docker system prune -af --volumes
 
 backend:
-	docker-compose -f $(COMPOSE_FILE) up -d backend
+	docker-compose -f $(COMPOSE_FILE) up -d --build backend
 
 frontend:
-	docker-compose -f $(COMPOSE_FILE) up -d frontend
+	docker-compose -f $(COMPOSE_FILE) up -d --build frontend
 
 
 # install:
