@@ -150,6 +150,7 @@ export default function ChatPage() {
                 </div>
               </div>
             ))}
+			<div ref={messagesEndRef} />
           </div>
 
           {/* Input Area */}
@@ -166,7 +167,6 @@ export default function ChatPage() {
                 type="submit"
                 className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-500"
               >
-				<div ref={messagesEndRef} />
                 {t('send')}
               </button>
             </form>
