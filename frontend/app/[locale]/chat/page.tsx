@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect, FormEvent } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 
 
 // same as models.py
@@ -21,6 +21,7 @@ type Message = {
 
 export default function ChatPage() {
   const t = useTranslations('ChatPage');
+  const locale = useLocale();
 
   // mock data
   const currentUser: User = { id: 1, username: 'currentUser' };
@@ -59,32 +60,49 @@ export default function ChatPage() {
     // Ignore empty messages
     if (!inputValue.trim()) return;
 
-    // Create new message object from user input
-    const newMessage: Message = {
-      id: messages.length + 1,
-      sender: currentUser,
-      recipient: otherUser,
-      content: inputValue,
-      timestamp: new Date().toISOString(),
-      is_read: false,
-    };
-
-    // Add message to the list and clear input field
-    setMessages([...messages, newMessage]);
+        // Capture current input value and clear the input field
+    const messageContent = inputValue;
     setInputValue('');
 
-    // Simulate a response after 1 second (replace with real backend call later)
-	//-------
-    setTimeout(() => {
-      const responseMessage: Message = {
-        id: messages.length + 2,
-        sender: otherUser,
-        recipient: currentUser,
-        content: 'This is a demo response.',
+    // Add message to the list using the functional updater to avoid stale state
+    setMessages((prevMessages) => {
+      const nextId =
+        prevMessages.length > 0
+          ? prevMessages[prevMessages.length - 1].id + 1
+          : 1;
+
+      const newMessage: Message = {
+        id: nextId,
+        sender: currentUser,
+        recipient: otherUser,
+        content: messageContent,
         timestamp: new Date().toISOString(),
         is_read: false,
       };
-      setMessages((prev) => [...prev, responseMessage]);
+
+      return [...prevMessages, newMessage];
+    });
+
+    // Simulate a response after 1 second (replace with real backend call later)
+    //-------
+    setTimeout(() => {
+      setMessages((prevMessages) => {
+        const nextId =
+          prevMessages.length > 0
+            ? prevMessages[prevMessages.length - 1].id + 1
+            : 1;
+
+        const responseMessage: Message = {
+          id: nextId,
+          sender: otherUser,
+          recipient: currentUser,
+          content: 'This is a demo response.',
+          timestamp: new Date().toISOString(),
+          is_read: false,
+        };
+
+        return [...prevMessages, responseMessage];
+      });
     }, 1000);
 	//-------
 
@@ -92,7 +110,7 @@ export default function ChatPage() {
 
   // Formats timestamp string into a readable time string (HH:MM)
   const formatTime = (timestamp: string) => {
-    return new Date(timestamp).toLocaleTimeString('en-US', {
+    return new Date(timestamp).toLocaleTimeString(locale, {
       hour: '2-digit',
       minute: '2-digit',
     });
@@ -105,6 +123,7 @@ export default function ChatPage() {
           {/* Messages Area */}
           <div className="flex-1 overflow-y-auto p-6 space-y-4">
             {messages.map((message) => (
+
               <div
                 key={message.id}
                 className={`flex ${
@@ -127,10 +146,10 @@ export default function ChatPage() {
                   <p className="text-xs mt-1 opacity-70">
                     {formatTime(message.timestamp)}
                   </p>
+
                 </div>
               </div>
             ))}
-            <div ref={messagesEndRef} />
           </div>
 
           {/* Input Area */}
@@ -147,6 +166,7 @@ export default function ChatPage() {
                 type="submit"
                 className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-500"
               >
+				<div ref={messagesEndRef} />
                 {t('send')}
               </button>
             </form>
