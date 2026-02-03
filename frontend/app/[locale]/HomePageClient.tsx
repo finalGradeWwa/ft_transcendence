@@ -1,50 +1,43 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import dynamic from 'next/dynamic';
+/**
+ * PL: Główny komponent kliencki strony głównej. Wyświetla siatkę rekomendowanych roślin.
+ * EN: Main client-side home page component. Displays a grid of recommended plants.
+ */
+
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { Icon } from '@/components/icons/ui/Icon';
-import { useSearchParams } from 'next/navigation';
 
-// Dynamiczny import modalu logowania
-const LoginModal = dynamic(() => import('@/components/LoginModal'), {
-  ssr: false,
-});
-
-type PlantType = {
+export type PlantType = {
   id: number;
-  author: string;
   latinName: string;
   commonName: string;
-  averageRating: string;
+  garden?: string;
+  author?: string;
+  averageRating?: string;
 };
 
 export const HomePageClient = ({
   plants,
-  showLogin,
-  isRegistered,
+  hideTitle,
 }: {
   plants: Array<PlantType>;
   showLogin?: boolean;
   isRegistered?: boolean;
+  hideTitle?: boolean;
 }) => {
   const t = useTranslations('HomePage');
-  const searchParams = useSearchParams();
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-
-  useEffect(() => {
-    if (showLogin || searchParams.get('showLogin') === 'true') {
-      setIsLoginModalOpen(true);
-    }
-  }, [showLogin, searchParams]);
 
   return (
     <>
       <section className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
-        <h2 className="text-2xl md:text-3xl font-bold mb-6 text-white-text">
-          {t('recommended')}
-        </h2>
+        {!hideTitle && (
+          <h1 className="text-2xl md:text-3xl font-bold mb-6 text-white-text overflow-hidden">
+            {t('recommended')}
+          </h1>
+        )}
+
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {plants.map((plant, idx) => (
             <article
@@ -54,7 +47,7 @@ export const HomePageClient = ({
               <div className="relative w-full h-48 mb-3 overflow-hidden rounded-lg">
                 <Image
                   src={`/images/temp/plant_${(plant.id % 5) + 1}.jpg`}
-                  alt={plant.commonName}
+                  alt={plant.commonName || plant.latinName || 'Roślina'}
                   fill
                   sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 25vw"
                   className="object-cover"
@@ -63,38 +56,34 @@ export const HomePageClient = ({
                   decoding="async"
                 />
               </div>
+
               <div className="space-y-1 text-sm text-neutral-900 flex-grow">
-                <h3 className="text-xl font-bold text-primary-green">
+                <h2 className="text-xl font-bold text-primary-green overflow-hidden">
                   {plant.commonName}
-                </h3>
-                <p className="text-xs italic opacity-80">{plant.latinName}</p>
-                <p className="font-medium">
-                  {t('author')}{' '}
-                  <span className="font-bold text-amber-900">
-                    {plant.author}
-                  </span>
+                </h2>
+                <p className="text-xs italic opacity-80 overflow-hidden">
+                  {plant.latinName}
                 </p>
-              </div>
-              <div className="flex items-center pt-4 mt-auto border-t border-subtle-gray/30">
-                <span
-                  className="font-bold text-lg text-red-800"
-                  aria-label={`${t('rating')}: ${plant.averageRating}`}
-                >
-                  {t('rating')} {plant.averageRating}
-                </span>
-                <Icon name="user" size={14} className="ms-2 text-neutral-500" />
+
+                <div className="pt-3 space-y-1 text-xs uppercase tracking-wider font-semibold overflow-hidden">
+                  <div className="flex items-center gap-1.5 text-dark-text">
+                    <Icon name="user" size={14} className="text-dark-text" />
+                    <span className="text-amber-900 leading-none font-bold">
+                      {plant.author || 'Anonim'}
+                    </span>
+                  </div>
+                  <p className="text-dark-text">
+                    Ogród:{' '}
+                    <span className="text-primary-green font-bold">
+                      {plant.garden || 'Brak ogrodu'}
+                    </span>
+                  </p>
+                </div>
               </div>
             </article>
           ))}
         </div>
       </section>
-
-      <LoginModal
-        isVisible={isLoginModalOpen}
-        onClose={() => setIsLoginModalOpen(false)}
-        t={t}
-        isRegistered={isRegistered}
-      />
     </>
   );
 };

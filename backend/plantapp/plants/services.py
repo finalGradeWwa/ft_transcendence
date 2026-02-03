@@ -3,10 +3,10 @@ from django.core.exceptions import ValidationError
 from gardens.models import Garden
 
 def create_plant(*, creator, data):
-    allowed_fields = {"nickname", "garden", "species"}
+    allowed_fields = {"nickname", "garden", "species", "image"}
 
     # Only include allowed fields
-    clean_data = {k: v for k, v in data.items() if k in allowed_fields}
+    clean_data = {key: value for (key, value) in data.items() if key in allowed_fields}
 
     garden_obj = clean_data.pop("garden", None)  # Remove garden from clean_data
 

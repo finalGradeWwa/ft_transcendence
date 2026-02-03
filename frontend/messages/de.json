@@ -2,7 +2,7 @@
   "HomePage": {
     "title": "Plant Portal",
     "description": "Ihre ultimative Wissensdatenbank und Galerie für Pflanzen.",
-    "recommended": "EMPFOHLEN:",
+    "recommended": "EMPFOHLEN",
     "search": "Pflanzen suchen...",
     "login": "Anmelden",
     "email": "E-Mail-Adresse",
@@ -17,7 +17,7 @@
     "showMore": "Mehr Pflanzen anzeigen",
     "nav": [
       "Startseite",
-      "Galerie",
+      "Gärten",
       "Über uns",
       "Nutzungsbedingungen",
       "Kontakt"
@@ -55,6 +55,8 @@
     "title": "Benutzerprofil",
     "joinedLabel": "Beigetreten",
     "userPlantsTitle": "Deine Pflanzensammlung",
+    "userCollection": "Pflanzensammlung von {name}",
+    "profileDescription": "Teilen wir die Schönheit der Pflanzen.",
     "stats": {
       "gardens": "Gärten",
       "plants": "Pflanzen"
@@ -75,9 +77,9 @@
       }
     },
     "aria": {
-      "avatarAlt": "Profilbild von {name}",
-      "gardensLink": "Zu meinen Gärten gehen",
-      "plantsLink": "Zu meinen Pflanzen gehen"
+      "avatarAlt": "Profilbild von Benutzer {name}",
+      "gardensLink": "Gehe zu den Gärten von {name}",
+      "plantsLink": "Gehe zu den Pflanzen von {name}"
     }
   },
   "RegisterPage": {
@@ -102,23 +104,64 @@
     "usernameExists": "Ein Benutzer mit diesem Benutzernamen existiert bereits.",
     "emailExists": "Ein Benutzer mit dieser E-Mail-Adresse existiert bereits.",
     "successMessage": "Konto erfolgreich erstellt!",
-    "registrationSuccessDescription": "Vielen Dank für Ihre Registrierung. Sie können sich teraz anmelden.",
+    "registrationSuccessDescription": "Vielen Dank für Ihre Registrierung. Sie können sich jetzt anmelden.",
     "goToLogin": "Zum Login",
     "serverError": "Verbindungsfehler zum Server. Bitte versuchen Sie es später erneut.",
     "showPassword": "Passwort anzeigen",
     "hidePassword": "Passwort ausblenden",
     "avatarRequirements": "Zulässige Formate: JPG, JPEG, PNG, WEBP.",
-    "errorInvalidFormat": "Ungültiges Dateiformat. Bitte wählen Sie JPG, PNG oder WebP."
+    "errorInvalidFormat": "Ungültiges Dateiformat. Bitte wählen Sie JPG, PNG oder WebP.",
+    "backToList": "Zurück zur Pflanzenliste"
   },
   "errors": {
     "connectionError": "Verbindungsfehler. Der Server antwortet nicht.",
     "invalidCredentials": "Ungültiger Benutzername oder Passwort.",
-    "generic": "Ein unerwarteter Fehler jest aufgetreten. Bitte versuchen Sie es erneut.",
+    "generic": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
     "invalidImage": "Bitte laden Sie ein gültiges Bild hoch. Die Datei war entweder kein Bild oder sie ist beschädigt."
   },
   "ChatPage": {
     "title": "Chat",
     "typeMessage": "Nachricht eingeben...",
     "send": "Senden"
+  },
+  "AboutUs": {
+    "title": "Über uns",
+    "description": "Um unser binäres Programmierabenteuer bei 42Warsaw etwas lebendiger zu gestalten, haben wir beschlossen, ihm einen Hauch von Naturfarben zu verleihen. Dies ist unser letztes Projekt im Rahmen des sogenannten Common Core – deshalb hinterlassen wir dieses Portal als Erinnerung an ein großartiges Abenteuer. Fotos für die Reichweite. 😏",
+    "footerText": "Werde auch du zum Gärtner!"
+  },
+  "AddPlantPage": {
+    "title": "Neue Pflanze hinzufügen",
+    "submit": "Pflanze zur Sammlung hinzufügen",
+    "fields": {
+      "species": "Gattung",
+      "nickname": "Name deiner Pflanze",
+      "garden": "Garten auswählen",
+      "garden_belong": "Garten:",
+      "no_garden": "Kein Garten",
+      "selectGarden": "-- Garten auswählen --",
+      "photo": "Pflanzenfoto"
+    },
+    "errors": {
+      "fillAllFields": "Bitte füllen Sie alle Felder aus und fügen Sie ein Foto hinzu.",
+      "addPlantFailed": "Fehler beim Hinzufügen der Pflanze.",
+      "unexpectedError": "Ein unerwarteter Fehler ist aufgetreten."
+    },
+    "success": {
+      "title": "Pflanze hinzugefügt!",
+      "message": "Deine neue Pflanze wurde erfolgreich im Garten registriert.",
+      "button": "Deine Sammlung ansehen"
+    }
+  },
+  "GardensPage": {
+    "title": "Neuen Garten hinzufügen",
+    "submit": "Garten speichern",
+    "backToList": "Zurück zur Gartenliste",
+    "latestGardens": "Neueste Gärten",
+    "owner": "Besitzer",
+    "plantsAmount": "Pflanzen",
+    "viewGarden": "Garten ansehen",
+    "plantsCountLabel": "Anzahl der Pflanzen",
+    "gardenNameLabel": "Gartenname",
+    "gardenNamePlaceholder": "z. B. Mein Balkon oder Wohnzimmer"
   }
 }

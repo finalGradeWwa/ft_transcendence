@@ -21,9 +21,6 @@ export const ModalContent = ({
   usernameRef,
   isRegistered,
 }: any) => {
-  /** PL: Pobranie parametrów z adresu URL. EN: Fetching parameters from URL. */
-  const searchParams = useSearchParams();
-
   return (
     <div
       className="bg-container-light p-6 rounded-lg shadow-2xl w-full max-sm:mx-4 max-w-sm border border-primary-green relative"
@@ -41,7 +38,8 @@ export const ModalContent = ({
         {t('login')}
       </Heading>
 
-      {/** * PL: Komunikat wyświetlany tylko po pomyślnej rejestracji.
+      {/**
+       * * PL: Komunikat wyświetlany tylko po pomyślnej rejestracji.
        * EN: Message displayed only after successful registration.
        */}
       {isRegistered && (
