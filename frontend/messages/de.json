@@ -119,6 +119,11 @@
     "generic": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
     "invalidImage": "Bitte laden Sie ein gültiges Bild hoch. Die Datei war entweder kein Bild oder sie ist beschädigt."
   },
+  "ChatPage": {
+    "title": "Chat",
+    "typeMessage": "Nachricht eingeben...",
+    "send": "Senden"
+  },
   "AboutUs": {
     "title": "Über uns",
     "description": "Um unser binäres Programmierabenteuer bei 42Warsaw etwas lebendiger zu gestalten, haben wir beschlossen, ihm einen Hauch von Naturfarben zu verleihen. Dies ist unser letztes Projekt im Rahmen des sogenannten Common Core – deshalb hinterlassen wir dieses Portal als Erinnerung an ein großartiges Abenteuer. Fotos für die Reichweite. 😏",

@@ -113,6 +113,11 @@
     "genericError": "Coś poszło nie tak.",
     "invalidImage": "Przesłany plik jest nieprawidłowy. Wybrany plik nie jest obrazem lub jest uszkodzony."
   },
+  "ChatPage": {
+    "title": "Czat",
+    "typeMessage": "Wpisz wiadomość...",
+    "send": "Wyślij"
+  },
   "AboutUs": {
     "title": "O nas",
     "description": "Aby ożywić naszą zero-jedynkową przygodę z programowaniem w 42Warsaw postanowiliśmy dodać do niej lekkiego kolorytu w barwach natury. To nasz ostatni projekt w ramach tzw. Common Core, zostawiamy zatem ten portal na pamiątkę wspaniałej przygody. Zdjęcia dla zasięgu. 😏",
