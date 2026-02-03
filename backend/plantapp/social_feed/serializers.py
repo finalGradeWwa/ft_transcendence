@@ -1,13 +1,21 @@
 from rest_framework import serializers
-from .models import Post
+from .models import Pin
 from gardens.models import Garden
 from plants.models import Plant
 
-class PostWriteModeSerializer(serializers.ModelSerializer):
-	garden = serializers.PrimaryKeyRelatedField(queryset=Garden.objects.none())
-	plant = serializers.PrimaryKeyRelatedField(queryset=Plant.objects.none())
+class PinWriteModeSerializer(serializers.ModelSerializer):
+	garden = serializers.PrimaryKeyRelatedField(
+		queryset=Garden.objects.none(),
+		required=False,
+		allow_null=True
+	)
+	plant = serializers.PrimaryKeyRelatedField(
+		queryset=Plant.objects.none(),
+		required=False,
+		allow_null=True
+	)
 	class Meta:
-		model = Post
+		model = Pin
 		fields = ("image", "content", "garden", "plant")
     
 	def __init__(self, *args, **kwargs):
@@ -23,13 +31,13 @@ class PostWriteModeSerializer(serializers.ModelSerializer):
 			)
 			
 
-
-class PostDetailReadModeSerializer(serializers.ModelSerializer):
+# detail on user's wall
+class PinDetailReadModeSerializer(serializers.ModelSerializer):
     garden = serializers.StringRelatedField(read_only=True)
     plant = serializers.StringRelatedField(read_only=True, required=False, allow_null=True)
     creator = serializers.StringRelatedField(read_only=True)
     class Meta:
-        model = Post
+        model = Pin
         fields = (
             "content",
             "image",
@@ -38,11 +46,12 @@ class PostDetailReadModeSerializer(serializers.ModelSerializer):
             "plant",
             "created_at",
         )
-        
-class PostListReadModeSerializer(serializers.ModelSerializer):
+
+# list on user's feed
+class PinListReadModeSerializer(serializers.ModelSerializer):
     creator = serializers.StringRelatedField(read_only=True)
     class Meta:
-        model = Post
+        model = Pin
         fields = (
             "content",
             "image",
