@@ -1,5 +1,10 @@
 'use client';
 
+/**
+ * PL: Uniwersalny komponent przycisku.
+ * EN: Universal button component.
+ */
+
 import React from 'react';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -7,6 +12,10 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   isLoading?: boolean;
 }
 
+/**
+ * PL: Komponent przycisku z obsługą stanu ładowania.
+ * EN: Button component with loading state support.
+ */
 export const Button = ({
   children,
   isLoading,

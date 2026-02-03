@@ -1,6 +1,10 @@
 'use client';
 
-// Sprawdź czy 'menu' i 'close' są tutaj wymienione:
+/**
+ * PL: Uniwersalny komponent ikon SVG.
+ * EN: Universal SVG icon component.
+ */
+
 type IconName =
   | 'plus'
   | 'search'
@@ -17,6 +21,10 @@ interface IconProps {
   size?: number;
 }
 
+/**
+ * PL: Renderuje ścieżki ikon na podstawie przekazanej nazwy.
+ * EN: Renders icon paths based on the provided name.
+ */
 export const Icon = ({ name, className, size = 24 }: IconProps) => {
   const icons: Record<IconName, React.ReactNode> = {
     plus: <path d="M12 4.5v15m7.5-7.5h-15" />,

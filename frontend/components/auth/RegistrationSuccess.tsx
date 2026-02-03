@@ -1,5 +1,10 @@
 'use client';
 
+/**
+ * PL: Komponent wyświetlany po pomyślnym zakończeniu procesu rejestracji.
+ * EN: Component displayed after the registration process is successfully completed.
+ */
+
 import { Link } from '@/i18n/navigation';
 import { Heading } from '@/components/Heading';
 import { Text } from '@/components/typography/Text';
@@ -11,6 +16,7 @@ export const RegistrationSuccess = () => {
 
   return (
     <div className="text-center py-8 animate-in fade-in zoom-in duration-300">
+      {/** PL: Ikona sukcesu (checkmrak). EN: Success icon (checkmark). */}
       <div className="flex justify-center mb-6">
         <div className="bg-green-100 p-4 rounded-full">
           <svg
@@ -30,6 +36,7 @@ export const RegistrationSuccess = () => {
         </div>
       </div>
 
+      {/** PL: Nagłówek i opis sukcesu. EN: Success heading and description. */}
       <Heading
         as="h2"
         className="mt-8 mb-4 !text-primary-green uppercase font-black text-2xl"
@@ -41,6 +48,7 @@ export const RegistrationSuccess = () => {
         {t('registrationSuccessDescription')}
       </Text>
 
+      {/** PL: Przycisk przekierowujący do formularza logowania. EN: Button redirecting to the login form. */}
       <Link href="/?showLogin=true">
         <Button className="w-full py-4 uppercase tracking-widest shadow-lg">
           {t('goToLogin')}

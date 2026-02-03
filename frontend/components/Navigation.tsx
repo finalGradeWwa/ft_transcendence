@@ -1,8 +1,12 @@
 'use client';
 
+/**
+ * PL: Główny komponent nawigacji. Zarządza logotypem, menu mobilnym, linkami oraz integracją z logowaniem.
+ * EN: Main navigation component. Manages logo, mobile menu, links, and login integration.
+ */
+
 import { useState, useEffect, Suspense } from 'react';
 import { Link } from '@/i18n/navigation';
-import { useSearchParams, usePathname } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { Icon } from '@/components/icons/ui/Icon';
 import Image from 'next/image';
@@ -13,18 +17,26 @@ const HeaderControls = dynamic(
   { ssr: true }
 );
 
+/**
+ * PL: Link ułatwiający dostępność (Accessibility), pozwalający pominąć nawigację klawiaturą.
+ * EN: Skip link for accessibility, allowing keyboard users to bypass navigation.
+ */
 const SkipLink = () => {
   const t = useTranslations('HomePage');
   return (
     <a
       href="#main-content"
-      className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:start-4 focus:z-[100] focus:bg-secondary-beige focus:text-primary-green focus:px-4 focus:py-2 focus:rounded-lg focus:font-bold focus:ring-2 focus:ring-primary-green outline-none"
+      className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-1/2 focus:-translate-x-1/2 focus:z-[100] focus:bg-secondary-beige focus:text-primary-green focus:px-6 focus:py-3 focus:rounded-xl focus:font-bold focus:ring-4 focus:ring-primary-green focus:shadow-2xl outline-none"
     >
       {t('aria.skipToContent')}
     </a>
   );
 };
 
+/**
+ * PL: Komponent logotypu z nazwą strony i obrazkiem favicon.
+ * EN: Logo component with site title and favicon image.
+ */
 const Logo = ({ title }: { title: string }) => {
   return (
     <Link
@@ -48,8 +60,12 @@ const Logo = ({ title }: { title: string }) => {
   );
 };
 
+/**
+ * PL: Lista linków nawigacyjnych generowana na podstawie tablicy tłumaczeń.
+ * EN: Navigation links list generated based on a translation array.
+ */
 const NavList = ({ items }: { items: string[] }) => {
-  const paths = ['/', '/gallery', '/about-us', '/terms', '/contact'];
+  const paths = ['/', '/gardens', '/about-us', '/terms', '/contact'];
   if (!Array.isArray(items)) return null;
 
   return (
@@ -68,6 +84,10 @@ const NavList = ({ items }: { items: string[] }) => {
   );
 };
 
+/**
+ * PL: Przycisk otwierający/zamykający menu mobilne (Hamburger).
+ * EN: Toggle button for opening/closing the mobile menu (Hamburger).
+ */
 const MenuToggle = ({
   isOpen,
   onClick,
@@ -95,6 +115,10 @@ const MenuToggle = ({
   );
 };
 
+/**
+ * PL: Kontener menu mobilnego zarządzający stanem otwarcia.
+ * EN: Mobile menu container managing its open state.
+ */
 const MobileMenu = ({ items }: { items: string[] }) => {
   const [isOpen, setIsOpen] = useState(false);
   const t = useTranslations('HomePage');
@@ -126,29 +150,11 @@ const MobileMenu = ({ items }: { items: string[] }) => {
   );
 };
 
-const AuthTrigger = ({ onLoginClick }: { onLoginClick?: () => void }) => {
-  const searchParams = useSearchParams();
-  const pathname = usePathname();
-
-  useEffect(() => {
-    if (pathname.includes('/register')) return;
-
-    const showLogin = searchParams.get('showLogin');
-    if (showLogin === 'true' && onLoginClick) {
-      onLoginClick();
-
-      const newUrl = window.location.pathname;
-      window.history.replaceState({}, '', newUrl);
-    }
-  }, [searchParams, onLoginClick, pathname]);
-
-  return null;
-};
-
-export const Navigation = (props: {
-  onLoginClick?: () => void;
-  onSearchClick?: () => void;
-}) => {
+/**
+ * PL: Główny komponent nawigacji eksportowany do layoutu.
+ * EN: Main navigation component exported to the layout.
+ */
+export const Navigation = () => {
   const t = useTranslations('HomePage');
 
   let navItems = [];
@@ -162,13 +168,10 @@ export const Navigation = (props: {
   return (
     <header className="main-header py-6 border-b border-subtle-gray relative z-20">
       <SkipLink />
-      <Suspense fallback={<div className="auth-trigger-fallback h-0" />}>
-        <AuthTrigger onLoginClick={props.onLoginClick} />
-      </Suspense>
 
       <div className="header-top-wrapper flex flex-col md:flex-row justify-between items-center space-y-10 md:space-y-0 md:gap-8">
         <Logo title={t('title')} />
-        <HeaderControls {...props} />
+        <HeaderControls />
       </div>
       <MobileMenu items={navItems} />
     </header>
