@@ -67,7 +67,7 @@ const SearchModal = ({ isVisible, onClose }: SearchModalProps) => {
   const handleSubmit = (e: React.FormEvent) => {
 	e.preventDefault();
   };
-//---------------
+  //---------------
 
   /**
    * PL: Efekt obsługujący fokusowanie pierwszego pola oraz nasłuchiwanie klawisza Escape.
@@ -76,7 +76,7 @@ const SearchModal = ({ isVisible, onClose }: SearchModalProps) => {
   useEffect(() => {
 	if (!isVisible) return;
 
-	// PL: Ustawienie fokusu na loginie dla lepszego UX. EN: Setting focus on login for better UX.
+	// PL: Ustawienie fokusu na searchbar dla lepszego UX. EN: Setting focus on searchbar for better UX.
 	searchInputRef.current?.focus();
 
 	/** PL: Funkcja zamykająca modal po naciśnięciu ESC. EN: Function closing the modal on ESC press. */
@@ -148,8 +148,8 @@ const SearchModal = ({ isVisible, onClose }: SearchModalProps) => {
 
 				{/** Mapping results to clickable list items. */}
 				<ul className="space-y-2">
-				  {results.map((result, index) => (
-					<li key={index}>
+				  {results.map((result) => (
+					<li key={result}>
 					  <button
 						onClick={() => handleResultClick(result)}
 						className="w-full text-left px-4 py-3 rounded-lg hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-green"
