@@ -5,21 +5,9 @@ from gardens.models import Garden
 class PlantListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Plant
-        fields = ["id", "nickname", "image"]
+        fields = ["plant_id", "nickname", "image"]
 
 class PlantSerializer(serializers.ModelSerializer):
-	class Meta:
-		model = Plant
-		fields = (
-			"plant_id",
-			"nickname",
-			"species",
-			"created_at",
-			"owner",
-            "image",
-		)
-
-class PlantDetailSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = Plant
 		fields = (
@@ -31,7 +19,7 @@ class PlantDetailSerializer(serializers.ModelSerializer):
 			"garden",
 			"image",
 		)
-            
+ 
 # This serializer controls which fields users can modify when creating a new Plant
 class PlantCreateSerializer(serializers.ModelSerializer):
     garden = serializers.PrimaryKeyRelatedField(

@@ -1,10 +1,8 @@
 'use client';
 
 /**
- * PL: Komponent formularza logowania. Zarządza stanem uwierzytelniania,
- * walidacją po stronie serwera oraz komunikacją z API Django.
- * EN: Login form component. Manages authentication state,
- * server-side validation, and communication with the Django API.
+ * PL: Komponent formularza logowania z obsługą stanów, walidacją i integracją z API.
+ * EN: Login form component with state management, validation, and API integration.
  */
 
 import { useState } from 'react';
@@ -13,21 +11,19 @@ import { Input } from '@/components/Input';
 import { Icon } from '@/components/icons/ui/Icon';
 import { Button } from '@/components/Button';
 
-/**
- * PL: Typ danych formularza logowania.
- * EN: Login form data type.
- */
 type FormData = {
   email: string;
   password: string;
 };
 
 /**
- * PL: Funkcja wysyłająca żądanie logowania do API Django.
- * EN: Function sending login request to Django API.
+ * PL: Wysyła żądanie logowania do API przy użyciu zmiennej środowiskowej dla adresu URL.
+ * EN: Sends a login request to the API using an environment variable for the URL.
  */
 const loginRequest = async (data: FormData): Promise<void> => {
-  const res = await fetch('http://localhost:8000/api/auth/login/', {
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+
+  const res = await fetch(`${apiUrl}/api/auth/login/`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -38,66 +34,86 @@ const loginRequest = async (data: FormData): Promise<void> => {
 
   if (!res.ok) {
     const errorData = await res.json().catch(() => ({}));
-    console.warn('Logowanie odrzucone:', errorData);
     throw new Error('LOGIN_FAILED');
   }
 };
 
 /**
- * PL: Pomocnik mapujący błędy logowania na przetłumaczone komunikaty.
- * EN: Helper mapping login errors to translated messages.
+ * PL: Mapuje błędy API lub połączenia na klucze tłumaczeń.
+ * EN: Maps API or connection errors to translation keys.
  */
 const getErrorMessage = (
   tError: (key: string) => string,
   error: unknown
-): string =>
-  error instanceof Error && error.message === 'LOGIN_FAILED'
+): string => {
+  const isLoginFailed =
+    error instanceof Error && error.message === 'LOGIN_FAILED';
+  return isLoginFailed
     ? tError('errors.invalidCredentials')
     : tError('errors.connectionError');
+};
 
 /**
- * PL: Interfejs właściwości komponentu LoginForm.
- * EN: Props interface for the LoginForm component.
+ * PL: Komponent wyświetlający komunikat o błędzie logowania.
+ * EN: Component displaying a login error message.
  */
+const ErrorMessage = ({ message }: { message: string }) => (
+  <div className="p-2 text-sm font-bold text-red-700 bg-white border-2 border-red-600 rounded flex items-center gap-2">
+    <Icon name="close" size={16} />
+    {message}
+  </div>
+);
+
+/**
+ * PL: Ikona oka przełączająca widoczność hasła (obsługuje dynamiczne ścieżki SVG).
+ * EN: Eye icon toggling password visibility (handles dynamic SVG paths).
+ */
+const EyeIcon = ({ show }: { show: boolean }) => {
+  const pathData = show
+    ? 'M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88'
+    : [
+        'M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z',
+        'M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z',
+      ].join(' ');
+
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      strokeWidth={1.5}
+      stroke="currentColor"
+      className="w-5 h-5"
+    >
+      <path strokeLinecap="round" strokeLinejoin="round" d={pathData} />
+    </svg>
+  );
+};
+
 interface LoginFormProps {
-  /** PL: Funkcja tłumacząca dla tekstów ogólnych. EN: Translation function for general texts. */
   t: (key: string) => string;
-  /** PL: Funkcja tłumacząca dla komunikatów o błędach. EN: Translation function for error messages. */
   tError: (key: string) => string;
-  /** PL: Callback wywoływany po pomyślnym zalogowaniu. EN: Callback triggered after successful login. */
   onLoginSuccess: () => void;
-  /** PL: Referencja do pola nazwy użytkownika (autofocus). EN: Reference to the username input (autofocus). */
   usernameRef: React.Ref<HTMLInputElement>;
 }
 
 /**
- * PL: Reużywalny komponent formularza logowania zintegrowany z systemem projektowym.
- * EN: Reusable login form component integrated with the design system.
+ * PL: Niestandardowy hook zarządzający logiką i stanem formularza logowania.
+ * EN: Custom hook managing the logic and state of the login form.
  */
-export const LoginForm = ({
-  t,
-  tError,
-  onLoginSuccess,
-  usernameRef,
-}: LoginFormProps) => {
+const useLoginForm = (
+  onLoginSuccess: () => void,
+  tError: (key: string) => string
+) => {
   const router = useRouter();
-
   const [formData, setFormData] = useState<FormData>({
     email: '',
     password: '',
   });
-
-  /** PL:
-   * Stan błędów i ładowania.
-   * EN: Error and loading states. */
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  /**
-   * PL: Obsługa wysyłania formularza.
-   * EN: Form submission handling.
-   */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -114,23 +130,53 @@ export const LoginForm = ({
     }
   };
 
-  /**
-   * PL: Aktualizacja stanu danych przy zmianie w polach Input.
-   * EN: Updating data state on Input field changes.
-   */
-  const update = ({ target }: React.ChangeEvent<HTMLInputElement>) => {
+  const updateFormData = (name: keyof FormData, value: string) => {
     setError(null);
-    setFormData(prev => ({ ...prev, [target.name]: target.value }));
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
+
+  return {
+    formData,
+    error,
+    isLoading,
+    showPassword,
+    setShowPassword,
+    handleSubmit,
+    updateFormData,
+  };
+};
+
+/**
+ * PL: Główny komponent widoku formularza logowania.
+ * EN: Main login form view component.
+ */
+export const LoginForm = ({
+  t,
+  tError,
+  onLoginSuccess,
+  usernameRef,
+}: LoginFormProps) => {
+  const {
+    formData,
+    error,
+    isLoading,
+    showPassword,
+    setShowPassword,
+    handleSubmit,
+    updateFormData,
+  } = useLoginForm(onLoginSuccess, tError);
+
+  const handleInputChange = ({
+    target,
+  }: React.ChangeEvent<HTMLInputElement>) => {
+    updateFormData(target.name as keyof FormData, target.value);
+  };
+
+  const togglePasswordVisibility = () => setShowPassword(!showPassword);
 
   return (
     <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
-      {error && (
-        <div className="p-2 text-sm font-bold text-red-700 bg-white border-2 border-red-600 rounded flex items-center gap-2">
-          <Icon name="close" size={16} />
-          {error}
-        </div>
-      )}
+      {error && <ErrorMessage message={error} />}
 
       <Input
         ref={usernameRef}
@@ -140,7 +186,7 @@ export const LoginForm = ({
         id="login-email"
         required
         value={formData.email}
-        onChange={update}
+        onChange={handleInputChange}
         disabled={isLoading}
       />
 
@@ -152,50 +198,15 @@ export const LoginForm = ({
           id="login-password"
           required
           value={formData.password}
-          onChange={update}
+          onChange={handleInputChange}
           disabled={isLoading}
         />
         <button
           type="button"
-          onClick={() => setShowPassword(!showPassword)}
+          onClick={togglePasswordVisibility}
           className="absolute right-3 top-9 z-10 text-primary-green hover:text-green-700 transition-colors"
         >
-          {showPassword ? (
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className="w-5 h-5"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88"
-              />
-            </svg>
-          ) : (
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className="w-5 h-5"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
-              />
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-              />
-            </svg>
-          )}
+          <EyeIcon show={showPassword} />
         </button>
       </div>
 
