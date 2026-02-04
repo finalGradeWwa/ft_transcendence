@@ -82,6 +82,43 @@ class GardenViewSet(viewsets.ViewSet):
         garden.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
     
+    def update(self, request, pk=None):
+        """
+        Update a plant (PUT). Only garden owners can update.
+        """
+        garden = get_object_or_404(
+            Garden,
+            pk=pk,
+            owners__organization_user__user=request.user
+        )
+        serializer = GardenCreateSerializer(
+            garden,
+            data=request.data,
+            context={"request": request},
+        )
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+        return Response(GardenListSerializer(serializer.instance).data)
+
+    def partial_update(self, request, pk=None):
+        """
+        Update a plant (PATCH). Only garden members can update.
+        """
+        garden = get_object_or_404(
+            Garden,
+            pk=pk,
+            owners__organization_user__user=request.user
+        )
+        serializer = GardenCreateSerializer(
+            garden,
+            data=request.data,
+            context={"request": request},
+            partial=True
+        )
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+        return Response(GardenListSerializer(serializer.instance).data) 
+    
     # POST /gardens/5/users/
     @action(detail=True, methods=["post"])
     def add_user(self, request, pk=None):
@@ -142,3 +179,32 @@ class GardenViewSet(viewsets.ViewSet):
 
         garden_user.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+   # POST /gardens/5/users/
+    @action(detail=True, methods=["post"])
+    def add_plant(self, request, pk=None):
+        """
+        create and add a plant to a garden. members and owners only
+        """
+        garden = get_object_or_404(Garden, pk=pk)
+        
+
+        try:
+            add_garden_user(
+                owner=request.user,
+                garden=garden,
+                user_to_add=user_to_add,
+            )
+        except PermissionError:
+            return Response(
+                {"detail": "You are not a garden owner"},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        return Response(
+        {  
+            "detail": f"new garden member has been added.",
+            "garden_id": garden.id,
+            "added_user_id": user_id,
+        },
+        status=status.HTTP_200_OK
+       )
