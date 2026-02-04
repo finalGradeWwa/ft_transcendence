@@ -9,7 +9,7 @@ import Image from 'next/image';
 
 export function Background({ children }: { children: React.ReactNode }) {
   return (
-    <div className="relative min-h-screen flex flex-col">
+    <div className="relative min-h-screen flex flex-col bg-dark-bg">
       {/**
        * PL: Stała warstwa obrazu tła pokrywająca całe okno.
        * EN: Fixed background image layer covering the entire window.
@@ -30,7 +30,7 @@ export function Background({ children }: { children: React.ReactNode }) {
        * EN: Background darkening overlay.
        */}
       <div
-        className="fixed inset-0 bg-black/50 backdrop-blur-[2px] z-10"
+        className="fixed inset-0 bg-black/60 backdrop-blur-[2px] z-10"
         aria-hidden="true"
       />
 

@@ -23,9 +23,9 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('authentication.urls')),
 	path('', include('users.urls')),
-    path('api/garden/', include('gardens.urls')),
-    path('api/plant/', include('plants.urls')),
-    path('api/auth/', include('social_django.urls', namespace='social')),
+    path('api/', include('gardens.urls')),
+    path('api/', include('plants.urls')),
+    path('api/', include('social_feed.urls')),
     path('chat/', include('chat_app.urls')),
     # path('api/image/', include('core.urls'))
 ]

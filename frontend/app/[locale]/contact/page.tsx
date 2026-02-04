@@ -5,14 +5,9 @@
  * EN: Contact page displaying business details and email link.
  */
 
-import { useState } from 'react';
-import dynamic from 'next/dynamic';
 import { useTranslations } from 'next-intl';
 import { Icon } from '@/components/icons/ui/Icon';
-
-const LoginModal = dynamic(() => import('@/components/LoginModal'), {
-  ssr: false,
-});
+import NextImage from 'next/image';
 
 const CONTACT_EMAIL = 'j.weeder@example.com';
 const NIP_VALUE = '111-111-11-11';
@@ -86,10 +81,9 @@ const ContactView = ({ t }: any) => (
  */
 export default function ContactPage() {
   const t = useTranslations('HomePage');
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
   return (
-    <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pt-4 pb-12 flex flex-col justify-center h-full flex-grow">
+    <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pt-20 pb-12 flex flex-col justify-center h-full flex-grow">
       <header className="text-center mb-12">
         <h1 className="text-4xl md:text-5xl font-bold text-header-main mb-4">
           {t('nav.4') || 'Kontakt'}
@@ -99,18 +93,23 @@ export default function ContactPage() {
 
       <ContactView t={t} />
 
-      <footer className="mt-12 text-center text-white">
+      <footer className="mt-12 text-xl text-center text-white">
         <p>
           {t('contact.officeOpen')}:{' '}
           <span className="font-bold">{t('contact.officeHours')}</span>
         </p>
+        <div className="relative max-w-2xl mx-auto overflow-hidden rounded-2xl border-4 border-white/10 mt-16 mb-6">
+          <NextImage
+            src="/images/contact/office-1200.webp"
+            alt="Biuro"
+            width={1200}
+            height={675}
+            className="w-full h-auto object-cover"
+            sizes="(max-width: 768px) 95vw, 672px"
+            priority
+          />
+        </div>
       </footer>
-
-      <LoginModal
-        isVisible={isLoginModalOpen}
-        onClose={() => setIsLoginModalOpen(false)}
-        t={t}
-      />
     </div>
   );
 }

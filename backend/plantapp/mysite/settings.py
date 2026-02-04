@@ -71,6 +71,7 @@ INSTALLED_APPS = [
     'gardens',
     'organizations',
     'social_django',
+    'social_feed',
     'chat_app',
 ]
 

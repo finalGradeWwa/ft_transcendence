@@ -5,21 +5,9 @@ from gardens.models import Garden
 class PlantListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Plant
-        fields = ["id", "nickname", "image"]
+        fields = ["plant_id", "nickname", "image"]
 
 class PlantSerializer(serializers.ModelSerializer):
-	class Meta:
-		model = Plant
-		fields = (
-			"plant_id",
-			"nickname",
-			"species",
-			"created_at",
-			"owner",
-            "image",
-		)
-
-class PlantDetailSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = Plant
 		fields = (
@@ -31,20 +19,15 @@ class PlantDetailSerializer(serializers.ModelSerializer):
 			"garden",
 			"image",
 		)
-            
+ 
 # This serializer controls which fields users can modify when creating a new Plant
 class PlantCreateSerializer(serializers.ModelSerializer):
     garden = serializers.PrimaryKeyRelatedField(
         queryset=Garden.objects.none()
     )
-
-    #garden = serializers.PrimaryKeyRelatedField(
-    #queryset=Garden.objects.all()  # BAD - evaluated at class definition
-    #) -> BAD SOLUTION -> assignment evaluated at class definition 
     class Meta:
         model = Plant
-        fields = ("nickname", "species", "garden")
-    
+        fields = ("nickname", "species", "garden", "image")
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
