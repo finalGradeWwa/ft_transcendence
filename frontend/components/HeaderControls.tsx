@@ -93,7 +93,7 @@ export function HeaderControls({
         aria-label="Narzędzia użytkownika"
       >
         <IconButton
-          onClick={onSearchClick}
+          href={`${pathname}?showSearch=true`}
           iconName="search"
           ariaLabel="Szukaj"
         />

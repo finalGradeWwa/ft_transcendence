@@ -9,8 +9,14 @@ const LoginModal = dynamic(() => import('@/components/LoginModal'), {
   ssr: false,
 });
 
+const SearchModal = dynamic(() => import('@/components/SearchModal'), {
+  ssr: false,
+});
+
 export const GlobalModalProvider = () => {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
+
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const t = useTranslations('HomePage');
@@ -19,15 +25,32 @@ export const GlobalModalProvider = () => {
     if (searchParams.get('showLogin') === 'true') {
       setIsLoginModalOpen(true);
     }
+
+    if (searchParams.get('showSearch') === 'true') {
+      setIsSearchModalOpen(true);
+    }
   }, [searchParams]);
 
-  const handleClose = () => {
+  const handleLoginClose = () => {
     setIsLoginModalOpen(false);
     const newUrl = pathname;
     window.history.replaceState({}, '', newUrl);
   };
 
+  // Close search modal and clean up URL
+  const handleSearchClose = () => {
+    setIsSearchModalOpen(false);
+    const newUrl = pathname;
+    window.history.replaceState({}, '', newUrl);
+  };
+
   return (
-    <LoginModal isVisible={isLoginModalOpen} onClose={handleClose} t={t} />
+    <>
+      {/* Login Modal */}
+      <LoginModal isVisible={isLoginModalOpen} onClose={handleLoginClose} t={t} />
+
+      {/* Search Modal */}
+      <SearchModal isVisible={isSearchModalOpen} onClose={handleSearchClose} />
+    </>
   );
 };

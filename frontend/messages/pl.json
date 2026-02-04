@@ -114,5 +114,13 @@
     "title": "Czat",
     "typeMessage": "Wpisz wiadomość...",
     "send": "Wyślij"
+  },
+  "SearchModal": {
+    "title": "Wyszukiwanie",
+    "placeholder": "Wpisz aby wyszukać...",
+    "resultsCount": "Znaleziono {count} wynik",
+    "resultsCount_other": "Znaleziono {count} wyniki",
+    "resultsCount_many": "Znaleziono {count} wyników",
+    "noResults": "Nie znaleziono wyników dla \"{query}\""
   }
 }

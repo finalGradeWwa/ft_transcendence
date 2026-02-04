@@ -145,6 +145,26 @@ const AuthTrigger = ({ onLoginClick }: { onLoginClick?: () => void }) => {
   return null;
 };
 
+/**
+ * SearchTrigger - Handles search modal triggering via URL params
+ * Similar to AuthTrigger but for search functionality
+ */
+const SearchTrigger = ({ onSearchClick }: { onSearchClick?: () => void }) => {
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const showSearch = searchParams.get('showSearch');
+    if (showSearch === 'true' && onSearchClick) {
+      onSearchClick();
+
+      const newUrl = window.location.pathname;
+      window.history.replaceState({}, '', newUrl);
+    }
+  }, [searchParams, onSearchClick]);
+
+  return null;
+};
+
 export const Navigation = (props: {
   onLoginClick?: () => void;
   onSearchClick?: () => void;
@@ -164,6 +184,9 @@ export const Navigation = (props: {
       <SkipLink />
       <Suspense fallback={<div className="auth-trigger-fallback h-0" />}>
         <AuthTrigger onLoginClick={props.onLoginClick} />
+      </Suspense>
+      <Suspense fallback={<div className="search-trigger-fallback h-0" />}>
+        <SearchTrigger onSearchClick={props.onSearchClick} />
       </Suspense>
 
       <div className="header-top-wrapper flex flex-col md:flex-row justify-between items-center space-y-10 md:space-y-0 md:gap-8">
