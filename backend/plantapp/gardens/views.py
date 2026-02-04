@@ -27,6 +27,7 @@ class GardenViewSet(viewsets.ViewSet):
         garden = get_object_or_404(
             Garden.objects # queryset chaining happens below
             .annotate(user_count=Count("gardenuser")) # responsible for returning number of garden users
+            .annotate(plant_count=Count("plants"))
             .prefetch_related( # responsible for returning garden's owner
                 "owners__organization_user__user"
             ),
@@ -64,6 +65,7 @@ class GardenViewSet(viewsets.ViewSet):
             Garden.objects
                 .distinct()
                 .annotate(user_count=Count("gardenuser"))
+                .annotate(plant_count=Count("plants"))
         )
         if owner_param:
             if owner_param.lower() == "me":

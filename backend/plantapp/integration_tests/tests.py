@@ -218,10 +218,8 @@ class GardenPlantIntegrationTests(APITestCase):
         response = self.client.get('/api/garden/')
         
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        # Find Alice's garden in response
         alice_garden = next(g for g in response.data if g['garden_id'] == self.garden1.garden_id)
-        # You'll need to add plant_count annotation to GardenListSerializer
-        # self.assertEqual(alice_garden['plant_count'], 2)
+        self.assertEqual(alice_garden['plant_count'], 2)
 
     def test_multiple_users_multiple_gardens_plants_isolation(self):
         """Test complex scenario with multiple users, gardens, and plants"""
