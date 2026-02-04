@@ -46,9 +46,7 @@ const getErrorMessage = (
   tError: (key: string) => string,
   error: unknown
 ): string => {
-  const isLoginFailed =
-    error instanceof Error && error.message === 'LOGIN_FAILED';
-  return isLoginFailed
+  return error instanceof Error && error.message === 'LOGIN_FAILED'
     ? tError('errors.invalidCredentials')
     : tError('errors.connectionError');
 };
@@ -141,7 +139,7 @@ const useLoginForm = (
       window.location.href = '/';
     } catch (err) {
       /** PL: Wyświetlamy błąd użytkownikowi EN: Displaying error to the user */
-      setError(tError('errors.invalidCredentials'));
+      setError(getErrorMessage(tError, err));
     } finally {
       setIsLoading(false);
     }
