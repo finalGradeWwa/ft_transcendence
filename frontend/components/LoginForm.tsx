@@ -5,7 +5,7 @@
  * EN: Login form component with state management, validation, and API integration.
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from '@/i18n/navigation';
 import { Input } from '@/components/Input';
 import { Icon } from '@/components/icons/ui/Icon';
@@ -46,9 +46,7 @@ const getErrorMessage = (
   tError: (key: string) => string,
   error: unknown
 ): string => {
-  const isLoginFailed =
-    error instanceof Error && error.message === 'LOGIN_FAILED';
-  return isLoginFailed
+  return error instanceof Error && error.message === 'LOGIN_FAILED'
     ? tError('errors.invalidCredentials')
     : tError('errors.connectionError');
 };
@@ -120,10 +118,27 @@ const useLoginForm = (
     setError(null);
 
     try {
-      await loginRequest(formData);
+      const data = await loginRequest(formData);
+
+      /**
+       * PL: Sprawdzenie, czy backend faktycznie przysłał dane użytkownika.
+       * EN: Checking if the backend actually sent user data.
+       */
+      if (!data || !data.user) {
+        throw new Error('EMPTY_RESPONSE');
+      }
+
+      /** PL: Zapis danych do localStorage. EN: Saving data to localStorage. */
+      localStorage.setItem('username', data.user.username);
+
+      /**
+       * PL: Przekierowanie na stronę główną i odświeżenie stanu aplikacji.
+       * EN: Redirect to home page and refresh application state.
+       */
       onLoginSuccess();
-      router.refresh();
+      window.location.href = '/';
     } catch (err) {
+      /** PL: Wyświetlamy błąd użytkownikowi EN: Displaying error to the user */
       setError(getErrorMessage(tError, err));
     } finally {
       setIsLoading(false);
@@ -180,22 +195,19 @@ export const LoginForm = ({
 
       <Input
         ref={usernameRef}
-        label={t('email') || 'E-mail'}
+        label={t('email')}
         name="email"
         type="email"
-        id="login-email"
         required
         value={formData.email}
         onChange={handleInputChange}
         disabled={isLoading}
       />
-
-      <div className="relative flex flex-col gap-1">
+      <div className="relative">
         <Input
           label={t('password')}
           type={showPassword ? 'text' : 'password'}
           name="password"
-          id="login-password"
           required
           value={formData.password}
           onChange={handleInputChange}
@@ -209,11 +221,10 @@ export const LoginForm = ({
           <EyeIcon show={showPassword} />
         </button>
       </div>
-
       <Button
         type="submit"
         isLoading={isLoading}
-        className="w-full py-4 uppercase font-bold text-lg tracking-widest shadow-lg focus-visible:outline-2 focus-visible:outline-black focus-visible:outline-offset-[3px]"
+        className="w-full uppercase font-bold"
       >
         {t('loginBtn')}
       </Button>

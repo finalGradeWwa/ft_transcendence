@@ -33,6 +33,7 @@
       "searchBtn": "Search",
       "add": "Add new plant",
       "profile": "User profile",
+      "logout": "Logout",
       "userTools": "User tools"
     },
     "contact": {
@@ -147,7 +148,7 @@
     }
   },
   "GardensPage": {
-    "title": "Add new garden",
+    "title": "Add a new garden",
     "submit": "Save garden",
     "backToList": "Back to gardens list",
     "latestGardens": "Latest Gardens",

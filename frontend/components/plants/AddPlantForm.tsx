@@ -172,10 +172,12 @@ function PhotoUploadControls({ form, tr, fileInputRef }: any) {
         <label
           htmlFor="plant-photo-upload"
           tabIndex={0}
-          onKeyDown={e =>
-            (e.key === 'Enter' || e.key === ' ') &&
-            (e.preventDefault(), fileInputRef.current?.click())
-          }
+          onKeyDown={e => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              fileInputRef.current?.click();
+            }
+          }}
           className="cursor-pointer bg-secondary-beige text-primary-green font-semibold py-2 px-4 rounded-full text-sm hover:bg-amber-100 transition-colors shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-gray-600 focus-visible:outline-offset-2"
         >
           {tr('chooseFile')}

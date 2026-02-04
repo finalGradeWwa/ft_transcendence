@@ -5,6 +5,9 @@ import { useLocale, useTranslations } from 'next-intl';
 import { useRouter, usePathname, Link } from '@/i18n/navigation';
 import { Icon } from '@/components/icons/ui/Icon';
 
+const BTN_S =
+  'p-2 rounded-full bg-secondary-beige text-neutral-900 hover:text-primary-green shadow-md transition-all focus-visible:ring-2 focus-visible:ring-[#ffffff] focus-visible:ring-offset-2 focus-visible:ring-offset-black outline-none shrink-0 flex items-center justify-center';
+
 interface HeaderControlsProps {
   onLoginClick?: () => void;
   onSearchClick?: () => void;
@@ -36,23 +39,16 @@ const IconButton = ({
   href?: any;
 }) => {
   const content = <Icon name={iconName} size={18} aria-hidden="true" />;
-  const className =
-    'p-2 rounded-full bg-secondary-beige text-neutral-900 hover:text-primary-green shadow-md transition-all focus-visible:ring-2 focus-visible:ring-[#ffffff] focus-visible:ring-offset-2 focus-visible:ring-offset-black outline-none shrink-0 flex items-center justify-center';
 
   return href ? (
-    <Link
-      href={href}
-      className={className}
-      aria-label={ariaLabel}
-      scroll={false}
-    >
+    <Link href={href} className={BTN_S} aria-label={ariaLabel} scroll={false}>
       {content}
     </Link>
   ) : (
     <button
       type="button"
       onClick={onClick}
-      className={className}
+      className={BTN_S}
       aria-label={ariaLabel}
     >
       {content}
@@ -77,18 +73,18 @@ const AddPlantDropdown = ({
         <Link
           href={`/profiles/${username}/plants/add`}
           onClick={onClose}
-          className="flex items-center gap-3 px-4 py-2 text-sm font-bold text-header-main outline-none focus:outline-header-main hover:bg-black/10"
+          className="flex items-center gap-3 px-4 py-2 text-sm font-bold text-white outline-none hover:bg-black/10"
         >
           <Icon name="plus" size={14} />
           {labelPlant}
         </Link>
       </li>
-      <div className="border-t border-header-main/30 mx-2 my-1" />
+      <div className="border-t border-white/30 mx-2 my-1" />
       <li>
         <Link
           href={`/profiles/${username}/gardens/add`}
           onClick={onClose}
-          className="flex items-center gap-3 px-4 py-2 text-sm font-bold text-header-main outline-none focus:outline-header-main hover:bg-black/10"
+          className="flex items-center gap-3 px-4 py-2 text-sm font-bold text-white outline-none hover:bg-black/10"
         >
           <Icon name="plus" size={14} />
           {labelGarden}
@@ -112,6 +108,7 @@ export function HeaderControls({
   const locale = useLocale();
   const router = useRouter();
   const pathname = usePathname();
+  const tAria = useTranslations('HomePage.aria');
   const tPlant = useTranslations('AddPlantPage');
   const tGarden = useTranslations('GardensPage');
   const [isAddMenuOpen, setIsAddMenuOpen] = useState(false);
@@ -119,11 +116,11 @@ export function HeaderControls({
   const menuRef = useClickOutside(() => setIsAddMenuOpen(false), isAddMenuOpen);
 
   return (
-    <div className="flex flex-col min-[320px]:flex-row items-center justify-center gap-x-6 gap-y-4 min-[320px]:gap-y-0">
+    <div className="flex flex-col md:flex-row items-center justify-center gap-x-6 gap-y-4">
       <select
         value={locale}
         onChange={e => router.replace(pathname, { locale: e.target.value })}
-        aria-label="Wybierz język strony"
+        aria-label={tAria('selectLanguage')}
         className="bg-container-light text-neutral-900 p-1 rounded cursor-pointer border border-secondary-beige outline-none focus-visible:ring-2 focus-visible:ring-[#ffffff] focus-visible:ring-offset-2 focus-visible:ring-offset-black text-sm w-full min-[320px]:w-auto min-w-[100px]"
       >
         {languageOptions.map(opt => (
@@ -133,21 +130,18 @@ export function HeaderControls({
         ))}
       </select>
 
-      <nav
-        className="flex flex-col min-[200px]:flex-row gap-3"
-        aria-label="Narzędzia użytkownika"
-      >
+      <nav className="flex flex-wrap md:flex-nowrap items-center justify-center gap-3">
         <IconButton
           onClick={onSearchClick}
           iconName="search"
-          ariaLabel="Szukaj"
+          ariaLabel={tAria('searchBtn')}
         />
 
         <div className="relative" ref={menuRef}>
           <IconButton
             onClick={() => setIsAddMenuOpen(!isAddMenuOpen)}
             iconName="plus"
-            ariaLabel="Dodaj"
+            ariaLabel={tAria('add')}
           />
           {isAddMenuOpen && (
             <AddPlantDropdown
@@ -162,7 +156,7 @@ export function HeaderControls({
         <IconButton
           href={{ pathname, query: { showLogin: 'true' } }}
           iconName="user"
-          ariaLabel="Profil"
+          ariaLabel={tAria('profile')}
         />
       </nav>
     </div>

@@ -1,10 +1,6 @@
 'use client';
 
-/**
- * PL: Formularz rejestracji z obsługą awatara, walidacją haseł i integracją z API.
- * EN: Registration form with avatar support, password validation, and API integration.
- */
-
+import { useState, useEffect } from 'react';
 import { Link } from '@/i18n/navigation';
 import { Input } from '@/components/Input';
 import { Text } from '@/components/typography/Text';
@@ -15,11 +11,13 @@ interface RegisterFormProps {
   onSuccess: () => void;
 }
 
-/**
- * PL: Komponent widoku formularza rejestracji.
- * EN: Registration form view component.
- */
 export const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
   const {
     t,
     tr,
@@ -33,11 +31,13 @@ export const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
     handleRemoveFile,
     handleFileChange,
     handleSubmit,
+    isAlreadyLoggedIn,
   } = useRegisterForm({ onSuccess });
+
+  if (!isMounted || isAlreadyLoggedIn) return null;
 
   return (
     <>
-      {/** PL: Sekcja wyświetlania błędów. EN: Error display section. */}
       {error && (
         <div
           role="alert"
@@ -51,7 +51,6 @@ export const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
       <form
         onSubmit={handleSubmit}
         className="grid grid-cols-1 md:grid-cols-2 gap-6"
-        noValidate
       >
         <Input
           id="reg-first-name"
@@ -87,7 +86,6 @@ export const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
           autoComplete="email"
         />
 
-        {/** PL: Pole uploadu awatara z podglądem. EN: Avatar upload field with preview. */}
         <div className="md:col-span-2">
           <label
             id="avatar-label"
@@ -185,7 +183,6 @@ export const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
           </Text>
         </div>
 
-        {/** PL: Pola hasła z przełącznikiem widoczności. EN: Password fields with visibility toggle. */}
         <div className="flex flex-col gap-1 relative">
           <Input
             id="reg-password"
@@ -254,7 +251,6 @@ export const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
           autoComplete="new-password"
         />
 
-        {/** PL: Akceptacja regulaminu i przycisk wysyłania. EN: Terms acceptance and submit button. */}
         <div className="md:col-span-2 flex items-center gap-2 mt-2">
           <input
             type="checkbox"
