@@ -10,6 +10,7 @@ from .serializers import GardenListSerializer, GardenContentSerializer, GardenCr
 from django.db.models import Count
 from django.contrib.auth import get_user_model
 from plants.services import create_plant
+from plants.serializers import PlantSerializer, PlantCreateSerializer
 
 # Create your views here.
 
@@ -189,35 +190,26 @@ class GardenViewSet(viewsets.ViewSet):
         """
         garden = get_object_or_404(Garden, pk=pk)
         
-        # Check if user is a member of this garden
         if not GardenUser.objects.filter(organization=garden, user=request.user).exists():
             return Response(
                 {"detail": "You must be a member of this garden to add plants"},
                 status=status.HTTP_403_FORBIDDEN,
             )
         
-        # Validate only plant fields (nickname, species, image) without garden
-        plant_data = {
-            'nickname': request.data.get('nickname'),
-            'species': request.data.get('species'),
-            'image': request.data.get('image'),
-            'garden': garden
-        }
+        # Prepare data with garden from URL
+        data = request.data.copy()
+        data['garden'] = garden.id
         
-        # Simple validation for required fields
-        if not plant_data['nickname']:
-            return Response(
-                {"nickname": ["This field may not be blank."]},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+        serializer = PlantCreateSerializer(
+            data=data,
+            context={"request": request}
+        )
+        serializer.is_valid(raise_exception=True)
         
-        # Create the plant using the service
         plant = create_plant(
             creator=request.user,
-            data=plant_data
+            data=serializer.validated_data
         )
-        
-        from plants.serializers import PlantSerializer
         return Response(
             {
                 "detail": f"Plant {plant.nickname} has been added to {garden.name}.",

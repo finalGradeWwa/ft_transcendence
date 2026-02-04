@@ -58,7 +58,7 @@ class GardenPlantIntegrationTests(APITestCase):
         """Test creating a plant in a garden via garden API"""
         self.client.force_authenticate(user=self.user1)
         
-        response = self.client.post(f'/api/garden/{self.garden1.id}/add_plant/', {
+        response = self.client.post(f'/api/garden/{self.garden1.garden_id}/add_plant/', {
             'nickname': 'Rose',
             'species': 'Rosa rubiginosa'
         })
@@ -198,14 +198,14 @@ class GardenPlantIntegrationTests(APITestCase):
         
         # User1 can update it
         self.client.force_authenticate(user=self.user1)
-        response = self.client.patch(f'/api/plant/{plant.plant_id}/', {'name': 'Updated Name'})
+        response = self.client.patch(f'/api/plant/{plant.plant_id}/', {'nickname': 'Updated Name'})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         
         # Remove user1 from garden
         garden_user.delete()
         
         # User1 can no longer update the plant
-        response = self.client.patch(f'/api/plant/{plant.plant_id}/', {'name': 'Another Update'})
+        response = self.client.patch(f'/api/plant/{plant.plant_id}/', {'nickname': 'Another Update'})
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_garden_list_shows_plant_count(self):
