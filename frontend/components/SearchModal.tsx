@@ -113,6 +113,7 @@ const SearchModal = ({ isVisible, onClose }: SearchModalProps) => {
 			<button
 			  onClick={onClose}
 			  className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+			  aria-label={t('aria.close')}
 			>
 			  <Icon name="close" size={20} />
 			</button>
