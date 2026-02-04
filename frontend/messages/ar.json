@@ -157,5 +157,12 @@
     "plantsCountLabel": "عدد النباتات",
     "gardenNameLabel": "اسم الحديقة",
     "gardenNamePlaceholder": "مثلاً: شرفتي أو غرفة المعيشة"
+  },
+  "SearchModal": {
+    "title": "بحث",
+    "placeholder": "اكتب للبحث...",
+    "resultsCount": "تم العثور على {count} نتيجة",
+    "resultsCount_other": "تم العثور على {count} نتائج",
+    "noResults": "لم يتم العثور على نتائج لـ \"{query}\""
   }
 }

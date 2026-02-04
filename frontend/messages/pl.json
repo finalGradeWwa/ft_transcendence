@@ -158,5 +158,13 @@
     "plantsCountLabel": "Liczba roślin",
     "gardenNameLabel": "Nazwa ogrodu",
     "gardenNamePlaceholder": "np. Mój Balkon lub Salon"
+  },
+  "SearchModal": {
+    "title": "Wyszukiwanie",
+    "placeholder": "Wpisz aby wyszukać...",
+    "resultsCount": "Znaleziono {count} wynik",
+    "resultsCount_other": "Znaleziono {count} wyniki",
+    "resultsCount_many": "Znaleziono {count} wyników",
+    "noResults": "Nie znaleziono wyników dla \"{query}\""
   }
 }
