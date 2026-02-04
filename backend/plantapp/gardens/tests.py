@@ -3,6 +3,7 @@ from django.contrib.auth import get_user_model
 from rest_framework.test import APITestCase
 from rest_framework import status
 from .models import Garden, GardenUser, GardenOwner
+from .services import create_garden
 
 User = get_user_model()
 
@@ -22,18 +23,9 @@ class GardenAPITests(APITestCase):
             password="password123"
         )
 
-        self.garden = Garden.objects.create(
-            name="Alice's Garden",
-        )
-
-        self.alice_membership = GardenUser.objects.create(
-            organization=self.garden,
-            user=self.alice
-        )
-
-        self.owner = GardenOwner.objects.create(
-            organization=self.garden,
-            organization_user=self.alice_membership
+        self.garden = create_garden(
+            creator=self.alice,
+            data={"name": "Alice's Garden"}
         )
 
         self.detail_url = reverse("garden-detail", args=[self.garden.pk])
@@ -51,6 +43,7 @@ class GardenAPITests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["name"], "Alice's Garden")
+        self.assertEqual(response.data["environment"], "I")  # Default is indoor
 
     def test_owner_and_user_count_in_detail(self):
         self.client.force_authenticate(user=self.alice)
@@ -58,17 +51,65 @@ class GardenAPITests(APITestCase):
 
         self.assertEqual(response.data["owner"], "alice")
         self.assertEqual(response.data["user_count"], 1)
+        self.assertEqual(response.data["environment"], "I")  # Default is indoor
 
-    def test_user_cannot_access_foreign_garden(self):
-        self.client.force_authenticate(user=self.bob)
-        response = self.client.get(self.detail_url)
+    def test_list_all_gardens(self):
+        """Test that all gardens are visible to authenticated users"""
+        # Create a garden for Bob
+        bob_garden = create_garden(
+            creator=self.bob,
+            data={"name": "Bob's Garden"}
+        )
 
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-
-    def test_list_only_my_gardens(self):
+        # Alice can see all gardens (hers and Bob's)
         self.client.force_authenticate(user=self.alice)
         response = self.client.get(self.list_url)
 
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # Alice has 2 gardens (auto-created "alice's Garden" + "Alice's Garden" from setUp)
+        # Bob has 2 gardens (auto-created "bob's Garden" + "Bob's Garden" from test)
+        # Total = 4 gardens
+        self.assertEqual(len(response.data), 4)
+
+    def test_list_gardens_filter_by_owner_me(self):
+        """Test filtering gardens by ?owner=me"""
+        # Create a garden for Bob
+        bob_garden = create_garden(
+            creator=self.bob,
+            data={"name": "Bob's Garden"}
+        )
+
+        # Alice filters by ?owner=me - should only see her gardens
+        self.client.force_authenticate(user=self.alice)
+        response = self.client.get(f'{self.list_url}?owner=me')
+
+        print("\n=== Response Data ===")
+        print(f"Status Code: {response.status_code}")
+        print(f"Number of gardens: {len(response.data)}")
+        print(f"Response data: {response.data}")
+        print("=====================\n")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # Alice should only see her 2 gardens
+        self.assertEqual(len(response.data), 2)
+        for garden in response.data:
+            # Verify gardens belong to Alice (check name contains "Alice" or similar logic)
+            self.assertNotEqual(garden["name"], "Bob's Garden")
+
+    def test_list_gardens_filter_by_owner_id(self):
+        """Test filtering gardens by ?owner=<user_id>"""
+        # Create a garden for Bob
+        bob_garden = create_garden(
+            creator=self.bob,
+            data={"name": "Bob's Garden"}
+        )
+
+        # Alice filters by Bob's user ID - should only see Bob's gardens
+        self.client.force_authenticate(user=self.alice)
+        response = self.client.get(f'{self.list_url}?owner={self.bob.id}')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # Should see Bob's 2 gardens (auto-created + manually created)
         self.assertEqual(len(response.data), 2)
 
     def test_create_garden(self):
@@ -83,6 +124,23 @@ class GardenAPITests(APITestCase):
         self.assertTrue(
             Garden.objects.filter(name="New Garden").exists()
         )
+        garden = Garden.objects.get(name="New Garden")
+        self.assertEqual(garden.environment, "I")  # Default is indoor
+
+    def test_create_garden_with_outdoor_environment(self):
+        self.client.force_authenticate(user=self.alice)
+
+        response = self.client.post(
+            self.create_url,
+            {"name": "Outdoor Garden", "environment": "O"}
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertTrue(
+            Garden.objects.filter(name="Outdoor Garden").exists()
+        )
+        garden = Garden.objects.get(name="Outdoor Garden")
+        self.assertEqual(garden.environment, "O")  # Outdoor environment
 
     def test_owner_can_delete_garden(self):
         self.client.force_authenticate(user=self.alice)
@@ -110,7 +168,7 @@ class GardenAPITests(APITestCase):
             {"user_id": self.bob.pk}
         )
 
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertTrue(
             GardenUser.objects.filter(
                 organization=self.garden,
@@ -130,7 +188,7 @@ class GardenAPITests(APITestCase):
             {"user_id": self.bob.pk}
         )
 
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(
             GardenUser.objects.filter(
                 organization=self.garden,

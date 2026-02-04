@@ -39,7 +39,7 @@
       "searchBtn": "Suche",
       "add": "Neue Pflanze hinzufügen",
       "profile": "Benutzerprofil",
-	  "logout": "Abmelden",
+      "logout": "Abmelden",
       "userTools": "Benutzer-Tools"
     },
     "contact": {
@@ -119,6 +119,11 @@
     "invalidCredentials": "Ungültiger Benutzername oder Passwort.",
     "generic": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
     "invalidImage": "Bitte laden Sie ein gültiges Bild hoch. Die Datei war entweder kein Bild oder sie ist beschädigt."
+  },
+  "ChatPage": {
+    "title": "Chat",
+    "typeMessage": "Nachricht eingeben...",
+    "send": "Senden"
   },
   "AboutUs": {
     "title": "Über uns",

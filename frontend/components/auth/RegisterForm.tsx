@@ -1,168 +1,50 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+/**
+ * PL: Formularz rejestracji z obsługą awatara, walidacją haseł i integracją z API.
+ * EN: Registration form with avatar support, password validation, and API integration.
+ */
+
 import { Link } from '@/i18n/navigation';
 import { Input } from '@/components/Input';
 import { Text } from '@/components/typography/Text';
 import { Button } from '@/components/Button';
-import { useTranslations } from 'next-intl';
+import { useRegisterForm } from './useRegisterForm';
 
 interface RegisterFormProps {
   onSuccess: () => void;
 }
 
+/**
+ * PL: Komponent widoku formularza rejestracji.
+ * EN: Registration form view component.
+ */
 export const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
-  const [isMounted, setIsMounted] = useState(false);
-
-  /**
-   * PL: Sprawdzamy, czy użytkownik jest już zalogowany, aby uniknąć renderowania formularza rejestracji.
-   * EN: Checking if the user is already logged in to avoid rendering the registration form.
-   */
-  const isAlreadyLoggedIn =
-    typeof window !== 'undefined' && !!localStorage.getItem('username');
-
-  useEffect(() => {
-    setIsMounted(true);
-    if (isAlreadyLoggedIn) {
-      onSuccess();
-    }
-  }, [isAlreadyLoggedIn, onSuccess]);
-
-  const t = useTranslations('HomePage');
-  const tr = useTranslations('RegisterPage');
-  const te = useTranslations('errors');
-
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const [fileName, setFileName] = useState('');
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [showPassword, setShowPassword] = useState(false);
-
-  useEffect(() => {
-    return () => {
-      if (previewUrl) URL.revokeObjectURL(previewUrl);
-    };
-  }, [previewUrl]);
-
-  const handleRemoveFile = () => {
-    setFileName('');
-    if (previewUrl) {
-      URL.revokeObjectURL(previewUrl);
-      setPreviewUrl(null);
-    }
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
-    setError(null);
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setFileName(file.name);
-      setPreviewUrl(URL.createObjectURL(file));
-      setError(null);
-    }
-  };
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    setIsLoading(true);
-    setError(null);
-
-    const formData = new FormData(e.currentTarget);
-
-    const password = (formData.get('password') as string) || '';
-    const passwordConfirm = (formData.get('password_confirm') as string) || '';
-    const avatarEntry = formData.get('avatar_photo');
-    const avatarFile = avatarEntry instanceof File ? avatarEntry : null;
-
-    /** PL: Walidacja formatu zdjęcia. EN: Image format validation. */
-    if (avatarFile && avatarFile.size > 0) {
-      const allowedTypes = [
-        'image/jpeg',
-        'image/png',
-        'image/webp',
-        'image/jpg',
-      ];
-      if (!allowedTypes.includes(avatarFile.type)) {
-        setError(te('invalidImage'));
-        setIsLoading(false);
-        return;
-      }
-    }
-
-    const passwordRegex =
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&./\\()|{}[\]#^_-]).{8,}$/;
-
-    if (!passwordRegex.test(password)) {
-      setError(tr('passwordRequirements'));
-      setIsLoading(false);
-      return;
-    }
-
-    if (password !== passwordConfirm) {
-      setError(tr('errorPasswordMatch'));
-      setIsLoading(false);
-      return;
-    }
-
-    try {
-      const response = await fetch('http://localhost:8000/api/register/', {
-        method: 'POST',
-        body: formData,
-        headers: { Accept: 'application/json' },
-      });
-
-      const text = await response.text();
-      const data = text ? JSON.parse(text) : null;
-
-      if (!response.ok) {
-        let serverErrorMessage = tr('errorRegistrationFailed');
-        if (data && typeof data === 'object') {
-          if (data.username) serverErrorMessage = tr('usernameExists');
-          else if (data.email) serverErrorMessage = tr('emailExists');
-          else if (data.avatar_photo) serverErrorMessage = te('invalidImage');
-          else {
-            const fieldErrors = Object.values(data).flat();
-            if (fieldErrors.length > 0 && typeof fieldErrors[0] === 'string') {
-              serverErrorMessage = fieldErrors[0];
-            } else if (data.detail) {
-              serverErrorMessage = data.detail;
-            }
-          }
-        }
-        setError(serverErrorMessage);
-        return;
-      }
-
-      onSuccess();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    } catch (err: any) {
-      console.error('Błąd podczas rejestracji:', err);
-      setError(
-        err.name === 'TypeError' || err.message === 'Failed to fetch'
-          ? tr('serverError')
-          : err.message
-      );
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const {
+    t,
+    tr,
+    fileName,
+    previewUrl,
+    isLoading,
+    error,
+    showPassword,
+    setShowPassword,
+    fileInputRef,
+    handleRemoveFile,
+    handleFileChange,
+    handleSubmit,
+  } = useRegisterForm({ onSuccess });
 
   if (!isMounted || isAlreadyLoggedIn) return null;
 
   return (
     <>
+      {/** PL: Sekcja wyświetlania błędów. EN: Error display section. */}
       {error && (
         <div
           role="alert"
           aria-live="assertive"
-          className="mb-6 p-3 font-bold text-red-700 bg-red-50 border-2 border-red-600 rounded text-center animate-pulse"
+          className="mb-6 p-3 font-bold text-red-700 bg-red-50 border-2 border-red-600 rounded text-center animate-pulse break-words"
         >
           {error}
         </div>
@@ -206,6 +88,7 @@ export const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
           autoComplete="email"
         />
 
+        {/** PL: Pole uploadu awatara z podglądem. EN: Avatar upload field with preview. */}
         <div className="md:col-span-2">
           <label
             id="avatar-label"
@@ -235,8 +118,8 @@ export const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
               )}
             </div>
 
-            <div className="flex flex-col gap-2">
-              <div className="flex items-center gap-4">
+            <div className="flex flex-col gap-2 max-w-full">
+              <div className="flex items-center gap-4 flex-wrap">
                 <input
                   type="file"
                   id="avatar-upload"
@@ -257,7 +140,7 @@ export const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
                       fileInputRef.current?.click();
                     }
                   }}
-                  className="cursor-pointer bg-secondary-beige text-primary-green font-semibold py-2 px-4 rounded-full text-sm hover:bg-amber-100 transition-colors shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-gray-600 focus-visible:outline-offset-2"
+                  className="cursor-pointer bg-secondary-beige text-primary-green font-semibold py-2 px-4 rounded-full text-sm hover:bg-amber-100 transition-colors shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-gray-600 focus-visible:outline-offset-2 shrink-0"
                 >
                   {tr('chooseFile')}
                 </label>
@@ -276,7 +159,7 @@ export const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
                       viewBox="0 0 24 24"
                       strokeWidth={2}
                       stroke="currentColor"
-                      className="w-3 h-3"
+                      className="w-3 h-3 shrink-0"
                       aria-hidden="true"
                     >
                       <path
@@ -298,11 +181,12 @@ export const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
               </Text>
             </div>
           </div>
-          <Text variant="caption" className="mt-1 px-1">
+          <Text variant="caption" className="mt-1 px-1 break-words">
             {tr('avatarRequirements')}
           </Text>
         </div>
 
+        {/** PL: Pola hasła z przełącznikiem widoczności. EN: Password fields with visibility toggle. */}
         <div className="flex flex-col gap-1 relative">
           <Input
             id="reg-password"
@@ -319,7 +203,7 @@ export const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
             onClick={() => setShowPassword(!showPassword)}
             aria-label={tr('password')}
             aria-pressed={showPassword}
-            className="absolute right-1 top-6 p-3 text-primary-green hover:text-green-700 transition-colors focus:outline-none focus:outline focus:outline-2 focus:outline-gray-600 focus:outline-offset-0 rounded-md"
+            className="hidden min-[321px]:block absolute right-1 top-6 p-3 text-primary-green hover:text-green-700 transition-colors focus:outline-none focus:outline focus:outline-2 focus:outline-gray-600 focus:outline-offset-0 rounded-md"
           >
             <svg
               aria-hidden="true"
@@ -355,7 +239,7 @@ export const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
           <Text
             id="password-reqs"
             variant="caption"
-            className="leading-tight px-1 italic opacity-70"
+            className="leading-tight px-1 italic opacity-70 break-words"
           >
             {tr('passwordRequirements')}
           </Text>
@@ -371,6 +255,7 @@ export const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
           autoComplete="new-password"
         />
 
+        {/** PL: Akceptacja regulaminu i przycisk wysyłania. EN: Terms acceptance and submit button. */}
         <div className="md:col-span-2 flex items-center gap-2 mt-2">
           <input
             type="checkbox"
@@ -378,13 +263,16 @@ export const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
             name="terms"
             required
             disabled={isLoading}
-            className="w-4 h-4 accent-primary-green focus:outline focus:outline-2 focus:outline-gray-600 focus:outline-offset-2"
+            className="w-4 h-4 accent-primary-green focus:outline focus:outline-2 focus:outline-gray-600 focus:outline-offset-2 shrink-0"
           />
-          <label htmlFor="terms" className="text-sm text-neutral-900">
+          <label
+            htmlFor="terms"
+            className="text-sm text-neutral-900 break-words"
+          >
             {tr('acceptTerms')}{' '}
             <Link
               href="/terms"
-              className="underline font-bold text-primary-green italic rounded px-1 focus:outline-none focus:outline focus:outline-2 focus:outline-gray-600 focus:outline-offset-0"
+              className="underline font-bold text-primary-green italic rounded px-1 focus:outline focus:outline-2 focus:outline-gray-600 focus:outline-offset-0"
             >
               {tr('termsLink')}
             </Link>
@@ -400,7 +288,7 @@ export const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
         </Button>
       </form>
 
-      <Text variant="small" className="mt-8 text-center">
+      <Text variant="small" className="mt-8 text-center break-words">
         {tr('alreadyHaveAccount')}{' '}
         <Link
           href="/?showLogin=true"

@@ -73,7 +73,7 @@ export const useAddPlantForm = ({
     formData.append('nickname', nickname);
     formData.append('garden', garden);
     formData.append('owner', username);
-    formData.append('photo_url', photo);
+    formData.append('image', photo);
 
     try {
       /**

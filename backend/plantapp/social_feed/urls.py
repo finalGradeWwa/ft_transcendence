@@ -1,7 +1,7 @@
 from rest_framework.routers import DefaultRouter
-from .views import GardenViewSet
+from .views import PinViewSet
 
 router = DefaultRouter()
-router.register(r"garden", GardenViewSet, basename="garden")
+router.register(r"pins", PinViewSet, basename="pins")
 
 urlpatterns = router.urls

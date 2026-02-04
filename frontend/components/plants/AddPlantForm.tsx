@@ -161,7 +161,7 @@ function PhotoUploadControls({ form, tr, fileInputRef }: any) {
           required
           type="file"
           id="plant-photo-upload"
-          name="photo_url"
+          name="image"
           className="hidden"
           accept=".jpg,.jpeg,.png,.webp"
           ref={fileInputRef}
