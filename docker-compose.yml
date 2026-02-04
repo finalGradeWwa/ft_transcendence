@@ -26,6 +26,8 @@ services:
     
     container_name: ft_transcendence_backend_migrate
     
+    volumes:
+      - ./backend:/app
     command: sh -c "cd plantapp && python manage.py migrate"
     
     restart: "no"
