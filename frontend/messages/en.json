@@ -162,8 +162,7 @@
   "SearchModal": {
     "title": "Search",
     "placeholder": "Type to search...",
-    "resultsCount": "{count} result found",
-    "resultsCount_other": "{count} results found",
+    "resultsCount": "{count, plural, one {# result found} other {# results found}}",
     "noResults": "No results found for \"{query}\"",
     "aria": {
       "close": "Close search"

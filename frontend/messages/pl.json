@@ -162,9 +162,7 @@
   "SearchModal": {
     "title": "Wyszukiwanie",
     "placeholder": "Wpisz aby wyszukać...",
-    "resultsCount": "Znaleziono {count} wynik",
-    "resultsCount_other": "Znaleziono {count} wyniki",
-    "resultsCount_many": "Znaleziono {count} wyników",
+    "resultsCount": "{count, plural, one {Znaleziono # wynik} few {Znaleziono # wyniki} many {Znaleziono # wyników} other {Znaleziono # wyników}}",
     "noResults": "Nie znaleziono wyników dla \"{query}\"",
     "aria": {
       "close": "Zamknij wyszukiwanie"

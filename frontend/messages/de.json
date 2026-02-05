@@ -168,8 +168,7 @@
   "SearchModal": {
     "title": "Suche",
     "placeholder": "Tippen Sie, um zu suchen...",
-    "resultsCount": "{count} Ergebnis gefunden",
-    "resultsCount_other": "{count} Ergebnisse gefunden",
+    "resultsCount": "{count, plural, one {# Ergebnis gefunden} other {# Ergebnisse gefunden}}",
     "noResults": "Keine Ergebnisse für \"{query}\" gefunden",
     "aria": {
       "close": "Suche schließen"

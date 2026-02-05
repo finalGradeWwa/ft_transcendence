@@ -161,8 +161,7 @@
   "SearchModal": {
     "title": "بحث",
     "placeholder": "اكتب للبحث...",
-    "resultsCount": "تم العثور على {count} نتيجة",
-    "resultsCount_other": "تم العثور على {count} نتائج",
+    "resultsCount": "{count, plural, zero {لم يتم العثور على أي نتائج} one {تم العثور على نتيجة واحدة} two {تم العثور على نتيجتين} few {تم العثور على # نتائج} many {تم العثور على # نتيجة} other {تم العثور على # نتيجة}}",
     "noResults": "لم يتم العثور على نتائج لـ \"{query}\"",
     "aria": {
       "close": "إغلاق البحث"
