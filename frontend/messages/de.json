@@ -170,6 +170,9 @@
     "placeholder": "Tippen Sie, um zu suchen...",
     "resultsCount": "{count} Ergebnis gefunden",
     "resultsCount_other": "{count} Ergebnisse gefunden",
-    "noResults": "Keine Ergebnisse für \"{query}\" gefunden"
+    "noResults": "Keine Ergebnisse für \"{query}\" gefunden",
+    "aria": {
+      "close": "Suche schließen"
+    }
   }
 }

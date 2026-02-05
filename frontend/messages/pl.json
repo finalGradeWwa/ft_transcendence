@@ -165,6 +165,9 @@
     "resultsCount": "Znaleziono {count} wynik",
     "resultsCount_other": "Znaleziono {count} wyniki",
     "resultsCount_many": "Znaleziono {count} wyników",
-    "noResults": "Nie znaleziono wyników dla \"{query}\""
+    "noResults": "Nie znaleziono wyników dla \"{query}\"",
+    "aria": {
+      "close": "Zamknij wyszukiwanie"
+    }
   }
 }

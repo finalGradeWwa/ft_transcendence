@@ -164,6 +164,9 @@
     "placeholder": "Type to search...",
     "resultsCount": "{count} result found",
     "resultsCount_other": "{count} results found",
-    "noResults": "No results found for \"{query}\""
+    "noResults": "No results found for \"{query}\"",
+    "aria": {
+      "close": "Close search"
+    }
   }
 }

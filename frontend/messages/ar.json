@@ -163,6 +163,9 @@
     "placeholder": "اكتب للبحث...",
     "resultsCount": "تم العثور على {count} نتيجة",
     "resultsCount_other": "تم العثور على {count} نتائج",
-    "noResults": "لم يتم العثور على نتائج لـ \"{query}\""
+    "noResults": "لم يتم العثور على نتائج لـ \"{query}\"",
+    "aria": {
+      "close": "إغلاق البحث"
+    }
   }
 }
