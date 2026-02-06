@@ -1,5 +1,6 @@
 from django.shortcuts import redirect
 from rest_framework_simplejwt.tokens import RefreshToken
+from django.conf import settings
 
 def set_email_for_new_user(backend, details, user=None, *args, **kwargs):
     if user:
@@ -17,7 +18,7 @@ def get_tokens_for_user(backend, user, *args, **kwargs):
         refresh = RefreshToken.for_user(user)
         access_token = str(refresh.access_token)
         refresh_token = str(refresh)
-        response = redirect(f'http://localhost:3000/auth/callback?access_token={access_token}&refresh_token={refresh_token}')
+        response = redirect(f'{settings.FRONTEND_URL}/auth/callback?access_token={access_token}&refresh_token={refresh_token}')
         return response
 
     return {}
