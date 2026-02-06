@@ -227,7 +227,7 @@ class PinViewSetTestCase(APITestCase):
         self.client.force_authenticate(user=self.user1)
         response = self.client.delete(f'/api/pins/{pin.id}/')
         
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual(Pin.objects.count(), 1)
 
     def test_update_own_pin(self):
@@ -258,7 +258,7 @@ class PinViewSetTestCase(APITestCase):
         data = {'content': 'Trying to change Bobs pin'}
         response = self.client.put(f'/api/pins/{pin.id}/', data)
         
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_partial_update_own_pin(self):
         """Test partially updating own pin"""

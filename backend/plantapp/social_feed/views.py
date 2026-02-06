@@ -83,16 +83,22 @@ class PinViewSet(viewsets.ViewSet):
         return Response(serializer.data)
 
     def destroy(self, request, pk):
-        pin = get_object_or_404(Pin, pk=pk, creator=request.user)
+        pin = get_object_or_404(Pin, pk=pk)
+        if pin.creator != request.user:
+            return Response(
+                {"detail": "You must be the creator of this pin to delete it"},
+                status=status.HTTP_403_FORBIDDEN,
+            )    
         pin.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     def update(self, request, pk):
-        pin = get_object_or_404(
-            Pin,
-            pk=pk,
-            creator=request.user
-        )
+        pin = get_object_or_404(Pin, pk=pk)
+        if pin.creator != request.user:
+            return Response(
+                {"detail": "You must be the creator of this pin to modify it"},
+                status=status.HTTP_403_FORBIDDEN,
+            )  
         serializer = PinWriteModeSerializer(
             pin,
             data=request.data,
@@ -103,11 +109,12 @@ class PinViewSet(viewsets.ViewSet):
         return Response(PinDetailReadModeSerializer(serializer.instance).data)
     
     def partial_update(self, request, pk=None):
-        pin = get_object_or_404(
-            Pin,
-            pk=pk,
-            creator=request.user
-        )
+        pin = get_object_or_404(Pin, pk=pk)
+        if pin.creator != request.user:
+            return Response(
+                {"detail": "You must be the creator of this pin to modify it"},
+                status=status.HTTP_403_FORBIDDEN,
+            )  
         serializer = PinWriteModeSerializer(
             pin,
             data=request.data,
