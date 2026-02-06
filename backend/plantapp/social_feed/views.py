@@ -72,6 +72,16 @@ class PinViewSet(viewsets.ViewSet):
         serializer = PinListReadModeSerializer(pins, many=True)
         return Response(serializer.data)
 
+    @action(detail=False, methods=['get'], url_path='profile_feed')
+    def profile_feed(self, request):
+        """
+        Get user's profile feed: only pins from the authenticated user.
+        GET /api/pins/profile_feed/
+        """
+        pins = Pin.objects.filter(creator=request.user).order_by('-created_at')
+        serializer = PinListReadModeSerializer(pins, many=True)
+        return Response(serializer.data)
+
     def destroy(self, request, pk):
         pin = get_object_or_404(Pin, pk=pk, creator=request.user)
         pin.delete()
