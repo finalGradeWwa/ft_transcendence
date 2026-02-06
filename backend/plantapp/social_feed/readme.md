@@ -184,6 +184,42 @@ Returns pins from users you follow, plus your own pins, ordered by most recent f
 
 ---
 
+### Get Profile Feed
+
+**`GET /api/pins/profile_feed/`**
+
+Returns only the authenticated user's own pins, ordered by most recent first.
+
+**Response**: Array of pin objects (list format)
+
+**Example**:
+```json
+[
+  {
+    "content": "My latest garden update!",
+    "image": "/media/my-garden.jpg",
+    "creator": "alice",
+    "created_at": "2026-02-06T14:00:00Z"
+  },
+  {
+    "content": "Started a new plant today",
+    "image": null,
+    "creator": "alice",
+    "created_at": "2026-02-06T10:00:00Z"
+  }
+]
+```
+
+**Use Case**: Display user's own pins on their profile page
+
+**Difference from Feed**:
+- `feed` - Shows pins from followed users + your own
+- `profile_feed` - Shows only your own pins
+
+**Access**: Any authenticated user (returns only their pins)
+
+---
+
 ### Retrieve Pin Details
 
 **`GET /api/pins/{id}/`**
@@ -314,6 +350,7 @@ Permanently deletes a pin.
 | View any pin | Any authenticated user |
 | List all pins | Any authenticated user |
 | View personalized feed | Any authenticated user (filtered to followed users) |
+| View profile feed | Any authenticated user (only own pins) |
 | Create pin | Any authenticated user |
 | Update pin | Pin creator only |
 | Delete pin | Pin creator only |
@@ -416,8 +453,9 @@ Used for list views and feeds.
 - **Optional Field**: Images are not required
 - **Field Type**: `ImageField` (requires Pillow library)
 - **Usage**: Send as multipart/form-data when uploading
+s
 
-## Feed Algorithm
+### Personalized Feed
 
 The personalized feed (`GET /api/pins/feed/`) shows:
 1. All pins from users you follow
@@ -430,6 +468,23 @@ following_ids = request.user.following.values_list('id', flat=True)
 pins = Pin.objects.filter(
     Q(creator__in=following_ids) | Q(creator=request.user)
 ).order_by('-created_at')
+```
+
+### Profile Feed
+
+The profile feed (`GET /api/pins/profile_feed/`) shows:
+1. Only pins created by the authenticated user
+2. Ordered by creation time (most recent first)
+
+**Implementation**:
+```python
+pins = Pin.objects.filter(creator=request.user).order_by('-created_at')
+```
+
+**Use Cases**:
+- User profile page showing their activity
+- "My Posts" section in user dashboard
+- Personal pin historyrder_by('-created_at')
 ```
 
 ## Usage Examples
