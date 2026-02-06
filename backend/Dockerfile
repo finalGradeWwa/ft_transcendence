@@ -20,11 +20,6 @@ COPY requirements.txt .
 RUN pip install --upgrade pip && \
     pip install -r requirements.txt
 
-# Copy project
-COPY . .
-
-# Expose port for Django/Daphne
-EXPOSE 8000
 
 # Run Daphne with auto-reload for development
 CMD ["sh", "-c", "cd plantapp && daphne -b 0.0.0.0 -p 8000 --reload mysite.asgi:application"]
