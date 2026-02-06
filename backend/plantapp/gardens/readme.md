@@ -94,7 +94,7 @@ Returns all gardens (visible to all authenticated users).
 
 Creates a new garden with the authenticated user as owner.
 
-**Request Body**:may indicate an attack
+**Request Body**:
 ```json
 {
   "name": "Fruit Forest",
