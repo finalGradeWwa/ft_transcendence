@@ -222,8 +222,8 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
 )
 
-SOCIAL_AUTH_GITHUB_KEY = os.environ.get('GITHUB_OAUTH_KEY')
-SOCIAL_AUTH_GITHUB_SECRET = os.environ.get('GITHUB_OAUTH_SECRET')
+SOCIAL_AUTH_GITHUB_KEY = os.getenv('GITHUB_OAUTH_KEY')
+SOCIAL_AUTH_GITHUB_SECRET = os.getenv('GITHUB_OAUTH_SECRET')
 if not SOCIAL_AUTH_GITHUB_KEY or not SOCIAL_AUTH_GITHUB_SECRET:
     raise RuntimeError(
         "GitHub OAuth credentials are not configured. "
