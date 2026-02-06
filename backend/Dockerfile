@@ -21,5 +21,7 @@ RUN pip install --upgrade pip && \
     pip install -r requirements.txt
 
 
+COPY . .
+
 # Run Daphne with auto-reload for development
 CMD ["sh", "-c", "cd plantapp && daphne -b 0.0.0.0 -p 8000 --reload mysite.asgi:application"]
