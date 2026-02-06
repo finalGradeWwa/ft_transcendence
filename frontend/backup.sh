@@ -4,7 +4,7 @@
 
 # 1. Definicja nazwy archiwum w wymaganym formacie
 # Format: 2025-12-13_15-18_transcendence.tar
-ARCHIVE_NAME="$(date +%Y-%m-%d_%H-%M)_transcendence.tar"
+ARCHIVE_NAME="$(date +%Y-%m-%d_%H-%M)_transcendence_frontend.tar"
 
 # 2. Tworzenie tymczasowego pliku z wykluczeniami
 TEMP_EXCLUDE_FILE=".temp_tar_exclude"

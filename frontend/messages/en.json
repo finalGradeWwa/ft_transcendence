@@ -48,13 +48,21 @@
   },
   "ProfilePage": {
     "title": "User Profile",
+    "summary": "Profile statistics",
     "joinedLabel": "Joined",
     "userPlantsTitle": "Your Plant Collection",
     "userCollection": "{name}'s plant collection",
     "profileDescription": "Let's share the beauty of plants.",
     "stats": {
       "gardens": "Gardens",
-      "plants": "Plants"
+      "plants": "Plants",
+      "followers": "Followers",
+      "following": "Following",
+      "pins": "Pins"
+    },
+    "actions": {
+      "follow": "Follow",
+      "unfollow": "Unfollow"
     },
     "settings": {
       "title": "Settings",
@@ -74,7 +82,10 @@
     "aria": {
       "avatarAlt": "{name}'s profile picture",
       "gardensLink": "Go to {name}'s gardens",
-      "plantsLink": "Go to {name}'s plants"
+      "plantsLink": "Go to {name}'s plants",
+      "previousPage": "Previous page",
+      "nextPage": "Next page",
+      "loadingAction": "Processing data"
     }
   },
   "RegisterPage": {
@@ -114,11 +125,6 @@
     "genericError": "Something went wrong.",
     "invalidImage": "Upload a valid image. The file you uploaded was either not an image or a corrupted image."
   },
-  "ChatPage": {
-    "title": "Chat",
-    "typeMessage": "Type a message...",
-    "send": "Send"
-  },
   "AboutUs": {
     "title": "About Us",
     "description": "To spice up our binary programming adventure at 42Warsaw, we decided to add a splash of nature's colors. This is our final project within the so-called Common Core, so we are leaving this portal as a souvenir of a wonderful journey. Photos included for reach. 😏",
@@ -157,6 +163,7 @@
     "viewGarden": "View Garden",
     "plantsCountLabel": "Number of plants",
     "gardenNameLabel": "Garden name",
-    "gardenNamePlaceholder": "e.g., My Balcony or Living Room"
+    "gardenNamePlaceholder": "e.g., My Balcony or Living Room",
+    "noPins": "No entries"
   }
 }

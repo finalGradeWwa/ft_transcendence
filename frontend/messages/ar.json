@@ -48,13 +48,21 @@
   },
   "ProfilePage": {
     "title": "ملف المستخدم",
+    "summary": "إحصائيات الملف الشخصي",
     "joinedLabel": "انضم في",
     "userPlantsTitle": "مجموعة نباتاتك",
     "userCollection": "مجموعة نباتات المستخدم {name}",
     "profileDescription": "لنشارك جمال النباتات.",
     "stats": {
       "gardens": "الحدائق",
-      "plants": "النباتات"
+      "plants": "النباتات",
+      "followers": "متابعون",
+      "following": "يتابع",
+      "pins": "دبابيس"
+    },
+    "actions": {
+      "follow": "متابعة",
+      "unfollow": "إلغاء المتابعة"
     },
     "settings": {
       "title": "الإعدادات",
@@ -74,7 +82,10 @@
     "aria": {
       "avatarAlt": "صورة الملف الشخصي للمستخدم {name}",
       "gardensLink": "الذهاب إلى حدائق {name}",
-      "plantsLink": "الذهاب إلى نباتات {name}"
+      "plantsLink": "الذهاب إلى نباتات {name}",
+      "previousPage": "الصفحة السابقة",
+      "nextPage": "الصفحة التالية",
+      "loadingAction": "جاري المعالجة"
     }
   },
   "RegisterPage": {
@@ -112,11 +123,6 @@
     "connectionError": "خطأ في الاتصال. حاول مرة أخرى لاحقًا.",
     "invalidCredentials": "اسم المستخدم أو كلمة المرور غير صالحة.",
     "invalidImage": "يرجى تحميل صورة صالحة. الملف الذي قمت بتحميله إما أنه ليس صورة أو أنه ملف تالف."
-  },
-  "ChatPage": {
-    "title": "الدردشة",
-    "typeMessage": "اكتب رسالة...",
-    "send": "إرسال"
   },
   "AboutUs": {
     "title": "من نحن",
@@ -156,6 +162,7 @@
     "viewGarden": "عرض الحديقة",
     "plantsCountLabel": "عدد النباتات",
     "gardenNameLabel": "اسم الحديقة",
-    "gardenNamePlaceholder": "مثلاً: شرفتي أو غرفة المعيشة"
+    "gardenNamePlaceholder": "مثلاً: شرفتي أو غرفة المعيشة",
+    "noPins": "لا توجد مدخلات"
   }
 }

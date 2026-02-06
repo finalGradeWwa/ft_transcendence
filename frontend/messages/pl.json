@@ -48,13 +48,21 @@
   },
   "ProfilePage": {
     "title": "Profil użytkownika",
-    "joinedLabel": "Dołączono",
+    "summary": "Statystyki profilu",
+    "joinedLabel": "Na portalu od:",
     "userPlantsTitle": "Twoja kolekcja roślin",
     "userCollection": "Kolekcja roślin użytkownika {name}",
     "profileDescription": "Podzielmy się pięknem roślin.",
     "stats": {
       "gardens": "Ogrody",
-      "plants": "Rośliny"
+      "plants": "Rośliny",
+      "followers": "Obserwujących",
+      "following": "Obserwowanych",
+      "pins": "Piny"
+    },
+    "actions": {
+      "follow": "Obserwuj",
+      "unfollow": "Przestań obserwować"
     },
     "settings": {
       "title": "Ustawienia",
@@ -74,7 +82,10 @@
     "aria": {
       "avatarAlt": "Zdjęcie profilowe użytkownika {name}",
       "gardensLink": "Przejdź do ogrodów użytkownika {name}",
-      "plantsLink": "Przejdź do roślin użytkownika {name}"
+      "plantsLink": "Przejdź do roślin użytkownika {name}",
+      "previousPage": "Poprzednia strona",
+      "nextPage": "Następna strona",
+      "pagination": "Nawigacja po galerii zdjęć"
     }
   },
   "RegisterPage": {
@@ -114,11 +125,6 @@
     "genericError": "Coś poszło nie tak.",
     "invalidImage": "Przesłany plik jest nieprawidłowy. Wybrany plik nie jest obrazem lub jest uszkodzony."
   },
-  "ChatPage": {
-    "title": "Czat",
-    "typeMessage": "Wpisz wiadomość...",
-    "send": "Wyślij"
-  },
   "AboutUs": {
     "title": "O nas",
     "description": "Aby ożywić naszą zero-jedynkową przygodę z programowaniem w 42Warsaw postanowiliśmy dodać do niej lekkiego kolorytu w barwach natury. To nasz ostatni projekt w ramach tzw. Common Core, zostawiamy zatem ten portal na pamiątkę wspaniałej przygody. Zdjęcia dla zasięgu. 😏",
@@ -157,6 +163,7 @@
     "viewGarden": "Zobacz Ogród",
     "plantsCountLabel": "Liczba roślin",
     "gardenNameLabel": "Nazwa ogrodu",
-    "gardenNamePlaceholder": "np. Mój Balkon lub Salon"
+    "gardenNamePlaceholder": "np. Mój Balkon lub Salon",
+    "noPins": "Brak wpisów"
   }
 }

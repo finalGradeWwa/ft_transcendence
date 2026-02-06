@@ -54,13 +54,21 @@
   },
   "ProfilePage": {
     "title": "Benutzerprofil",
+    "summary": "Profilstatistiken",
     "joinedLabel": "Beigetreten",
     "userPlantsTitle": "Deine Pflanzensammlung",
     "userCollection": "Pflanzensammlung von {name}",
     "profileDescription": "Teilen wir die Schönheit der Pflanzen.",
     "stats": {
       "gardens": "Gärten",
-      "plants": "Pflanzen"
+      "plants": "Pflanzen",
+      "followers": "Follower",
+      "following": "Gefolgt",
+      "pins": "Pins"
+    },
+    "actions": {
+      "follow": "Folgen",
+      "unfollow": "Nicht mehr folgen"
     },
     "settings": {
       "title": "Einstellungen",
@@ -80,7 +88,10 @@
     "aria": {
       "avatarAlt": "Profilbild von Benutzer {name}",
       "gardensLink": "Gehe zu den Gärten von {name}",
-      "plantsLink": "Gehe zu den Pflanzen von {name}"
+      "plantsLink": "Gehe zu den Pflanzen von {name}",
+      "previousPage": "Vorherige Seite",
+      "nextPage": "Nächste Seite",
+      "loadingAction": "Daten zostaną przetworzone"
     }
   },
   "RegisterPage": {
@@ -120,11 +131,6 @@
     "generic": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
     "invalidImage": "Bitte laden Sie ein gültiges Bild hoch. Die Datei war entweder kein Bild oder sie ist beschädigt."
   },
-  "ChatPage": {
-    "title": "Chat",
-    "typeMessage": "Nachricht eingeben...",
-    "send": "Senden"
-  },
   "AboutUs": {
     "title": "Über uns",
     "description": "Um unser binäres Programmierabenteuer bei 42Warsaw etwas lebendiger zu gestalten, haben wir beschlossen, ihm einen Hauch von Naturfarben zu verleihen. Dies ist unser letztes Projekt im Rahmen des sogenannten Common Core – deshalb hinterlassen wir dieses Portal als Erinnerung an ein großartiges Abenteuer. Fotos für die Reichweite. 😏",
@@ -163,6 +169,7 @@
     "viewGarden": "Garten ansehen",
     "plantsCountLabel": "Anzahl der Pflanzen",
     "gardenNameLabel": "Gartenname",
-    "gardenNamePlaceholder": "z. B. Mein Balkon oder Wohnzimmer"
+    "gardenNamePlaceholder": "z. B. Mein Balkon oder Wohnzimmer",
+    "noPins": "Keine Einträge"
   }
 }
