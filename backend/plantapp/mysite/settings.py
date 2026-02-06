@@ -253,5 +253,5 @@ FRONTEND_URL = os.getenv("FRONTEND_BASE_URL", "http://localhost:3000")
 SOCIAL_AUTH_LOGIN_ERROR_URL = f"{FRONTEND_URL.rstrip('/')}/pl/login?error=access_denied"
 
 CSRF_COOKIE_SECURE = not DEBUG
-CSRF_COOKIE_HTTPONLY = True
+CSRF_COOKIE_HTTPONLY = False
 CSRF_COOKIE_SAMESITE = 'Lax'
