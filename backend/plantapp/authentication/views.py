@@ -8,6 +8,7 @@ from rest_framework.decorators import api_view, permission_classes
 
 from .serializers import UserRegistrationSerializer, ChangePasswordSerializer, LoginSerializer
 from users.serializers import UserSerializer
+from .jwt_cookies import set_refresh_cookie
 
 
 # GET /
@@ -52,13 +53,12 @@ class RegisterView(APIView):
 
 		refresh = RefreshToken.for_user(user)
 
-		return Response({
+		response = Response({
 			"user": UserSerializer(user).data,
-			"tokens": {
-				"refresh": str(refresh),
-				"access": str(refresh.access_token),
-			}
+			# "access": str(refresh.access_token),
 		}, status=status.HTTP_201_CREATED)
+		set_refresh_cookie(response, str(refresh))
+		return response
 
 
 # POST /api/auth/change-password/
@@ -118,10 +118,9 @@ class LoginView(APIView):
 		user = serializer.validated_data["user"]
 		refresh = RefreshToken.for_user(user)
 
-		return Response({
+		response = Response({
             "user": UserSerializer(user).data,
-            "tokens": {
-                "refresh": str(refresh),
-                "access": str(refresh.access_token),
-            }
+            # "access": str(refresh.access_token),
         }, status=status.HTTP_200_OK)
+		set_refresh_cookie(response, str(refresh))
+		return response

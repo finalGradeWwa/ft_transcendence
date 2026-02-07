@@ -20,7 +20,7 @@ def get_tokens_for_user(backend, user, *args, **kwargs):
 
     refresh = RefreshToken.for_user(user)
     response = redirect(f"{settings.FRONTEND_URL.rstrip('/')}/pl/auth/callback")
+    set_refresh_cookie(response, str(refresh))
 
-    return set_refresh_cookie(response, str(refresh))
-
+    return response
 
