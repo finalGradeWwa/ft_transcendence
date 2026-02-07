@@ -29,15 +29,24 @@ interface LoginResponse {
  * EN: Login request function.
  */
 const loginRequest = async (data: FormData): Promise<LoginResponse> => {
-  const res = await fetch('http://localhost:8000/api/auth/login/', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data),
-    /** PL: Zezwolenie na obsługę ciasteczek HttpOnly. EN: Allowing HttpOnly cookies. */
-    credentials: 'include',
-  });
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/auth/login/`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+      /** PL: Zezwolenie na obsługę ciasteczek HttpOnly. EN: Allowing HttpOnly cookies. */
+      credentials: 'include',
+    }
+  );
 
-  if (!res.ok) throw new Error('LOGIN_FAILED');
+  if (!res.ok) {
+    if (res.status === 400 || res.status === 401)
+      throw new Error('INVALID_CREDENTIALS');
+    if (res.status === 403) throw new Error('CSRF_ERROR');
+    if (res.status === 429) throw new Error('TOO_MANY_REQUESTS');
+    throw new Error('LOGIN_FAILED');
+  }
   return res.json();
 };
 
@@ -89,8 +98,36 @@ export const LoginForm = ({ t, tError, onLoginSuccess, usernameRef }: any) => {
       onLoginSuccess();
       window.location.href = '/';
     } catch (err) {
-      /** PL: Wyświetlamy błąd użytkownikowi EN: Displaying error to the user */
-      setError(tError('errors.invalidCredentials'));
+      if (err instanceof TypeError) {
+        /** PL: Błąd sieci lub serwer nie odpowiada. EN: Network error or server is unreachable. */
+        setError(tError('errors.connectionError'));
+      } else if (err instanceof Error) {
+        switch (err.message) {
+          case 'INVALID_CREDENTIALS':
+          case 'EMPTY_RESPONSE':
+            /** PL: Błędny login/hasło lub brak danych użytkownika. EN: Invalid login/password or missing user data. */
+            setError(tError('errors.invalidCredentials'));
+            break;
+          case 'TOO_MANY_REQUESTS':
+            /** PL: Zbyt wiele prób logowania (blokada czasowa). EN: Too many login attempts (rate limited). */
+            setError(tError('errors.tooManyRequests'));
+            break;
+          case 'ACCOUNT_DISABLED':
+            /** PL: Konto jest nieaktywne lub zablokowane. EN: Account is inactive or disabled. */
+            setError(tError('errors.accountDisabled'));
+            break;
+          case 'CSRF_ERROR':
+            /** PL: Błąd bezpieczeństwa (sesja wygasła). EN: Security error (session expired). */
+            setError(tError('errors.sessionExpired'));
+            break;
+          default:
+            /** PL: Nieoczekiwany błąd serwera (np. 500). EN: Unexpected server error (e.g., 500). */
+            setError(tError('errors.genericError'));
+        }
+      } else {
+        /** PL: Inny nieznany typ błędu. EN: Other unknown error type. */
+        setError(tError('errors.genericError'));
+      }
     } finally {
       setIsLoading(false);
     }
@@ -99,8 +136,6 @@ export const LoginForm = ({ t, tError, onLoginSuccess, usernameRef }: any) => {
   const update = ({ target }: React.ChangeEvent<HTMLInputElement>) => {
     setFormData(prev => ({ ...prev, [target.name]: target.value }));
   };
-
-  if (isAlreadyLoggedIn) return null;
 
   return (
     <form className="flex flex-col gap-4" onSubmit={handleSubmit}>

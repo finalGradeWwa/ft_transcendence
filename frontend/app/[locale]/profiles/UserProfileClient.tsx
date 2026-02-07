@@ -23,7 +23,7 @@ export default function UserProfileClient({
   /** PL: Czy zalogowany użytkownik obserwuje ten profil | EN: Does the logged-in user follow this profile */
   const [isFollowing, setIsFollowing] = useState(false);
 
-  /** PL: Licznik obserwujących (zarządzany lokalnie dla natychmiastowego UI) | EN: Followers count (managed locally for instant UI update) */
+  /** PL: Licznik obserwujących (zarządzany lokalnie    dla natychmiastowego UI) | EN: Followers count (managed locally for instant UI update) */
   const [followersCount, setFollowersCount] = useState(user?.followers || 0);
 
   /** PL: Stan ładowania akcji (follow/unfollow) | EN: Loading state for actions (follow/unfollow) */
@@ -58,19 +58,19 @@ export default function UserProfileClient({
     if (!user || isActionLoading || !isLoggedIn) return;
 
     const currentFollowing = isFollowing;
+    const action = currentFollowing ? 'unfollow' : 'follow';
+    const url = `${process.env.NEXT_PUBLIC_API_URL}/users/${user.id}/${action}/`;
+
     setIsActionLoading(true);
 
     try {
-      const response = await fetch('/api/follow', {
+      const response = await fetch(url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         credentials: 'include',
-        body: JSON.stringify({
-          userId: user.id,
-          action: currentFollowing ? 'unfollow' : 'follow',
-        }),
+        body: JSON.stringify({}),
       });
 
       if (response.ok) {

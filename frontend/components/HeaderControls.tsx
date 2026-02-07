@@ -94,7 +94,6 @@ const ProfileArea = ({ user, logout, t }: any) => (
 function useUsername() {
   const [username, setUsername] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const router = useRouter();
 
   useEffect(() => {
     setUsername(localStorage.getItem('username'));
@@ -104,7 +103,7 @@ function useUsername() {
   const logout = useCallback(async () => {
     /** PL: Usunięcie ciasteczek sesji po stronie serwera. EN: Removing session cookies on server side. */
     try {
-      await fetch('http://localhost:8000/api/auth/logout/', {
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/logout/`, {
         method: 'POST',
         credentials: 'include',
       });

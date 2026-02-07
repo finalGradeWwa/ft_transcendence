@@ -91,7 +91,8 @@
       "plantsLink": "Gehe zu den Pflanzen von {name}",
       "previousPage": "Vorherige Seite",
       "nextPage": "Nächste Seite",
-      "loadingAction": "Daten zostaną przetworzone"
+      "pagination": "Fotogalerie-Navigation",
+      "loadingAction": "Daten werden verarbeitet"
     }
   },
   "RegisterPage": {
@@ -128,8 +129,16 @@
   "errors": {
     "connectionError": "Verbindungsfehler. Der Server antwortet nicht.",
     "invalidCredentials": "Ungültiger Benutzername oder Passwort.",
-    "generic": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
-    "invalidImage": "Bitte laden Sie ein gültiges Bild hoch. Die Datei war entweder kein Bild oder sie ist beschädigt."
+    "genericError": "Etwas ist schief gelaufen.",
+    "invalidImage": "Bitte laden Sie ein gültiges Bild hoch. Die Datei war entweder kein Bild oder sie ist beschädigt.",
+    "tooManyRequests": "Zu viele Login-Versuche. Bitte warten Sie einen Moment.",
+    "accountDisabled": "Ihr Konto ist inaktiv.",
+    "sessionExpired": "Ihre Sitzung ist abgelaufen. Bitte laden Sie die Seite neu."
+  },
+  "ChatPage": {
+    "title": "Chat",
+    "typeMessage": "Nachricht eingeben...",
+    "send": "Senden"
   },
   "AboutUs": {
     "title": "Über uns",

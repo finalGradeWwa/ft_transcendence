@@ -38,12 +38,31 @@ export interface UserProfileProps {
  * PL: Funkcja pomocnicza do budowania pełnego adresu URL awatara.
  * EN: Helper function to construct the full avatar URL.
  */
-export const getAvatarUrl = (path?: string) =>
-  !path
-    ? '/images/favicon/fav_480.webp'
-    : path.startsWith('http')
-      ? path
-      : `${(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000').replace(/\/+$/, '')}${path.startsWith('/media') ? '' : '/media'}${path.startsWith('/') ? path : `/${path}`}`;
+export const getAvatarUrl = (path?: string) => {
+  if (!path) return '/images/favicon/fav_480.webp';
+  if (path.startsWith('http')) return path;
+
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+
+  if (!apiUrl) {
+    if (process.env.NODE_ENV === 'development') {
+      console.warn(
+        'NEXT_PUBLIC_API_URL is not defined! Check your .env.local file.'
+      );
+    }
+    return path;
+  }
+
+  const baseUrl = apiUrl.replace(/\/+$/, '');
+  const cleanPath = path.startsWith('/') ? path : `/${path}`;
+
+  if (cleanPath.startsWith('/media/')) {
+    return `${baseUrl}${cleanPath}`;
+  }
+
+  return `${baseUrl}/media${cleanPath}`;
+};
+
 /**
  * PL: Komponent przycisku "Obserwuj / Przestań obserwować".
  * EN: Follow / Unfollow button component.
@@ -81,7 +100,7 @@ export const FollowButton = ({
       {isLoading ? (
         <>
           <span aria-hidden="true">...</span>
-          <span className="sr-only">{t('actions.loading')}</span>{' '}
+          <span className="sr-only">{t('aria.loadingAction')}</span>{' '}
         </>
       ) : isFollowing ? (
         t('actions.unfollow')
@@ -97,13 +116,6 @@ export const FollowButton = ({
  * EN: Displays the user's circular avatar.
  */
 export const UserAvatar = ({ user }: { user: UserProfileProps['user'] }) => {
-  // tymczasowy debug: pokaż co REALLY jest w user.avatar_photo i jaki URL generuje getAvatarUrl
-  // usuń te logi po weryfikacji
-  if (typeof window !== 'undefined') {
-    console.log('DEBUG user.avatar_photo =', user?.avatar_photo);
-    console.log('DEBUG getAvatarUrl(...) =', getAvatarUrl(user?.avatar_photo));
-  }
-
   return (
     <div className="relative w-40 h-40 sm:w-48 sm:h-48 overflow-hidden rounded-full border-4 border-secondary-beige shadow-lg flex-shrink-0">
       <Image
