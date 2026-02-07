@@ -48,13 +48,21 @@
   },
   "ProfilePage": {
     "title": "User Profile",
+    "summary": "Profile statistics",
     "joinedLabel": "Joined",
     "userPlantsTitle": "Your Plant Collection",
     "userCollection": "{name}'s plant collection",
     "profileDescription": "Let's share the beauty of plants.",
     "stats": {
       "gardens": "Gardens",
-      "plants": "Plants"
+      "plants": "Plants",
+      "followers": "Followers",
+      "following": "Following",
+      "pins": "Pins"
+    },
+    "actions": {
+      "follow": "Follow",
+      "unfollow": "Unfollow"
     },
     "settings": {
       "title": "Settings",
@@ -74,7 +82,11 @@
     "aria": {
       "avatarAlt": "{name}'s profile picture",
       "gardensLink": "Go to {name}'s gardens",
-      "plantsLink": "Go to {name}'s plants"
+      "plantsLink": "Go to {name}'s plants",
+      "previousPage": "Previous page",
+      "nextPage": "Next page",
+      "pagination": "Photo gallery navigation",
+      "loadingAction": "Processing data"
     }
   },
   "RegisterPage": {
@@ -112,7 +124,10 @@
     "connectionError": "Connection error. Try again later.",
     "invalidCredentials": "Invalid username or password.",
     "genericError": "Something went wrong.",
-    "invalidImage": "Upload a valid image. The file you uploaded was either not an image or a corrupted image."
+    "invalidImage": "Upload a valid image. The file you uploaded was either not an image or a corrupted image.",
+    "tooManyRequests": "Too many login attempts. Please wait a moment.",
+    "accountDisabled": "Your account is inactive.",
+    "sessionExpired": "Your session has expired. Please refresh the page."
   },
   "ChatPage": {
     "title": "Chat",
@@ -157,6 +172,7 @@
     "viewGarden": "View Garden",
     "plantsCountLabel": "Number of plants",
     "gardenNameLabel": "Garden name",
-    "gardenNamePlaceholder": "e.g., My Balcony or Living Room"
+    "gardenNamePlaceholder": "e.g., My Balcony or Living Room",
+    "noPins": "No entries"
   }
 }
