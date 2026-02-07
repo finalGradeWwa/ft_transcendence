@@ -1,22 +1,23 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
+from .models import Friend
 
 User = get_user_model()
 
 class UserSerializer(serializers.ModelSerializer):
-	class Meta:
-		model = User
-		fields = (
-			"id", # Do we need 'id' in users model?
-			"first_name",
+    class Meta:
+        model = User
+        fields = (
+            "id",  # Do we need 'id' in users model?
+            "first_name",
             "last_name",
             "username",
-			"email",
-			"bio",
-			"date_joined",
-			"is_active",
-		)
-		read_only_fields = fields
+            "email",
+            "bio",
+            "date_joined",
+            "is_active",
+        )
+        read_only_fields = fields
 
 
 class UserUpdateSerializer(serializers.ModelSerializer):
@@ -48,8 +49,18 @@ class PublicUserSerializer(serializers.ModelSerializer):
         model = User
         fields = ("id", "username", "first_name", "last_name")
 
+
+class FriendSerializer(serializers.ModelSerializer):
+    user1 = PublicUserSerializer(read_only=True)
+    user2 = PublicUserSerializer(read_only=True)
+
+    class Meta:
+        model = Friend
+        fields = ("id", "user1", "user2", "created_at")
+        read_only_fields = fields
+
 class ListFollowersSerializer(serializers.ModelSerializer):
-     class Meta:
+    class Meta:
         model = User
         fields = ("followers",)
         read_only_fields = fields

@@ -3,7 +3,8 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.shortcuts import get_object_or_404
 from rest_framework import status
-from .serializers import UserSerializer, UserUpdateSerializer, PublicUserSerializer
+from .serializers import UserSerializer, UserUpdateSerializer, PublicUserSerializer, FriendSerializer
+from .models import Friend
 from django.contrib.auth import get_user_model
 
 
@@ -92,9 +93,68 @@ class UnfollowUserAPIView(APIView):
         target = get_object_or_404(User, pk=user_id)
         user = request.user
 
+        if not user.following.filter(pk=target.pk).exists():
+            return Response(
+                {"detail": f"You are not following {target.username}."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
         user.following.remove(target)
 
         return Response(
             {"detail": f"You have unfollowed {target.username}."},
             status=status.HTTP_200_OK,
         )
+
+
+class ListFriendsAPIView(APIView):
+    """Get all friends (mutual follows) for a user."""
+    permission_classes = [AllowAny]
+
+    def get(self, request, user_id):
+        user = get_object_or_404(User, pk=user_id)
+        friends = user.get_friends()
+        
+        serializer = PublicUserSerializer(friends, many=True)
+        return Response(serializer.data)
+
+
+class IsFriendAPIView(APIView):
+    """Check if two users are friends."""
+    permission_classes = [AllowAny]
+
+    def get(self, request, user_id):
+        user = get_object_or_404(User, pk=user_id)
+        target_id = request.query_params.get("target_id")
+        
+        if not target_id:
+            return Response(
+                {"detail": "target_id query parameter required"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        
+        target = get_object_or_404(User, pk=target_id)
+        is_friend = user.is_friend_with(target)
+        
+        return Response({"is_friend": is_friend})
+
+
+class UserFriendsListAPIView(APIView):
+    """Get all of current user's friends (mutual follows)."""
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        friends = request.user.get_friends()
+        serializer = PublicUserSerializer(friends, many=True)
+        return Response(serializer.data)
+
+
+class FriendRequestsListAPIView(APIView):
+    """Get pending friend requests (users who follow you but you don't follow back)."""
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        pending = user.followers.exclude(following=user)
+        serializer = PublicUserSerializer(pending, many=True)
+        return Response(serializer.data)
