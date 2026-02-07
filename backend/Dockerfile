@@ -8,20 +8,24 @@ ENV PIP_NO_CACHE_DIR=1
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     gcc \
+    libjpeg-dev \
+    zlib1g-dev \
+    libpq-dev \
+    libssl-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Set work directory
-WORKDIR /app
+# Set work directory to the Django project
+WORKDIR /app/plantapp
 
-# Copy requirements
-COPY requirements.txt .
+# Copy requirements from parent directory
+COPY requirements.txt /app/
 
 # Install Python dependencies
 RUN pip install --upgrade pip && \
-    pip install -r requirements.txt
+    pip install -r /app/requirements.txt
 
-
-COPY . .
+# Copy the entire backend directory
+COPY . /app/
 
 # Run Daphne with auto-reload for development
-CMD ["sh", "-c", "cd plantapp && daphne -b 0.0.0.0 -p 8000 --reload mysite.asgi:application"]
+CMD ["daphne", "-b", "0.0.0.0", "-p", "8000", "--reload", "mysite.asgi:application"]

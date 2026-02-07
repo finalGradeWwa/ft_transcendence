@@ -12,8 +12,9 @@ services:
 
     volumes:
       - ./backend:/app
+      - backend_db:/app/plantapp
     
-    command: sh -c "cd plantapp && daphne -b 0.0.0.0 -p 8000 mysite.asgi:application"
+    command: daphne -b 0.0.0.0 -p 8000 mysite.asgi:application
     
     restart: unless-stopped
     depends_on:
@@ -28,7 +29,8 @@ services:
     
     volumes:
       - ./backend:/app
-    command: sh -c "cd plantapp && python manage.py migrate"
+      - backend_db:/app/plantapp
+    command: python manage.py migrate
     
     restart: "no"
 
@@ -55,5 +57,6 @@ services:
     restart: unless-stopped
 
 volumes:
+  backend_db:
   frontend_node_modules:
 
