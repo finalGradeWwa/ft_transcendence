@@ -236,6 +236,8 @@ if not SOCIAL_AUTH_GITHUB_KEY or not SOCIAL_AUTH_GITHUB_SECRET:
 SOCIAL_AUTH_GITHUB_SCOPE = ['user:email']
 SOCIAL_AUTH_FIELDS_STORED_IN_SESSION = ['locale']
 SOCIAL_AUTH_URL_NAMESPACE = 'social'
+SOCIAL_AUTH_RAISE_EXCEPTIONS = False
+
 
 SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.social_auth.social_details',
@@ -252,7 +254,7 @@ SOCIAL_AUTH_PIPELINE = (
 )
 
 FRONTEND_URL = os.getenv("FRONTEND_BASE_URL", "http://localhost:3000")
-SOCIAL_AUTH_LOGIN_ERROR_URL = f"{FRONTEND_URL.rstrip('/')}/pl?showLogin=true&error=access_denied"
+SOCIAL_AUTH_LOGIN_ERROR_URL = f"{FRONTEND_URL.rstrip('/')}/?showLogin=true&error=access_denied"
 
 # CSRF_COOKIE_SECURE = not DEBUG
 # CSRF_COOKIE_HTTPONLY = False
