@@ -1,33 +1,38 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
+import { fetchCurrentUser, refreshAccessToken } from '@/lib/auth';
 
 export default function AuthCallbackPage() {
-  const searchParams = useSearchParams();
   const router = useRouter();
+  const params = useParams<{ locale?: string }>();
+  const locale = params?.locale ?? 'pl';
 
   useEffect(() => {
-    const accessToken = searchParams.get('access_token');
-    const refreshToken = searchParams.get('refresh_token');
+    (async () => {
+      try {
+        const access = await refreshAccessToken();
+        const user = await fetchCurrentUser(access);
 
-    if (accessToken && refreshToken) {
-      localStorage.setItem('accessToken', accessToken);
-      window.location.href = '/pl';
-    } else {
-      console.error("OAuth callback error: Tokens not found in URL.");
-      router.push('/pl/login?error=oauth_failed');
-    }
+        sessionStorage.setItem('accessToken', access);
+        localStorage.setItem('username', user.username);
 
-  }, [searchParams, router]);
+        router.replace(`/${locale}?auth=oauth_success`);
+      } catch (error) {
+        console.error('OAuth callback failed:', error);
+        router.replace(`/${locale}?showLogin=true&error=oauth_failed`);
+      }
+    })();
+  }, [locale, router]);
 
   return (
     <div style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        height: '100vh',
-        fontFamily: 'sans-serif'
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      height: '100vh',
+      fontFamily: 'sans-serif'
     }}>
       <p>Przetwarzanie logowania, proszę czekać...</p>
     </div>

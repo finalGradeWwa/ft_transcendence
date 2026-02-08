@@ -7,6 +7,7 @@
 
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
+import { useSearchParams } from 'next/navigation';
 import { Icon } from '@/components/icons/ui/Icon';
 
 export type PlantType = {
@@ -28,10 +29,18 @@ export const HomePageClient = ({
   hideTitle?: boolean;
 }) => {
   const t = useTranslations('HomePage');
+  const searchParams = useSearchParams();
+  const authStatus = searchParams.get('auth');
 
   return (
     <>
       <section className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
+        {authStatus === 'oauth_success' && (
+          <div className="mb-6 rounded-lg border border-green-600 bg-green-50 px-4 py-3 text-sm font-semibold text-green-800">
+            {t('oauthLoginSuccess')}
+          </div>
+        )}
+
         {!hideTitle && (
           <h1 className="text-2xl md:text-3xl font-bold mb-6 text-white-text overflow-hidden">
             {t('recommended')}

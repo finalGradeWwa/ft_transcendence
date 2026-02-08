@@ -23,4 +23,3 @@ def get_tokens_for_user(backend, user, *args, **kwargs):
     set_refresh_cookie(response, str(refresh))
 
     return response
-

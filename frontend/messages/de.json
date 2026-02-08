@@ -15,6 +15,7 @@
     "author": "Autor:",
     "rating": "Bewertung:",
     "showMore": "Mehr Pflanzen anzeigen",
+    "oauthLoginSuccess": "GitHub-Anmeldung erfolgreich. Du bist jetzt eingeloggt.",
     "nav": [
       "Startseite",
       "Gärten",
@@ -117,6 +118,8 @@
   "errors": {
     "connectionError": "Verbindungsfehler. Der Server antwortet nicht.",
     "invalidCredentials": "Ungültiger Benutzername oder Passwort.",
+    "oauthFailed": "Die GitHub-Anmeldung ist fehlgeschlagen. Bitte versuche es erneut.",
+    "oauthAccessDenied": "Die GitHub-Anmeldung wurde abgebrochen.",
     "generic": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
     "invalidImage": "Bitte laden Sie ein gültiges Bild hoch. Die Datei war entweder kein Bild oder sie ist beschädigt."
   },

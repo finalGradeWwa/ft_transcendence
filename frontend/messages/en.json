@@ -15,6 +15,7 @@
     "author": "Author:",
     "rating": "Rating:",
     "showMore": "Show more plants",
+    "oauthLoginSuccess": "GitHub login completed successfully. You are signed in.",
     "nav": ["Home", "Gardens", "About Us", "Terms", "Contact"],
     "searchPlaceholder": "Search is active",
     "searchInfo": "Full search logic will be here.",
@@ -111,6 +112,8 @@
   "errors": {
     "connectionError": "Connection error. Try again later.",
     "invalidCredentials": "Invalid username or password.",
+    "oauthFailed": "GitHub login failed. Please try again.",
+    "oauthAccessDenied": "GitHub login was canceled.",
     "genericError": "Something went wrong.",
     "invalidImage": "Upload a valid image. The file you uploaded was either not an image or a corrupted image."
   },

@@ -84,6 +84,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'social_django.middleware.SocialAuthExceptionMiddleware',
+
 ]
 
 ROOT_URLCONF = 'mysite.urls'
@@ -250,8 +252,19 @@ SOCIAL_AUTH_PIPELINE = (
 )
 
 FRONTEND_URL = os.getenv("FRONTEND_BASE_URL", "http://localhost:3000")
-SOCIAL_AUTH_LOGIN_ERROR_URL = f"{FRONTEND_URL.rstrip('/')}/pl/login?error=access_denied"
+SOCIAL_AUTH_LOGIN_ERROR_URL = f"{FRONTEND_URL.rstrip('/')}/pl?showLogin=true&error=access_denied"
 
-CSRF_COOKIE_SECURE = not DEBUG
-CSRF_COOKIE_HTTPONLY = False
-CSRF_COOKIE_SAMESITE = 'Lax'
+# CSRF_COOKIE_SECURE = not DEBUG
+# CSRF_COOKIE_HTTPONLY = False
+# CSRF_COOKIE_SAMESITE = 'Lax'
+
+SOCIAL_AUTH_REDIRECT_IS_HTTPS = not DEBUG
+SOCIAL_AUTH_SANITIZE_REDIRECTS = True
+# SOCIAL_AUTH_LOGIN_REDIRECT_URL = f"{FRONTEND_URL.rstrip('/')}/pl/auth/callback"
+# SOCIAL_AUTH_NEW_USER_REDIRECT_URL = f"{FRONTEND_URL.rstrip('/')}/pl/auth/callback"
+
+# Session configuration for OAuth
+# SESSION_COOKIE_AGE = 3600  # 1 hour
+# SESSION_COOKIE_SECURE = not DEBUG
+# SESSION_COOKIE_HTTPONLY = True
+# SESSION_COOKIE_SAMESITE = 'Lax'

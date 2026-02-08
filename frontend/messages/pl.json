@@ -15,6 +15,7 @@
     "author": "Autor:",
     "rating": "Ocena:",
     "showMore": "Pokaż więcej roślin",
+    "oauthLoginSuccess": "Logowanie przez GitHub zakończone sukcesem. Jesteś zalogowany.",
     "nav": ["Strona Główna", "Ogrody", "O nas", "Regulamin", "Kontakt"],
     "searchPlaceholder": "Wyszukiwanie jest aktywne",
     "searchInfo": "Tutaj będzie pełna logika wyszukiwania.",
@@ -111,6 +112,8 @@
   "errors": {
     "connectionError": "Błąd połączenia. Spróbuj ponownie później.",
     "invalidCredentials": "Nieprawidłowy login lub hasło.",
+    "oauthFailed": "Logowanie przez GitHub nie powiodło się. Spróbuj ponownie.",
+    "oauthAccessDenied": "Anulowano logowanie przez GitHub.",
     "genericError": "Coś poszło nie tak.",
     "invalidImage": "Przesłany plik jest nieprawidłowy. Wybrany plik nie jest obrazem lub jest uszkodzony."
   },
