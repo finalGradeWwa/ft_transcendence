@@ -11,6 +11,7 @@ import { Input } from '@/components/Input';
 import { Icon } from '@/components/icons/ui/Icon';
 import { Button } from '@/components/Button';
 import { clearAccessToken, getApiUrl, getValidAccessToken } from "@/lib/auth";
+import { useLocale } from "next-intl";
 
 type FormData = {
   email: string;
@@ -204,6 +205,8 @@ export const LoginForm = ({
     updateFormData,
   } = useLoginForm(onLoginSuccess, tError);
 
+  const locale = useLocale();
+
   const handleInputChange = ({
     target,
   }: React.ChangeEvent<HTMLInputElement>) => {
@@ -253,7 +256,7 @@ export const LoginForm = ({
         <div className="flex-grow border-t border-gray-400"></div>
       </div>
       <a
-        href={`${apiUrl}/api/auth/login/github/`}
+        href={`${apiUrl}/api/auth/login/github/?locale=${locale}`}
         className="w-full flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
       >
         <svg
