@@ -10,7 +10,7 @@ import { useSearchParams } from 'next/navigation';
 import { Input } from '@/components/Input';
 import { Icon } from '@/components/icons/ui/Icon';
 import { Button } from '@/components/Button';
-import { refreshAccessToken } from "@/lib/auth";
+import { clearAccessToken, getApiUrl, getValidAccessToken } from "@/lib/auth";
 
 type FormData = {
   email: string;
@@ -27,7 +27,7 @@ type LoginResponse = {
  * EN: Sends a login request to the API using an environment variable for the URL.
  */
 const loginRequest = async (data: FormData): Promise<LoginResponse> => {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+  const apiUrl = getApiUrl();
 
   const res = await fetch(`${apiUrl}/api/auth/login/`, {
     method: 'POST',
@@ -140,8 +140,8 @@ const useLoginForm = (
 
     try {
       const data = await loginRequest(formData);
-      const access = await refreshAccessToken();
-      sessionStorage.setItem("accessToken", access);
+      clearAccessToken();
+      await getValidAccessToken();
 
       /**
        * PL: Sprawdzenie, czy backend faktycznie przysłał dane użytkownika.
@@ -159,7 +159,7 @@ const useLoginForm = (
        * EN: Redirect to home page and refresh application state.
        */
       onLoginSuccess();
-      window.location.href = '/';
+      window.location.href = '/?auth=login_success&provider=password';
     } catch (err) {
       /** PL: Wyświetlamy błąd użytkownikowi EN: Displaying error to the user */
       setError(getErrorMessage(tError, err));
@@ -211,7 +211,7 @@ export const LoginForm = ({
   };
 
   const togglePasswordVisibility = () => setShowPassword(!showPassword);
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+  const apiUrl = getApiUrl();
 
   return (
     <form className="flex flex-col gap-4" onSubmit={handleSubmit}>

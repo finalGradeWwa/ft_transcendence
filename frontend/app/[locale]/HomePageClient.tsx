@@ -5,9 +5,10 @@
  * EN: Main client-side home page component. Displays a grid of recommended plants.
  */
 
+import React from 'react';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Icon } from '@/components/icons/ui/Icon';
 
 export type PlantType = {
@@ -30,16 +31,50 @@ export const HomePageClient = ({
 }) => {
   const t = useTranslations('HomePage');
   const searchParams = useSearchParams();
+  const router = useRouter();
   const authStatus = searchParams.get('auth');
+  const authProvider = searchParams.get('provider');
+
+  // Keep a local flag so the banner stays visible after we clean the URL.
+  const [showLoginSuccess, setShowLoginSuccess] = React.useState(false);
+  const [loginProvider, setLoginProvider] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    if (authStatus !== 'login_success') return;
+
+    setShowLoginSuccess(true);
+    setLoginProvider(authProvider);
+
+    // Clean the URL so the message doesn't reappear on refresh.
+    // Delay the replace slightly so the user actually sees the banner.
+    const timeout = window.setTimeout(() => {
+      const url = new URL(window.location.href);
+      url.searchParams.delete('auth');
+      url.searchParams.delete('provider');
+      url.searchParams.delete('showLogin');
+      url.searchParams.delete('error');
+
+      router.replace(url.pathname + url.search);
+    }, 800);
+
+    return () => window.clearTimeout(timeout);
+  }, [authProvider, authStatus, router]);
+
+  // Auto-hide the banner after a short time (optional, feels like a toast).
+  React.useEffect(() => {
+    if (!showLoginSuccess) return;
+    const timeout = window.setTimeout(() => setShowLoginSuccess(false), 3500);
+    return () => window.clearTimeout(timeout);
+  }, [showLoginSuccess]);
+
 
   return (
     <>
       <section className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
-        {authStatus === 'oauth_success' && (
+        {showLoginSuccess && (
           <div className="mb-6 rounded-lg border border-green-600 bg-green-50 px-4 py-3 text-sm font-semibold text-green-800">
-            {t('oauthLoginSuccess')}
-          </div>
-        )}
+            {loginProvider === 'github' ? t('oauthLoginSuccess') : t('loginSuccess')}
+          </div>)}
 
         {!hideTitle && (
           <h1 className="text-2xl md:text-3xl font-bold mb-6 text-white-text overflow-hidden">

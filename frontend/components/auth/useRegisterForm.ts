@@ -106,7 +106,7 @@ export const useRegisterForm = ({ onSuccess }: UseRegisterFormProps) => {
     }
 
     try {
-      const response = await fetch('http://localhost:8000/api/register/', {
+      const response = await fetch('http://localhost:8000/api/auth/register/', {
         method: 'POST',
         body: formData,
         headers: { Accept: 'application/json' },

@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { fetchCurrentUser, refreshAccessToken } from '@/lib/auth';
+import { fetchCurrentUser, getValidAccessToken } from '@/lib/auth';
 
 export default function AuthCallbackPage() {
   const router = useRouter();
@@ -10,20 +10,24 @@ export default function AuthCallbackPage() {
   const locale = params?.locale ?? 'pl';
 
   useEffect(() => {
+    let cancelled = false;
+
     (async () => {
       try {
-        const access = await refreshAccessToken();
-        const user = await fetchCurrentUser(access);
-
-        sessionStorage.setItem('accessToken', access);
+        await getValidAccessToken();
+        const user = await fetchCurrentUser();
+        if (cancelled) return;
         localStorage.setItem('username', user.username);
-
-        router.replace(`/${locale}?auth=oauth_success`);
+        router.replace(`/${locale}?auth=login_success&provider=github`);
       } catch (error) {
+        if (cancelled) return;
         console.error('OAuth callback failed:', error);
         router.replace(`/${locale}?showLogin=true&error=oauth_failed`);
       }
     })();
+    return () => {
+      cancelled = true;
+    };
   }, [locale, router]);
 
   return (
