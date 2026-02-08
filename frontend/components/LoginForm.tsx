@@ -161,7 +161,6 @@ const useLoginForm = (
        * EN: Redirect to home page and refresh application state.
        */
       onLoginSuccess();
-      // window.location.href = '/?auth=login_success&provider=password';
       window.location.href = `/${locale}/?auth=login_success&provider=password`;
     } catch (err) {
       /** PL: Wyświetlamy błąd użytkownikowi EN: Displaying error to the user */
