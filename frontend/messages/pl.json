@@ -52,7 +52,9 @@
       "emailDescription": "Masz pytania? Chętnie na nie odpowiemy!",
       "officeOpen": "Biuro czynne",
       "officeHours": "Poniedziałek - Piątek 9:00 - 17:00"
-    }
+    },
+    "or": "Lub",
+    "githubLogin": "Zaloguj się przez GitHub"
   },
   "ProfilePage": {
     "title": "Profil użytkownika",

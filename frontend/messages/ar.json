@@ -52,7 +52,9 @@
       "emailDescription": "لديك أسئلة؟ يسعدنا الرد عليها!",
       "officeOpen": "ساعات العمل",
       "officeHours": "الاثنين - الجمعة 9:00 صباحًا - 5:00 مساءً"
-    }
+    },
+    "or": "أو",
+    "githubLogin": "تسجيل الدخول عبر GitHub"
   },
   "ProfilePage": {
     "title": "ملف المستخدم",

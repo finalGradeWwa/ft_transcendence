@@ -252,7 +252,7 @@ export const LoginForm = ({
       {/* GITHUB LOGIN BUTTON START */}
       <div className="relative flex py-5 items-center">
         <div className="flex-grow border-t border-gray-400"></div>
-        <span className="flex-shrink mx-4 text-gray-400">Lub</span>
+        <span className="flex-shrink mx-4 text-gray-400">{t('or')}</span>
         <div className="flex-grow border-t border-gray-400"></div>
       </div>
       <a
@@ -271,7 +271,7 @@ export const LoginForm = ({
             clipRule="evenodd"
           />
         </svg>
-        Zaloguj się przez GitHub
+        {t('githubLogin')}
       </a>
       {/* GITHUB LOGIN BUTTON END */}
 

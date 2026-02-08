@@ -52,7 +52,9 @@
       "emailDescription": "Haben Sie Fragen? Wir antworten Ihnen gerne!",
       "officeOpen": "Bürozeiten",
       "officeHours": "Montag - Freitag 9:00 - 17:00 Uhr"
-    }
+    },
+    "or": "Oder",
+    "githubLogin": "Mit GitHub anmelden"
   },
   "ProfilePage": {
     "title": "Benutzerprofil",
