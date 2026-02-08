@@ -81,7 +81,7 @@ class ChangePasswordView(APIView):
 # logout adds refresh token to blacklist
 class LogoutView(APIView):
 
-	permission_classes = [AllowAny]
+	permission_classes = [IsAuthenticated]
 
 	def post(self, request):
 		refresh_token = request.COOKIES.get(REFRESH_COOKIE_NAME)
@@ -96,6 +96,8 @@ class LogoutView(APIView):
 			token = RefreshToken(refresh_token)
 			token.blacklist()
 		except TokenError:
+			# Token may be invalid/expired/already blacklisted; logout should be idempotent.
+    		# We still clear the refresh cookie and return 205.
 			pass
 
 		clear_refresh_cookie(response)

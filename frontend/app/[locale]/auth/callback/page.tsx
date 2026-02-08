@@ -3,11 +3,13 @@
 import { useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { fetchCurrentUser, getValidAccessToken } from '@/lib/auth';
+import { useTranslations } from 'next-intl';
 
 export default function AuthCallbackPage() {
   const router = useRouter();
   const params = useParams<{ locale?: string }>();
   const locale = params?.locale ?? 'pl';
+  const t = useTranslations('AuthCallbackPage');
 
   useEffect(() => {
     let cancelled = false;
@@ -38,7 +40,7 @@ export default function AuthCallbackPage() {
       height: '100vh',
       fontFamily: 'sans-serif'
     }}>
-      <p>Przetwarzanie logowania, proszę czekać...</p>
+      <p>{t('loading')}</p>
     </div>
   );
 }

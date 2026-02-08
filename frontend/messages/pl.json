@@ -16,8 +16,14 @@
     "rating": "Ocena:",
     "showMore": "Pokaż więcej roślin",
     "oauthLoginSuccess": "Logowanie przez GitHub zakończone sukcesem. Jesteś zalogowany.",
-    "loginSuccess":"Zalogowano pomyślnie.",
-    "nav": ["Strona Główna", "Ogrody", "O nas", "Regulamin", "Kontakt"],
+    "loginSuccess": "Zalogowano pomyślnie.",
+    "nav": [
+      "Strona Główna",
+      "Ogrody",
+      "O nas",
+      "Regulamin",
+      "Kontakt"
+    ],
     "searchPlaceholder": "Wyszukiwanie jest aktywne",
     "searchInfo": "Tutaj będzie pełna logika wyszukiwania.",
     "rights": "Wszelkie prawa zastrzeżone.",
@@ -162,5 +168,8 @@
     "plantsCountLabel": "Liczba roślin",
     "gardenNameLabel": "Nazwa ogrodu",
     "gardenNamePlaceholder": "np. Mój Balkon lub Salon"
+  },
+  "AuthCallbackPage": {
+    "loading": "Przetwarzanie logowania, proszę czekać..."
   }
 }

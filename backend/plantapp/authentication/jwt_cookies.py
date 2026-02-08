@@ -23,5 +23,5 @@ def set_refresh_cookie(response, refresh_token: str):
 def clear_refresh_cookie(response):
     response.delete_cookie(
         REFRESH_COOKIE_NAME,
-        path = "/api/",
+        path = "/",
     )

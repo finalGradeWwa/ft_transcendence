@@ -16,7 +16,7 @@
     "rating": "Bewertung:",
     "showMore": "Mehr Pflanzen anzeigen",
     "oauthLoginSuccess": "GitHub-Anmeldung erfolgreich. Du bist jetzt eingeloggt.",
-    "loginSuccess":"Erfolgreich angemeldet.",
+    "loginSuccess": "Erfolgreich angemeldet.",
     "nav": [
       "Startseite",
       "Gärten",
@@ -168,5 +168,8 @@
     "plantsCountLabel": "Anzahl der Pflanzen",
     "gardenNameLabel": "Gartenname",
     "gardenNamePlaceholder": "z. B. Mein Balkon oder Wohnzimmer"
+  },
+  "AuthCallbackPage": {
+    "loading": "Anmeldung wird verarbeitet, bitte warten..."
   }
 }

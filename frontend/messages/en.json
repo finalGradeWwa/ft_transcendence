@@ -16,8 +16,14 @@
     "rating": "Rating:",
     "showMore": "Show more plants",
     "oauthLoginSuccess": "GitHub login completed successfully. You are signed in.",
-    "loginSuccess":"Successfully signed in.",
-    "nav": ["Home", "Gardens", "About Us", "Terms", "Contact"],
+    "loginSuccess": "Successfully signed in.",
+    "nav": [
+      "Home",
+      "Gardens",
+      "About Us",
+      "Terms",
+      "Contact"
+    ],
     "searchPlaceholder": "Search is active",
     "searchInfo": "Full search logic will be here.",
     "rights": "All rights reserved.",
@@ -162,5 +168,8 @@
     "plantsCountLabel": "Number of plants",
     "gardenNameLabel": "Garden name",
     "gardenNamePlaceholder": "e.g., My Balcony or Living Room"
+  },
+  "AuthCallbackPage": {
+    "loading": "Processing login, please wait..."
   }
 }
