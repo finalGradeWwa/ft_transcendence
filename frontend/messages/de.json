@@ -173,5 +173,13 @@
   },
   "AuthCallbackPage": {
     "loading": "Anmeldung wird verarbeitet, bitte warten..."
+  "SearchModal": {
+    "title": "Suche",
+    "placeholder": "Tippen Sie, um zu suchen...",
+    "resultsCount": "{count, plural, one {# Ergebnis gefunden} other {# Ergebnisse gefunden}}",
+    "noResults": "Keine Ergebnisse für \"{query}\" gefunden",
+    "aria": {
+      "close": "Suche schließen"
+    }
   }
 }

@@ -132,7 +132,7 @@ export function HeaderControls({
 
       <nav className="flex flex-wrap md:flex-nowrap items-center justify-center gap-3">
         <IconButton
-          onClick={onSearchClick}
+          href={{ pathname, query: { showSearch: 'true' } }}
           iconName="search"
           ariaLabel={tAria('searchBtn')}
         />

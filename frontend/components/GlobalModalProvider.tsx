@@ -14,6 +14,10 @@ const LoginModal = dynamic(() => import('@/components/LoginModal'), {
   ssr: false,
 });
 
+const SearchModal = dynamic(() => import('@/components/SearchModal'), {
+  ssr: false,
+});
+
 /**
  * PL: Komponent zarządzający widocznością modali w skali całej aplikacji.
  * EN: Component managing modal visibility application-wide.
@@ -29,6 +33,7 @@ export const GlobalModalProvider = () => {
    * EN: Reacts to URL parameter changes and opens the modal if showLogin=true.
    */
   const isLoginModalOpen = searchParams.get('showLogin') === 'true';
+  const isSearchModalOpen = searchParams.get('showSearch') === 'true';
 
   /**
    * PL: Zamyka modal i czyści parametry URL przy użyciu routera Next.js.
@@ -39,6 +44,9 @@ export const GlobalModalProvider = () => {
   };
 
   return (
-    <LoginModal isVisible={isLoginModalOpen} onClose={handleClose} t={t} />
+    <>
+      <LoginModal isVisible={isLoginModalOpen} onClose={handleClose} t={t} />
+      <SearchModal isVisible={isSearchModalOpen} onClose={handleClose} />
+    </>
   );
 };
