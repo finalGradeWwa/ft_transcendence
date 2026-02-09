@@ -206,7 +206,7 @@ export function HeaderControls({
       {/* PL: Główne przyciski akcji | EN: Main action buttons */}
       <nav className="flex flex-wrap md:flex-nowrap items-center justify-center gap-3">
         <IconButton
-          onClick={onSearchClick}
+          href={{ pathname, query: { showSearch: 'true' } }}
           icon="search"
           label={tAria('searchBtn')}
         />

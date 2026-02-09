@@ -20,7 +20,7 @@ COPY . .
 
 # PL: Blokada zbierania anonimowych danych analitycznych przez Next.js.
 # EN: Disabling anonymous telemetry data collection by Next.js.
-ENV NEXT_TELEMETRY_DISABLED 1
+ENV NEXT_TELEMETRY_DISABLED=1
 
 # PL: Uruchomienie aplikacji w trybie deweloperskim z funkcją Hot Reload.
 # EN: Starting the application in development mode with Hot Reload enabled.
