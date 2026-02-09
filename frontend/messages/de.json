@@ -164,5 +164,14 @@
     "plantsCountLabel": "Anzahl der Pflanzen",
     "gardenNameLabel": "Gartenname",
     "gardenNamePlaceholder": "z. B. Mein Balkon oder Wohnzimmer"
+  },
+  "SearchModal": {
+    "title": "Suche",
+    "placeholder": "Tippen Sie, um zu suchen...",
+    "resultsCount": "{count, plural, one {# Ergebnis gefunden} other {# Ergebnisse gefunden}}",
+    "noResults": "Keine Ergebnisse für \"{query}\" gefunden",
+    "aria": {
+      "close": "Suche schließen"
+    }
   }
 }
