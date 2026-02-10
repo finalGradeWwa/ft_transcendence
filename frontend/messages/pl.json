@@ -15,7 +15,15 @@
     "author": "Autor:",
     "rating": "Ocena:",
     "showMore": "Pokaż więcej roślin",
-    "nav": ["Strona Główna", "Ogrody", "O nas", "Regulamin", "Kontakt"],
+    "oauthLoginSuccess": "Logowanie przez GitHub zakończone sukcesem. Jesteś zalogowany.",
+    "loginSuccess": "Zalogowano pomyślnie.",
+    "nav": [
+      "Strona Główna",
+      "Ogrody",
+      "O nas",
+      "Regulamin",
+      "Kontakt"
+    ],
     "searchPlaceholder": "Wyszukiwanie jest aktywne",
     "searchInfo": "Tutaj będzie pełna logika wyszukiwania.",
     "rights": "Wszelkie prawa zastrzeżone.",
@@ -44,7 +52,9 @@
       "emailDescription": "Masz pytania? Chętnie na nie odpowiemy!",
       "officeOpen": "Biuro czynne",
       "officeHours": "Poniedziałek - Piątek 9:00 - 17:00"
-    }
+    },
+    "or": "Lub",
+    "githubLogin": "Zaloguj się przez GitHub"
   },
   "ProfilePage": {
     "title": "Profil użytkownika",
@@ -111,6 +121,8 @@
   "errors": {
     "connectionError": "Błąd połączenia. Spróbuj ponownie później.",
     "invalidCredentials": "Nieprawidłowy login lub hasło.",
+    "oauthFailed": "Logowanie przez GitHub nie powiodło się. Spróbuj ponownie.",
+    "oauthAccessDenied": "Anulowano logowanie przez GitHub.",
     "genericError": "Coś poszło nie tak.",
     "invalidImage": "Przesłany plik jest nieprawidłowy. Wybrany plik nie jest obrazem lub jest uszkodzony."
   },
@@ -159,6 +171,8 @@
     "gardenNameLabel": "Nazwa ogrodu",
     "gardenNamePlaceholder": "np. Mój Balkon lub Salon"
   },
+  "AuthCallbackPage": {
+    "loading": "Przetwarzanie logowania, proszę czekać..."
   "SearchModal": {
     "title": "Wyszukiwanie",
     "placeholder": "Wpisz aby wyszukać...",

@@ -9,6 +9,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
+import { getApiUrl } from "@/lib/auth";
 
 interface UseRegisterFormProps {
   onSuccess: () => void;
@@ -106,7 +107,8 @@ export const useRegisterForm = ({ onSuccess }: UseRegisterFormProps) => {
     }
 
     try {
-      const response = await fetch('http://localhost:8000/api/register/', {
+      const apiUrl = getApiUrl();
+      const response = await fetch(`${apiUrl}/api/auth/register/`, {
         method: 'POST',
         body: formData,
         headers: { Accept: 'application/json' },

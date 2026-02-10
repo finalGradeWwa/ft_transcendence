@@ -67,9 +67,10 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt.token_blacklist',
     'authentication',
     'corsheaders',
-    'plants', 
+    'plants',
     'gardens',
     'organizations',
+    'social_django',
     'social_feed',
     'chat_app',
 ]
@@ -83,6 +84,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'social_django.middleware.SocialAuthExceptionMiddleware',
+
 ]
 
 ROOT_URLCONF = 'mysite.urls'
@@ -215,3 +218,55 @@ CORS_ALLOW_CREDENTIALS = True # For cookies
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+AUTHENTICATION_BACKENDS = (
+    'social_core.backends.github.GithubOAuth2',
+    'django.contrib.auth.backends.ModelBackend',
+)
+
+SOCIAL_AUTH_GITHUB_KEY = os.getenv('GITHUB_OAUTH_KEY')
+SOCIAL_AUTH_GITHUB_SECRET = os.getenv('GITHUB_OAUTH_SECRET')
+if not SOCIAL_AUTH_GITHUB_KEY or not SOCIAL_AUTH_GITHUB_SECRET:
+    raise RuntimeError(
+        "GitHub OAuth credentials are not configured. "
+        "Set GITHUB_OAUTH_KEY and GITHUB_OAUTH_SECRET in your environment or .env file "
+        "before running the project."
+    )
+
+SOCIAL_AUTH_GITHUB_SCOPE = ['user:email']
+SOCIAL_AUTH_FIELDS_STORED_IN_SESSION = ['locale']
+SOCIAL_AUTH_URL_NAMESPACE = 'social'
+SOCIAL_AUTH_RAISE_EXCEPTIONS = False
+
+
+SOCIAL_AUTH_PIPELINE = (
+    'social_core.pipeline.social_auth.social_details',
+    'social_core.pipeline.social_auth.social_uid',
+    'social_core.pipeline.social_auth.auth_allowed',
+    'social_core.pipeline.social_auth.social_user',
+    'social_core.pipeline.user.get_username',
+    'authentication.pipeline.set_email_for_new_user',
+    'social_core.pipeline.user.create_user',
+    'social_core.pipeline.social_auth.associate_user',
+    'social_core.pipeline.social_auth.load_extra_data',
+    'social_core.pipeline.user.user_details',
+    'authentication.pipeline.get_tokens_for_user',
+)
+
+FRONTEND_URL = os.getenv("FRONTEND_BASE_URL", "http://localhost:3000")
+SOCIAL_AUTH_LOGIN_ERROR_URL = f"{FRONTEND_URL.rstrip('/')}/?showLogin=true&error=access_denied"
+
+# CSRF_COOKIE_SECURE = not DEBUG
+# CSRF_COOKIE_HTTPONLY = False
+# CSRF_COOKIE_SAMESITE = 'Lax'
+
+SOCIAL_AUTH_REDIRECT_IS_HTTPS = not DEBUG
+SOCIAL_AUTH_SANITIZE_REDIRECTS = True
+# SOCIAL_AUTH_LOGIN_REDIRECT_URL = f"{FRONTEND_URL.rstrip('/')}/pl/auth/callback"
+# SOCIAL_AUTH_NEW_USER_REDIRECT_URL = f"{FRONTEND_URL.rstrip('/')}/pl/auth/callback"
+
+# Session configuration for OAuth
+# SESSION_COOKIE_AGE = 3600  # 1 hour
+# SESSION_COOKIE_SECURE = not DEBUG
+# SESSION_COOKIE_HTTPONLY = True
+# SESSION_COOKIE_SAMESITE = 'Lax'
