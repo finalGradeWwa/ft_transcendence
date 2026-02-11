@@ -173,6 +173,7 @@
   },
   "AuthCallbackPage": {
     "loading": "Przetwarzanie logowania, proszę czekać..."
+  },
   "SearchModal": {
     "title": "Wyszukiwanie",
     "placeholder": "Wpisz aby wyszukać...",

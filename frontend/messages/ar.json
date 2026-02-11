@@ -172,6 +172,7 @@
   },
   "AuthCallbackPage": {
     "loading": "جارٍ معالجة تسجيل الدخول… يُرجى الانتظار"
+  },
   "SearchModal": {
     "title": "بحث",
     "placeholder": "اكتب للبحث...",
