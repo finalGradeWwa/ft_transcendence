@@ -6,6 +6,7 @@ import { Input } from '@/components/Input';
 import { Text } from '@/components/typography/Text';
 import { Button } from '@/components/Button';
 import { useTranslations } from 'next-intl';
+import { getApiUrl } from '@/lib/auth'; // Poprawka kolegi
 
 interface RegisterFormProps {
   onSuccess: () => void;
@@ -40,6 +41,9 @@ export const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
   const [error, setError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
 
+  /** PL: Zarządzanie pamięcią URL podglądu
+   *  EN: Managing preview URL memory
+   **/
   useEffect(() => {
     return () => {
       if (previewUrl) URL.revokeObjectURL(previewUrl);
@@ -75,7 +79,6 @@ export const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
     setError(null);
 
     const formData = new FormData(e.currentTarget);
-
     const password = (formData.get('password') as string) || '';
     const passwordConfirm = (formData.get('password_confirm') as string) || '';
     const avatarEntry = formData.get('avatar_photo');
@@ -96,6 +99,7 @@ export const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
       }
     }
 
+    /** PL: Walidacja hasła. EN: Password validation. */
     const passwordRegex =
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&./\\()|{}[\]#^_-]).{8,}$/;
 

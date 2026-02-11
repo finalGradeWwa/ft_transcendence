@@ -15,6 +15,8 @@
     "author": "Author:",
     "rating": "Rating:",
     "showMore": "Show more plants",
+    "oauthLoginSuccess": "GitHub login completed successfully. You are signed in.",
+    "loginSuccess": "Successfully signed in.",
     "nav": ["Home", "Gardens", "About Us", "Terms", "Contact"],
     "searchPlaceholder": "Search is active",
     "searchInfo": "Full search logic will be here.",
@@ -44,7 +46,9 @@
       "emailDescription": "Have questions? We'd love to hear from you!",
       "officeOpen": "Office open",
       "officeHours": "Monday - Friday 9:00 AM - 5:00 PM"
-    }
+    },
+    "or": "Or",
+    "githubLogin": "Sign in with GitHub"
   },
   "ProfilePage": {
     "title": "User Profile",
@@ -123,6 +127,8 @@
   "errors": {
     "connectionError": "Connection error. Try again later.",
     "invalidCredentials": "Invalid username or password.",
+    "oauthFailed": "GitHub login failed. Please try again.",
+    "oauthAccessDenied": "GitHub login was canceled.",
     "genericError": "Something went wrong.",
     "invalidImage": "Upload a valid image. The file you uploaded was either not an image or a corrupted image.",
     "tooManyRequests": "Too many login attempts. Please wait a moment.",
@@ -175,13 +181,16 @@
     "gardenNamePlaceholder": "e.g., My Balcony or Living Room",
     "noPins": "No entries"
   },
-  "SearchModal": {
-    "title": "Search",
-    "placeholder": "Type to search...",
-    "resultsCount": "{count, plural, one {# result found} other {# results found}}",
-    "noResults": "No results found for \"{query}\"",
-    "aria": {
-      "close": "Close search"
+  "AuthCallbackPage": {
+    "loading": "Processing login, please wait...",
+    "SearchModal": {
+      "title": "Search",
+      "placeholder": "Type to search...",
+      "resultsCount": "{count, plural, one {# result found} other {# results found}}",
+      "noResults": "No results found for \"{query}\"",
+      "aria": {
+        "close": "Close search"
+      }
     }
   }
 }

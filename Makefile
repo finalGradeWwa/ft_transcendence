@@ -1,7 +1,13 @@
-.PHONY: help build up down logs restart clean ps fclean backend frontend logs-backend logs-frontend dev-up dev-down
+.PHONY: help build up down logs restart clean ps fclean backend frontend logs-backend logs-frontend dev-up dev-down run local-backend local-frontend
 
 # Docker Compose file
 COMPOSE_FILE = docker-compose.yml
+
+# Zmienne dla wersji lokalnej
+BE_DIR = backend
+FE_DIR = frontend
+MANAGE = $(BE_DIR)/plantapp/manage.py
+VENV_ACTIVATE = . $(BE_DIR)/venv/bin/activate
 
 help:
 	@echo "ft_transcendence Commands"
@@ -19,11 +25,25 @@ help:
 	@echo "  make backend     - Build and start backend only"
 	@echo "  make frontend    - Build and start frontend only"
 	@echo ""
-# 	@echo "NPM Commands:"
-# 	@echo "  make install     - Install frontend dependencies"
-# 	@echo "  make npm-remove  - Remove a frontend dependency"
-# 	@echo "  make npm-clean   - Clean and reinstall frontend dependencies"
-# 	@echo ""
+	@echo "Local Commands:"
+	@echo "  make run         - Quick start BE & FE locally in parallel"
+	@echo ""
+#   @echo "NPM Commands:"
+#   @echo "  make install     - Install frontend dependencies"
+#   @echo "  make npm-remove  - Remove a frontend dependency"
+#   @echo "  make npm-clean   - Clean and reinstall frontend dependencies"
+#   @echo ""
+
+# OPCJA SZYBKIEGO URUCHAMIANIA LOKALNEGO
+run:
+	@make -j 2 local-backend local-frontend
+
+local-backend:
+	$(VENV_ACTIVATE) && python3 $(MANAGE) migrate
+	$(VENV_ACTIVATE) && python3 $(MANAGE) runserver
+
+local-frontend:
+	cd $(FE_DIR) && npm run dev
 
 build:
 	docker compose -f $(COMPOSE_FILE) build
@@ -45,6 +65,7 @@ ps:
 
 clean:
 	docker compose -f $(COMPOSE_FILE) down -v --rmi local
+	find . -type d -name "__pycache__" -exec rm -rf {} +
 
 fclean:
 	docker compose -f $(COMPOSE_FILE) down -v

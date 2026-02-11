@@ -3,6 +3,7 @@ from rest_framework.test import APITestCase
 from rest_framework import status
 from django.contrib.auth import get_user_model
 
+from .jwt_cookies import REFRESH_COOKIE_NAME
 User = get_user_model()
 
 
@@ -22,9 +23,7 @@ class RegisterViewTests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertIn('user', response.data)
-        self.assertIn('tokens', response.data)
-        self.assertIn('access', response.data['tokens'])
-        self.assertIn('refresh', response.data['tokens'])
+        self.assertIn(REFRESH_COOKIE_NAME, response.cookies)
         self.assertEqual(response.data['user']['username'], 'testuser')
         self.assertEqual(response.data['user']['email'], 'test@example.com')
 
@@ -98,9 +97,7 @@ class LoginTests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn('user', response.data)
-        self.assertIn('tokens', response.data)
-        self.assertIn('access', response.data['tokens'])
-        self.assertIn('refresh', response.data['tokens'])
+        self.assertIn(REFRESH_COOKIE_NAME, response.cookies)
         self.assertEqual(response.data['user']['username'], 'testuser')
         self.assertEqual(response.data['user']['email'], 'test@example.com')
 
@@ -145,7 +142,7 @@ class LoginTests(APITestCase):
         }, format='json')
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertIn('tokens', response.data)
+        self.assertIn(REFRESH_COOKIE_NAME, response.cookies)
 
     def test_login_inactive_user(self):
         self.user.is_active = False
@@ -158,7 +155,6 @@ class LoginTests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn('non_field_errors', response.data)
-        self.assertNotIn('tokens', response.data)
         self.assertNotIn('user', response.data)
 
 
@@ -228,46 +224,43 @@ class LogoutViewTests(APITestCase):
             email='test@example.com',
             password='SecurePass123!'
         )
-        # Get tokens
-        login_response = self.client.post(reverse('token_obtain_pair'), {
+        # Login to get cookie
+        login_response = self.client.post(reverse('login'), {
             'email': 'test@example.com',
             'password': 'SecurePass123!'
         }, format='json')
-        self.refresh_token = login_response.data['refresh']
-        self.access_token = login_response.data['access']
-        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {self.access_token}')
+
+        # Save refresh token value for verification later
+        self.refresh_token_value = login_response.cookies[REFRESH_COOKIE_NAME].value
+
+        # Authenticate for permission check (IsAuthenticated)
+        self.client.force_authenticate(user=self.user)
 
     def test_logout_success(self):
-        response = self.client.post(self.url, {
-            'refresh': self.refresh_token
-        }, format='json')
+        # Cookie is already in self.client from setUp login
+        response = self.client.post(self.url)
 
         self.assertEqual(response.status_code, status.HTTP_205_RESET_CONTENT)
+        # Verify cookie is cleared (empty string)
+        self.assertEqual(response.cookies[REFRESH_COOKIE_NAME].value, '')
 
-        # Verify refresh token is invalidated
-        refresh_response = self.client.post(reverse('token_refresh'), {
-            'refresh': self.refresh_token
-        }, format='json')
+        # Verify refresh token is invalidated (blacklisted)
+        # We manually set the cookie back to the old value to test if it's rejected
+        self.client.cookies[REFRESH_COOKIE_NAME] = self.refresh_token_value
+        refresh_response = self.client.post('/api/auth/token/refresh/')
         self.assertEqual(refresh_response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_logout_missing_refresh_token(self):
-        response = self.client.post(self.url, {}, format='json')
-
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn('error', response.data)
+        self.client.cookies.clear()
+        response = self.client.post(self.url)
+        self.assertEqual(response.status_code, status.HTTP_205_RESET_CONTENT)
 
     def test_logout_invalid_refresh_token(self):
-        response = self.client.post(self.url, {
-            'refresh': 'invalid-token-here'
-        }, format='json')
-
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.client.cookies[REFRESH_COOKIE_NAME] = 'invalid-token'
+        response = self.client.post(self.url)
+        self.assertEqual(response.status_code, status.HTTP_205_RESET_CONTENT)
 
     def test_logout_unauthenticated(self):
-        self.client.credentials()  # Remove authorization
-
-        response = self.client.post(self.url, {
-            'refresh': self.refresh_token
-        }, format='json')
-
+        self.client.force_authenticate(user=None)
+        response = self.client.post(self.url)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)

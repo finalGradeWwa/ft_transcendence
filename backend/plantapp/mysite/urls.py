@@ -28,6 +28,7 @@ urlpatterns = [
     path('api/', include('social_feed.urls')),
     path('chat/', include('chat_app.urls')),
     # path('api/image/', include('core.urls'))
+    path('api/auth/', include('social_django.urls', namespace='social')),
 ]
 
 if settings.DEBUG:

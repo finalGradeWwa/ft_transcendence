@@ -8,7 +8,11 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useRouter, usePathname, Link } from '@/i18n/navigation';
+import { useSearchParams } from 'next/navigation';
 import { Icon } from '@/components/icons/ui/Icon';
+// PL: Importujemy poprawną funkcję fetchCurrentUser z Twojej biblioteki auth.
+// EN: Importing the correct fetchCurrentUser function from your auth library.
+import { fetchCurrentUser } from '@/lib/auth';
 
 const BTN_S =
   'p-2 rounded-full bg-secondary-beige text-neutral-900 hover:text-primary-green shadow-md transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black dark:focus-visible:outline-white outline-none shrink-0 flex items-center justify-center';
@@ -16,7 +20,6 @@ const LANGS = ['pl', 'en', 'de', 'ar'];
 
 /**
  * PL: Uniwersalny przycisk z ikoną (Link lub Button).
- * EN: Universal icon button (Link or Button).
  */
 const IconButton = ({ onClick, icon, label, href }: any) => {
   const content = <Icon name={icon} size={18} aria-hidden="true" />;
@@ -38,7 +41,6 @@ const IconButton = ({ onClick, icon, label, href }: any) => {
 
 /**
  * PL: Menu szybkiego dodawania rośliny lub ogrodu.
- * EN: Quick add menu for plants or gardens.
  */
 const AddMenu = ({ user, tP, tG, close }: any) => (
   <div className="absolute right-0 md:right-[-48px] mt-4 w-64 bg-primary-green rounded-xl shadow-2xl overflow-hidden z-[100] py-1 flex flex-col">
@@ -62,7 +64,6 @@ const AddMenu = ({ user, tP, tG, close }: any) => (
 
 /**
  * PL: Widok zalogowanego użytkownika (Avatar + Nick + Wyloguj).
- * EN: Logged-in user view (Avatar + Nickname + Logout).
  */
 const ProfileArea = ({ user, logout, t }: any) => (
   <div className="flex items-center gap-2 bg-primary-green p-1 pr-4 rounded-full shadow-md border border-primary-green/20 w-fit">
@@ -88,20 +89,26 @@ const ProfileArea = ({ user, logout, t }: any) => (
 );
 
 /**
- * PL: Hook zarządzający danymi użytkownika z localStorage z obsługą ładowania i przekierowania.
- * EN: Hook managing user data from localStorage with loading and redirect support.
+ * PL: Hook zarządzający danymi użytkownika z localStorage.
  */
 function useUsername() {
   const [username, setUsername] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    setUsername(localStorage.getItem('username'));
+    const storedUsername = localStorage.getItem('username');
+    setUsername(storedUsername);
     setIsLoading(false);
+
+    const handleStorageChange = () => {
+      setUsername(localStorage.getItem('username'));
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
   const logout = useCallback(async () => {
-    /** PL: Usunięcie ciasteczek sesji po stronie serwera. EN: Removing session cookies on server side. */
     try {
       await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/logout/`, {
         method: 'POST',
@@ -113,16 +120,18 @@ function useUsername() {
 
     localStorage.removeItem('username');
     localStorage.removeItem('token');
+    sessionStorage.removeItem('accessToken'); // PL: Czyścimy też token z sessionStorage
+    setUsername(null);
+    window.dispatchEvent(new Event('storage'));
 
     window.location.href = '/';
   }, []);
 
-  return { username, logout, isLoading };
+  return { username, setUsername, logout, isLoading };
 }
 
 /**
  * PL: Hook zamykający menu po kliknięciu poza element.
- * EN: Hook that closes the menu when clicking outside.
  */
 function useOutsideClose<T extends HTMLElement>(onClose: () => void) {
   const ref = useRef<T>(null);
@@ -137,8 +146,7 @@ function useOutsideClose<T extends HTMLElement>(onClose: () => void) {
 }
 
 /**
- * PL: Warunkowe renderowanie logowania lub obszaru profilu z blokadą mignięcia.
- * EN: Conditional rendering of login or profile area with flash prevention.
+ * PL: Warunkowe renderowanie logowania lub obszaru profilu.
  */
 const UserSection = ({
   username,
@@ -170,23 +178,64 @@ export function HeaderControls({
 }: {
   onSearchClick?: () => void;
 }) {
-  const { username, logout, isLoading } = useUsername();
+  const {
+    username,
+    setUsername,
+    logout,
+    isLoading: usernameLoading,
+  } = useUsername();
   const [isAddMenuOpen, setIsAddMenuOpen] = useState(false);
+  const [isAuthLoading, setIsAuthLoading] = useState(false);
   const closeMenu = useCallback(() => setIsAddMenuOpen(false), []);
   const addMenuRef = useOutsideClose<HTMLDivElement>(closeMenu);
 
   const locale = useLocale();
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
 
-  /**
-   * PL: Inicjalizacja tlumaczeń z odpowiednich plików JSON.
-   * EN: Initialization of translations from appropriate JSON files.
-   */
   const tHome = useTranslations('HomePage');
   const tAria = useTranslations('HomePage.aria');
   const tP = useTranslations('AddPlantPage');
   const tG = useTranslations('GardensPage');
+
+  /**
+   * PL: Obsługa parametru auth=login_success w URL (logowanie OAuth).
+   * EN: Handling auth=login_success URL parameter (OAuth login).
+   */
+  useEffect(() => {
+    const authStatus = searchParams.get('auth');
+
+    if (authStatus === 'login_success') {
+      setIsAuthLoading(true);
+
+      /**
+       * PL: Używamy zaimportowanej funkcji fetchCurrentUser z lib/auth, która automatycznie wywoła refreshAccessToken(), pobierze nowy token Bearer i użyje go do pobrania danych użytkownika.
+       * EN: We use the imported fetchCurrentUser function from lib/auth, which will automatically call refreshAccessToken(), fetch a new Bearer token, and use it to retrieve the user data.
+       */
+      fetchCurrentUser()
+        .then(userData => {
+          if (userData?.username) {
+            localStorage.setItem('username', userData.username);
+            setUsername(userData.username);
+            window.dispatchEvent(new Event('storage'));
+
+            const url = new URL(window.location.href);
+            url.searchParams.delete('auth');
+            url.searchParams.delete('provider');
+            window.history.replaceState({}, '', url.toString());
+          }
+        })
+        .catch(err => {
+          console.error('Failed to fetch user after OAuth:', err);
+        })
+        .finally(() => {
+          setIsAuthLoading(false);
+        });
+    }
+  }, [searchParams, setUsername]);
+
+  const isLoading = usernameLoading || isAuthLoading;
 
   return (
     <div className="flex flex-col md:flex-row items-center justify-center gap-x-6 gap-y-4">
@@ -203,7 +252,6 @@ export function HeaderControls({
         ))}
       </select>
 
-      {/* PL: Główne przyciski akcji | EN: Main action buttons */}
       <nav className="flex flex-wrap md:flex-nowrap items-center justify-center gap-3">
         <IconButton
           href={{ pathname, query: { showSearch: 'true' } }}
