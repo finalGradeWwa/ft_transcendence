@@ -1,85 +1,70 @@
-"""
-Test suite for the friend system (mutual following).
-Tests the core logic without requiring a running Django instance.
-"""
+from django.contrib.auth import get_user_model
+from rest_framework import status
+from rest_framework.test import APITestCase
 
-# Mock test data
-def test_friend_logic():
-    """Test mutual friend logic"""
-    
-    # Simulate user relationships
-    class MockUser:
-        def __init__(self, username):
-            self.username = username
-            self.following_list = set()
-            self.followers_list = set()
-        
-        def follow(self, other):
-            """Simulate user following another"""
-            self.following_list.add(other.username)
-            other.followers_list.add(self.username)
-        
-        def get_friends(self):
-            """Get mutual friends (both following each other)"""
-            mutual = []
-            for username in self.following_list:
-                if username in self.followers_list:
-                    mutual.append(username)
-            return mutual
-        
-        def is_friend_with(self, other):
-            """Check if mutual follow"""
-            return (other.username in self.following_list and 
-                    other.username in self.followers_list)
-    
-    # Test scenario 1: One-way follow
-    print("=" * 50)
-    print("Test 1: One-way follow")
-    alice = MockUser("alice")
-    bob = MockUser("bob")
-    
-    alice.follow(bob)
-    print(f"Alice follows Bob: {bob.username in alice.following_list}")
-    print(f"Are they friends? {alice.is_friend_with(bob)}")  # Should be False
-    assert not alice.is_friend_with(bob), "One-way follow shouldn't create friendship"
-    print("✓ PASS\n")
-    
-    # Test scenario 2: Mutual follow (friendship)
-    print("=" * 50)
-    print("Test 2: Mutual follow (friendship)")
-    bob.follow(alice)
-    print(f"Bob now follows Alice: {alice.username in bob.following_list}")
-    print(f"Are they friends? {alice.is_friend_with(bob)}")  # Should be True
-    assert alice.is_friend_with(bob), "Mutual follow should create friendship"
-    assert bob.is_friend_with(alice), "Friendship should be symmetric"
-    print("✓ PASS\n")
-    
-    # Test scenario 3: Multiple friends
-    print("=" * 50)
-    print("Test 3: Multiple friends")
-    charlie = MockUser("charlie")
-    alice.follow(charlie)
-    charlie.follow(alice)
-    
-    alice_friends = alice.get_friends()
-    print(f"Alice's friends: {alice_friends}")
-    assert "bob" in alice_friends, "Bob should be in Alice's friends"
-    assert "charlie" in alice_friends, "Charlie should be in Alice's friends"
-    print("✓ PASS\n")
-    
-    # Test scenario 4: Unfollow
-    print("=" * 50)
-    print("Test 4: Unfollow breaks friendship")
-    alice.following_list.discard(bob.username)
-    bob.followers_list.discard(alice.username)
-    
-    print(f"Are they friends after unfollow? {alice.is_friend_with(bob)}")  # Should be False
-    assert not alice.is_friend_with(bob), "Unfollowing should break friendship"
-    print("✓ PASS\n")
-    
-    print("=" * 50)
-    print("All tests passed! ✓")
-    print("=" * 50)
 
-if __name__ == "__main__":
-    test_friend_logic()
+User = get_user_model()
+
+
+class FriendSystemTests(APITestCase):
+    def setUp(self):
+        self.alice = User.objects.create_user(
+            email="alice@a.com",
+            username="alice",
+            password="password123",
+        )
+        self.bob = User.objects.create_user(
+            email="bob@b.com",
+            username="bob",
+            password="password123",
+        )
+        self.charlie = User.objects.create_user(
+            email="charlie@c.com",
+            username="charlie",
+            password="password123",
+        )
+
+    def test_is_friend_true_and_false(self):
+        url = f"/users/{self.alice.id}/is-friend/?target_id={self.bob.id}"
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertFalse(response.data["is_friend"])
+
+        self.alice.following.add(self.bob)
+        self.bob.following.add(self.alice)
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(response.data["is_friend"])
+
+    def test_list_friends_mutual_follow(self):
+        self.alice.following.add(self.bob)
+        self.bob.following.add(self.alice)
+        self.alice.following.add(self.charlie)
+        self.charlie.following.add(self.alice)
+
+        response = self.client.get(f"/users/{self.alice.id}/friends/")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        usernames = {user["username"] for user in response.data}
+        self.assertEqual(usernames, {"bob", "charlie"})
+
+    def test_pending_friend_requests(self):
+        self.bob.following.add(self.alice)
+
+        self.client.force_authenticate(user=self.alice)
+        response = self.client.get("/api/friend-requests/")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]["username"], "bob")
+
+    def test_reject_friend_request(self):
+        self.bob.following.add(self.alice)
+
+        self.client.force_authenticate(user=self.alice)
+        response = self.client.post(f"/users/{self.bob.id}/reject/")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertFalse(self.bob.following.filter(id=self.alice.id).exists())

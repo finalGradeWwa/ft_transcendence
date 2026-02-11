@@ -3,7 +3,7 @@ from .views import (
     MeView, FollowUserAPIView, UnfollowUserAPIView, 
     ListFollowersAPIView, ListFollowingAPIView,
     ListFriendsAPIView, IsFriendAPIView, UserFriendsListAPIView,
-    FriendRequestsListAPIView
+    FriendRequestsListAPIView, RejectFriendRequestAPIView
 )
 
 
@@ -17,4 +17,5 @@ urlpatterns = [
     path("users/<int:user_id>/is-friend/", IsFriendAPIView.as_view(), name='is-friend'),
     path("api/friends/", UserFriendsListAPIView.as_view(), name='my-friends'),
     path("api/friend-requests/", FriendRequestsListAPIView.as_view(), name='friend-requests'),
+    path("users/<int:user_id>/reject/", RejectFriendRequestAPIView.as_view(), name='reject-friend-request'),
 ]

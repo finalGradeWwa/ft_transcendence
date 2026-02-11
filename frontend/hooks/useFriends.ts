@@ -24,8 +24,18 @@ export const useFriends = (userId?: number): UseFriendsReturn => {
   const [friends, setFriends] = useState<User[]>([]);
   const [pendingRequests, setPendingRequests] = useState<User[]>([]);
   const [isFriend, setIsFriend] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [loadingCount, setLoadingCount] = useState(0);
   const [error, setError] = useState<string | null>(null);
+
+  const isLoading = loadingCount > 0;
+
+  const beginLoading = useCallback(() => {
+    setLoadingCount((current) => current + 1);
+  }, []);
+
+  const endLoading = useCallback(() => {
+    setLoadingCount((current) => Math.max(0, current - 1));
+  }, []);
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
@@ -40,8 +50,8 @@ export const useFriends = (userId?: number): UseFriendsReturn => {
   // Fetch friends list
   const fetchFriends = useCallback(async () => {
     if (!userId) return;
-    
-    setIsLoading(true);
+
+    beginLoading();
     try {
       const res = await fetch(`${API_URL}/users/${userId}/friends/`);
       if (!res.ok) throw new Error('Failed to fetch friends');
@@ -51,18 +61,17 @@ export const useFriends = (userId?: number): UseFriendsReturn => {
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error');
     } finally {
-      setIsLoading(false);
+      endLoading();
     }
-  }, [userId, API_URL]);
+  }, [userId, API_URL, beginLoading, endLoading]);
 
   // Fetch pending friend requests
   const fetchPendingRequests = useCallback(async () => {
-    setIsLoading(true);
+    beginLoading();
     try {
       const token = getAuthToken();
       if (!token) {
         setError('Not authenticated');
-        setIsLoading(false);
         return;
       }
       const res = await fetch(`${API_URL}/api/friend-requests/`, {
@@ -77,9 +86,9 @@ export const useFriends = (userId?: number): UseFriendsReturn => {
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error');
     } finally {
-      setIsLoading(false);
+      endLoading();
     }
-  }, [API_URL, getAuthToken]);
+  }, [API_URL, getAuthToken, beginLoading, endLoading]);
 
   // Check if users are friends
   const checkIsFriend = useCallback(
@@ -190,7 +199,7 @@ export const useFriends = (userId?: number): UseFriendsReturn => {
           setError('Not authenticated');
           throw new Error('Not authenticated');
         }
-        const res = await fetch(`${API_URL}/users/${targetUserId}/unfollow/`, {
+        const res = await fetch(`${API_URL}/users/${targetUserId}/reject/`, {
           method: 'POST',
           headers: {
             Authorization: `Bearer ${token}`,
@@ -212,8 +221,8 @@ export const useFriends = (userId?: number): UseFriendsReturn => {
   useEffect(() => {
     if (userId) {
       fetchFriends();
-      fetchPendingRequests();
     }
+    fetchPendingRequests();
   }, [userId, fetchFriends, fetchPendingRequests]);
 
   return {

@@ -3,13 +3,11 @@ import { useFriends } from '@/hooks/useFriends';
 
 interface FriendsListProps {
   userId?: number;
-  onFriendAdded?: (userId: number) => void;
   onFriendRemoved?: (userId: number) => void;
 }
 
 export const FriendsList: React.FC<FriendsListProps> = ({
   userId,
-  onFriendAdded,
   onFriendRemoved,
 }) => {
   const { friends, isLoading, error, removeFriend } = useFriends(userId);

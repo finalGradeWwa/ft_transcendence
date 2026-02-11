@@ -3,8 +3,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.shortcuts import get_object_or_404
 from rest_framework import status
-from .serializers import UserSerializer, UserUpdateSerializer, PublicUserSerializer, FriendSerializer
-from .models import Friend
+from .serializers import UserSerializer, UserUpdateSerializer, PublicUserSerializer
 from django.contrib.auth import get_user_model
 
 
@@ -155,6 +154,34 @@ class FriendRequestsListAPIView(APIView):
 
     def get(self, request):
         user = request.user
-        pending = user.followers.exclude(following=user)
+        pending = user.get_pending_requests()
         serializer = PublicUserSerializer(pending, many=True)
         return Response(serializer.data)
+
+
+class RejectFriendRequestAPIView(APIView):
+    """Reject a friend request by removing the follower relationship."""
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, user_id):
+        target = get_object_or_404(User, pk=user_id)
+        user = request.user
+
+        if target == user:
+            return Response(
+                {"detail": "You cannot reject yourself."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if not user.followers.filter(pk=target.pk).exists():
+            return Response(
+                {"detail": f"{target.username} is not following you."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        target.following.remove(user)
+
+        return Response(
+            {"detail": f"You have rejected {target.username}."},
+            status=status.HTTP_200_OK,
+        )

@@ -89,7 +89,12 @@ class Friend(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        unique_together = ("user1", "user2")
+        constraints = [
+            models.UniqueConstraint(
+                fields=["user1", "user2"],
+                name="unique_friendship",
+            ),
+        ]
         indexes = [
             models.Index(fields=["user1", "user2"]),
         ]
