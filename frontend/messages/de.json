@@ -173,6 +173,7 @@
   },
   "AuthCallbackPage": {
     "loading": "Anmeldung wird verarbeitet, bitte warten..."
+  },
   "SearchModal": {
     "title": "Suche",
     "placeholder": "Tippen Sie, um zu suchen...",
