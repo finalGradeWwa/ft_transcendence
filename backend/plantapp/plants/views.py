@@ -74,11 +74,12 @@ class PlantViewSet(viewsets.ViewSet):
         """
         Delete a plant. Only garden members can delete.
         """
-        plant = get_object_or_404(
-            Plant,
-            pk=pk,
-            garden__gardenuser__user=request.user
-        )
+        plant = get_object_or_404(Plant, pk=pk)
+        if not plant.garden.gardenuser_set.filter(user=request.user).exists():
+            return Response(
+                {"detail": "You must be a member of this plant's garden to delete it"},
+                status=status.HTTP_403_FORBIDDEN,
+            )
         plant.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -87,11 +88,12 @@ class PlantViewSet(viewsets.ViewSet):
         """
         Update a plant (PUT). Only garden members can update.
         """
-        plant = get_object_or_404(
-            Plant,
-            pk=pk,
-            garden__gardenuser__user=request.user
-        )
+        plant = get_object_or_404(Plant, pk=pk)        
+        if not plant.garden.gardenuser_set.filter(user=request.user).exists():
+            return Response(
+                {"detail": "You must be a member of this plant's garden to update it"},
+                status=status.HTTP_403_FORBIDDEN,
+            )
         serializer = PlantCreateSerializer(
             plant,
             data=request.data,
@@ -106,11 +108,12 @@ class PlantViewSet(viewsets.ViewSet):
         """
         Update a plant (PATCH). Only garden members can update.
         """
-        plant = get_object_or_404(
-            Plant,
-            pk=pk,
-            garden__gardenuser__user=request.user
-        )
+        plant = get_object_or_404(Plant, pk=pk)
+        if not plant.garden.gardenuser_set.filter(user=request.user).exists():
+            return Response(
+                {"detail": "You must be a member of this plant's garden to update it"},
+                status=status.HTTP_403_FORBIDDEN,
+            )
         serializer = PlantCreateSerializer(
             plant,
             data=request.data,

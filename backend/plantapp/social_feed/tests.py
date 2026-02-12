@@ -227,7 +227,7 @@ class PinViewSetTestCase(APITestCase):
         self.client.force_authenticate(user=self.user1)
         response = self.client.delete(f'/api/pins/{pin.id}/')
         
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual(Pin.objects.count(), 1)
 
     def test_update_own_pin(self):
@@ -258,7 +258,7 @@ class PinViewSetTestCase(APITestCase):
         data = {'content': 'Trying to change Bobs pin'}
         response = self.client.put(f'/api/pins/{pin.id}/', data)
         
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_partial_update_own_pin(self):
         """Test partially updating own pin"""
@@ -302,3 +302,150 @@ class PinViewSetTestCase(APITestCase):
         self.assertEqual(response.data[0]['content'], 'Third pin')
         self.assertEqual(response.data[1]['content'], 'Second pin')
         self.assertEqual(response.data[2]['content'], 'First pin')
+
+    def test_profile_feed_returns_only_own_pins(self):
+        """Test that profile_feed returns only the authenticated user's pins"""
+        # Create pins from both users
+        Pin.objects.create(content='Alice pin 1', creator=self.user1)
+        Pin.objects.create(content='Bob pin 1', creator=self.user2)
+        Pin.objects.create(content='Alice pin 2', creator=self.user1, garden=self.garden1_default)
+        Pin.objects.create(content='Bob pin 2', creator=self.user2)
+        Pin.objects.create(content='Alice pin 3', creator=self.user1)
+        
+        self.client.force_authenticate(user=self.user1)
+        response = self.client.get('/api/pins/profile_feed/')
+        
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 3)
+        # All returned pins should be from user1
+        for pin_data in response.data:
+            self.assertEqual(pin_data['creator'], 'alice')
+
+    def test_profile_feed_ordered_by_newest(self):
+        """Test that profile_feed returns pins ordered by newest first"""
+        pin1 = Pin.objects.create(content='First', creator=self.user1)
+        pin2 = Pin.objects.create(content='Second', creator=self.user1)
+        pin3 = Pin.objects.create(content='Third', creator=self.user1)
+        
+        self.client.force_authenticate(user=self.user1)
+        response = self.client.get('/api/pins/profile_feed/')
+        
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 3)
+        self.assertEqual(response.data[0]['content'], 'Third')
+        self.assertEqual(response.data[1]['content'], 'Second')
+        self.assertEqual(response.data[2]['content'], 'First')
+
+    def test_profile_feed_empty_for_user_without_pins(self):
+        """Test that profile_feed returns empty array for user with no pins"""
+        Pin.objects.create(content='Someone elses pin', creator=self.user1)
+        
+        self.client.force_authenticate(user=self.user2)
+        response = self.client.get('/api/pins/profile_feed/')
+        
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 0)
+
+    def test_profile_feed_requires_authentication(self):
+        """Test that profile_feed requires authentication"""
+        self.client.force_authenticate(user=None)
+        response = self.client.get('/api/pins/profile_feed/')
+        
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_feed_includes_followed_users_and_own_pins(self):
+        """Test that feed returns pins from followed users + own pins"""
+        # Create a third user
+        user3 = User.objects.create_user(
+            username='charlie',
+            email='charlie@example.com',
+            password='testpass123'
+        )
+        
+        # user1 follows user2
+        self.user1.following.add(self.user2)
+        
+        # Create pins from all three users
+        Pin.objects.create(content='Alice pin', creator=self.user1)
+        Pin.objects.create(content='Bob pin 1', creator=self.user2)
+        Pin.objects.create(content='Bob pin 2', creator=self.user2)
+        Pin.objects.create(content='Charlie pin', creator=user3)
+        
+        self.client.force_authenticate(user=self.user1)
+        response = self.client.get('/api/pins/feed/')
+        
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # Should see own pin + Bob's pins (followed), but not Charlie's
+        self.assertEqual(len(response.data), 3)
+        
+        creators = [pin['creator'] for pin in response.data]
+        self.assertIn('alice', creators)
+        self.assertIn('bob', creators)
+        self.assertNotIn('charlie', creators)
+
+    def test_feed_excludes_unfollowed_users(self):
+        """Test that feed excludes pins from users not followed"""
+        # Create pins from both users
+        Pin.objects.create(content='Alice pin', creator=self.user1)
+        Pin.objects.create(content='Bob pin', creator=self.user2)
+        
+        # user1 does NOT follow user2
+        self.client.force_authenticate(user=self.user1)
+        response = self.client.get('/api/pins/feed/')
+        
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # Should only see own pin
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['creator'], 'alice')
+
+    def test_feed_includes_all_own_pins(self):
+        """Test that feed includes all user's own pins regardless of following"""
+        Pin.objects.create(content='My pin 1', creator=self.user1)
+        Pin.objects.create(content='My pin 2', creator=self.user1)
+        Pin.objects.create(content='My pin 3', creator=self.user1)
+        
+        self.client.force_authenticate(user=self.user1)
+        response = self.client.get('/api/pins/feed/')
+        
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 3)
+
+    def test_feed_ordered_by_newest(self):
+        """Test that feed returns pins ordered by newest first"""
+        self.user1.following.add(self.user2)
+        
+        pin1 = Pin.objects.create(content='Alice first', creator=self.user1)
+        pin2 = Pin.objects.create(content='Bob second', creator=self.user2)
+        pin3 = Pin.objects.create(content='Alice third', creator=self.user1)
+        pin4 = Pin.objects.create(content='Bob fourth', creator=self.user2)
+        
+        self.client.force_authenticate(user=self.user1)
+        response = self.client.get('/api/pins/feed/')
+        
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 4)
+        self.assertEqual(response.data[0]['content'], 'Bob fourth')
+        self.assertEqual(response.data[1]['content'], 'Alice third')
+        self.assertEqual(response.data[2]['content'], 'Bob second')
+        self.assertEqual(response.data[3]['content'], 'Alice first')
+
+    def test_feed_requires_authentication(self):
+        """Test that feed requires authentication"""
+        self.client.force_authenticate(user=None)
+        response = self.client.get('/api/pins/feed/')
+        
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_feed_with_no_following(self):
+        """Test feed when user doesn't follow anyone"""
+        Pin.objects.create(content='Alice pin', creator=self.user1)
+        Pin.objects.create(content='Bob pin', creator=self.user2)
+        
+        # user1 follows nobody
+        self.client.force_authenticate(user=self.user1)
+        response = self.client.get('/api/pins/feed/')
+        
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # Should only see own pins
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['creator'], 'alice')

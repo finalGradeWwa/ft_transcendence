@@ -55,14 +55,6 @@ Designates garden owners with full administrative privileges.
 
 **Related name**: `gardenuser.ownerships` - Access ownership records
 
-### GardenInvitation
-
-Handles garden invitation system (extends django-organizations).
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `organization` | ForeignKey | Reference to Garden |
-
 ## API Endpoints
 
 ### Authentication
@@ -88,6 +80,7 @@ Returns all gardens (visible to all authenticated users).
 - `name`: Garden name
 - `environment`: Environment type (I/O/G)
 - `user_count`: Number of members
+- `plant_count`: Number of plants
 
 **Access**: Any authenticated user
 
@@ -104,15 +97,15 @@ Creates a new garden with the authenticated user as owner.
 **Request Body**:
 ```json
 {
-  "name": "My Garden",
-  "environment": "I"  // Optional, defaults to "I"
+  "name": "Fruit Forest",
+  "environment": "O"  // Optional, defaults to "I"
 }
 ```
 
 **Response**:
 ```json
 {
-  "detail": "Your new My Garden garden has been created.",
+  "detail": "Your new garden named Fruit Forest has been created.",
   "garden_id": 123
 }
 ```
@@ -127,7 +120,7 @@ Creates a new garden with the authenticated user as owner.
 
 **`GET /api/garden/{id}/`**
 
-Returns detailed information about a specific garden.
+Returns **detailed** information about a specific garden.
 
 **Response Fields**:
 - `garden_id`: Garden identifier
@@ -136,6 +129,7 @@ Returns detailed information about a specific garden.
 - `plants`: Array of plants in the garden
 - `owner`: Username of garden owner
 - `user_count`: Number of members
+- `plant_count`: Number of plants
 
 **Access**: Any authenticated user
 
@@ -170,7 +164,7 @@ Adds a new member to the garden.
 ```json
 {
   "detail": "new garden member has been added.",
-  "garden_id": 456
+  "garden_id": 123
 }
 ```
 
@@ -190,6 +184,49 @@ Removes a member from the garden.
 
 **Access**: Garden owners only (403 if not an owner)
 
+---
+
+### Add Plant to Garden
+
+**`POST /api/garden/{id}/add_plant/`**
+
+Creates a new plant and adds it to this specific garden.
+
+**Request Body**:
+```json
+{
+  "nickname": "Freddy",
+  "species": "Fern",
+  "image": "<file>"
+}
+```
+
+**Fields**:
+- `nickname` (required): Unique plant nickname
+- `species` (optional): Plant species name
+- `image` (optional): Image file upload
+- `garden`: Automatically set from URL parameter
+
+**Response**:
+```json
+{
+  "detail": "Plant Freddy has been added to My Garden.",
+  "plant": {
+    "plant_id": 123,
+    "nickname": "Freddy",
+    "species": "Fern",
+    "garden": 5,
+    "owner": 42,
+    "image": "/media/plant-images/photo.jpg",
+    "created_at": "2026-02-06T10:30:00Z"
+  }
+}
+```
+
+**Access**: Garden members only (403 if not a member)
+
+**Note**: The garden is automatically set from the URL - no need to include it in the request body
+
 ## User Access & Permissions
 
 ### Permission Levels
@@ -202,12 +239,12 @@ Removes a member from the garden.
    - All member privileges
 
 ### Access Matrix
-
 | Action | Any User | Member | Owner |
 |--------|----------|--------|-------|
 | View garden details | ✅ | ✅ | ✅ |
 | List all gardens | ✅ | ✅ | ✅ |
 | Create new garden | ✅ | ✅ | ✅ |
+| Add plants to garden | ❌ | ✅ | ✅ |
 | Modify plants in garden | ❌ | ✅ | ✅ |
 | Delete garden | ❌ | ❌ | ✅ |
 | Add members | ❌ | ❌ | ✅ |
