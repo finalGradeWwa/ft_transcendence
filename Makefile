@@ -34,7 +34,7 @@ help:
 #   @echo "  make npm-clean   - Clean and reinstall frontend dependencies"
 #   @echo ""
 
-# OPCJA SZYBKIEGO URUCHAMIANIA LOKALNEGO
+# PL: OPCJA SZYBKIEGO URUCHAMIANIA LOKALNEGO EN: QUICK START OPTION FOR LOCAL DEVELOPMENT
 run:
 	@make -j 2 local-backend local-frontend
 

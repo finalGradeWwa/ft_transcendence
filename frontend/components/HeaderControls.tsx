@@ -199,6 +199,47 @@ export function HeaderControls({
   const tP = useTranslations('AddPlantPage');
   const tG = useTranslations('GardensPage');
 
+  // PL: Stan informujący o nowych wiadomościach EN: State indicating new messages
+  const [hasNewMessages, setHasNewMessages] = useState(false);
+
+  // PL: Sprawdzanie nieprzeczytanych wiadomości co 30 sekund EN: Checking for unread messages every 30 seconds
+  useEffect(() => {
+    if (!username) return;
+
+    const checkMessages = async () => {
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/chat/unread-count/`,
+          {
+            credentials: 'include',
+          }
+        );
+
+        // PL: Sprawdzamy, czy odpowiedź to faktycznie JSON
+        const contentType = response.headers.get('content-type');
+        if (
+          response.ok &&
+          contentType &&
+          contentType.includes('application/json')
+        ) {
+          const data = await response.json();
+          setHasNewMessages(data.unread_count > 0);
+        } else {
+          // PL: Jeśli to nie JSON, nie robimy nic (zapobiega SyntaxError)
+          console.warn('Chat count endpoint returned non-JSON response');
+          setHasNewMessages(false);
+        }
+      } catch (error) {
+        console.error('Failed to fetch unread messages', error);
+      }
+    };
+
+    checkMessages();
+    const interval = setInterval(checkMessages, 30000);
+
+    return () => clearInterval(interval);
+  }, [username]);
+
   /**
    * PL: Obsługa parametru auth=login_success w URL (logowanie OAuth).
    * EN: Handling auth=login_success URL parameter (OAuth login).
@@ -274,6 +315,19 @@ export function HeaderControls({
             <AddMenu user={username} tP={tP} tG={tG} close={closeMenu} />
           )}
         </div>
+
+        {/**
+         * PL: Przycisk przejścia do czatu - widoczny tylko dla zalogowanych.
+         * EN: Chat button - visible only for logged-in users.
+         */}
+        {username && (
+          <div className="relative">
+            <IconButton href="/chat" icon="chat" label={tAria('chat')} />
+            {hasNewMessages && (
+              <span className="absolute top-0 right-0 block h-3 w-3 rounded-full bg-red-500 border-2 border-secondary-beige animate-pulse" />
+            )}
+          </div>
+        )}
 
         <UserSection
           username={username}
