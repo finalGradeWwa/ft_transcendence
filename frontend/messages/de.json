@@ -58,13 +58,21 @@
   },
   "ProfilePage": {
     "title": "Benutzerprofil",
+    "summary": "Profilstatistiken",
     "joinedLabel": "Beigetreten",
     "userPlantsTitle": "Deine Pflanzensammlung",
     "userCollection": "Pflanzensammlung von {name}",
     "profileDescription": "Teilen wir die Schönheit der Pflanzen.",
     "stats": {
       "gardens": "Gärten",
-      "plants": "Pflanzen"
+      "plants": "Pflanzen",
+      "followers": "Follower",
+      "following": "Gefolgt",
+      "pins": "Pins"
+    },
+    "actions": {
+      "follow": "Folgen",
+      "unfollow": "Nicht mehr folgen"
     },
     "settings": {
       "title": "Einstellungen",
@@ -84,7 +92,11 @@
     "aria": {
       "avatarAlt": "Profilbild von Benutzer {name}",
       "gardensLink": "Gehe zu den Gärten von {name}",
-      "plantsLink": "Gehe zu den Pflanzen von {name}"
+      "plantsLink": "Gehe zu den Pflanzen von {name}",
+      "previousPage": "Vorherige Seite",
+      "nextPage": "Nächste Seite",
+      "pagination": "Fotogalerie-Navigation",
+      "loadingAction": "Daten werden verarbeitet"
     }
   },
   "RegisterPage": {
@@ -121,10 +133,14 @@
   "errors": {
     "connectionError": "Verbindungsfehler. Der Server antwortet nicht.",
     "invalidCredentials": "Ungültiger Benutzername oder Passwort.",
+    "genericError": "Etwas ist schief gelaufen.",
+    "invalidImage": "Bitte laden Sie ein gültiges Bild hoch. Die Datei war entweder kein Bild oder sie ist beschädigt.",
+    "tooManyRequests": "Zu viele Login-Versuche. Bitte warten Sie einen Moment.",
+    "accountDisabled": "Ihr Konto ist inaktiv.",
+    "sessionExpired": "Ihre Sitzung ist abgelaufen. Bitte laden Sie die Seite neu.",
     "oauthFailed": "Die GitHub-Anmeldung ist fehlgeschlagen. Bitte versuche es erneut.",
     "oauthAccessDenied": "Die GitHub-Anmeldung wurde abgebrochen.",
-    "generic": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
-    "invalidImage": "Bitte laden Sie ein gültiges Bild hoch. Die Datei war entweder kein Bild oder sie ist beschädigt."
+    "generic": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es erneut."
   },
   "ChatPage": {
     "title": "Chat",
@@ -169,18 +185,19 @@
     "viewGarden": "Garten ansehen",
     "plantsCountLabel": "Anzahl der Pflanzen",
     "gardenNameLabel": "Gartenname",
-    "gardenNamePlaceholder": "z. B. Mein Balkon oder Wohnzimmer"
+    "gardenNamePlaceholder": "z. B. Mein Balkon oder Wohnzimmer",
+    "noPins": "Keine Einträge"
   },
   "AuthCallbackPage": {
-    "loading": "Anmeldung wird verarbeitet, bitte warten..."
-  },
-  "SearchModal": {
-    "title": "Suche",
-    "placeholder": "Tippen Sie, um zu suchen...",
-    "resultsCount": "{count, plural, one {# Ergebnis gefunden} other {# Ergebnisse gefunden}}",
-    "noResults": "Keine Ergebnisse für \"{query}\" gefunden",
-    "aria": {
-      "close": "Suche schließen"
+    "loading": "Anmeldung wird verarbeitet, bitte warten...",
+    "SearchModal": {
+      "title": "Suche",
+      "placeholder": "Tippen Sie, um zu suchen...",
+      "resultsCount": "{count, plural, one {# Ergebnis gefunden} other {# Ergebnisse gefunden}}",
+      "noResults": "Keine Ergebnisse für \"{query}\" gefunden",
+      "aria": {
+        "close": "Suche schließen"
+      }
     }
   }
 }

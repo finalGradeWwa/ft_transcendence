@@ -24,14 +24,17 @@ export default async function ProfilePage({
    * EN: User data object (backend handles).
    */
   const mockUser = {
+    id: 1, // Dodane
     username: username,
-    email: `${username}@example.com`,
-    joined: '2024-05-20',
+    date_joined: '2024-05-20',
+    avatar_photo: '',
+    followers: 0,
+    following: 0,
     gardens: 0,
     plants: 0,
-    avatar: '',
-    avatar_photo: '',
+    pins: [], // Dodane
   };
 
-  return <UserProfileClient user={mockUser} />;
+  // Musisz też dodać drugi wymagany prop: currentLoggedUser
+  return <UserProfileClient user={mockUser} currentLoggedUser={null} />;
 }

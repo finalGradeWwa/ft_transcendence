@@ -17,13 +17,7 @@
     "showMore": "عرض المزيد من النباتات",
     "oauthLoginSuccess": "تم تسجيل الدخول عبر GitHub بنجاح. أنت الآن مسجل الدخول.",
     "loginSuccess": "تم تسجيل الدخول بنجاح.",
-    "nav": [
-      "الصفحة الرئيسية",
-      "الحدائق",
-      "من نحن",
-      "الشروط",
-      "اتصل بنا"
-    ],
+    "nav": ["الصفحة الرئيسية", "الحدائق", "من نحن", "الشروط", "اتصل بنا"],
     "searchPlaceholder": "البحث نشط",
     "searchInfo": "ستكون منطق البحث الكامل هنا.",
     "rights": "جميع الحقوق محفوظة.",
@@ -58,13 +52,21 @@
   },
   "ProfilePage": {
     "title": "ملف المستخدم",
+    "summary": "إحصائيات الملف الشخصي",
     "joinedLabel": "انضم في",
     "userPlantsTitle": "مجموعة نباتاتك",
     "userCollection": "مجموعة نباتات المستخدم {name}",
     "profileDescription": "لنشارك جمال النباتات.",
     "stats": {
       "gardens": "الحدائق",
-      "plants": "النباتات"
+      "plants": "النباتات",
+      "followers": "متابعون",
+      "following": "يتابع",
+      "pins": "دبابيس"
+    },
+    "actions": {
+      "follow": "متابعة",
+      "unfollow": "إلغاء المتابعة"
     },
     "settings": {
       "title": "الإعدادات",
@@ -84,7 +86,11 @@
     "aria": {
       "avatarAlt": "صورة الملف الشخصي للمستخدم {name}",
       "gardensLink": "الذهاب إلى حدائق {name}",
-      "plantsLink": "الذهاب إلى نباتات {name}"
+      "plantsLink": "الذهاب إلى نباتات {name}",
+      "previousPage": "الصفحة السابقة",
+      "nextPage": "الصفحة التالية",
+      "pagination": "التنقل معرض الصور",
+      "loadingAction": "جاري المعالجة"
     }
   },
   "RegisterPage": {
@@ -121,9 +127,13 @@
   "errors": {
     "connectionError": "خطأ في الاتصال. حاول مرة أخرى لاحقًا.",
     "invalidCredentials": "اسم المستخدم أو كلمة المرور غير صالحة.",
+    "genericError": "حدث خطأ ما.",
+    "invalidImage": "يرجى تحميل صورة صالحة. الملف الذي قمت بتحميله إما أنه ليس صورة أو أنه ملف تالف.",
+    "tooManyRequests": "لقد قمت بمحاولات تسجيل دخول كثيرة جداً. يرجى الانتظار قليلاً.",
+    "accountDisabled": "حسابك غير نشط.",
+    "sessionExpired": "لقد انتهت صلاحية جلستك. يرجى تحديث الصفحة.",
     "oauthFailed": "فشل تسجيل الدخول عبر GitHub. يرجى المحاولة مرة أخرى.",
-    "oauthAccessDenied": "تم إلغاء تسجيل الدخول عبر GitHub.",
-    "invalidImage": "يرجى تحميل صورة صالحة. الملف الذي قمت بتحميله إما أنه ليس صورة أو أنه ملف تالف."
+    "oauthAccessDenied": "تم إلغاء تسجيل الدخول عبر GitHub."
   },
   "ChatPage": {
     "title": "الدردشة",
@@ -168,18 +178,19 @@
     "viewGarden": "عرض الحديقة",
     "plantsCountLabel": "عدد النباتات",
     "gardenNameLabel": "اسم الحديقة",
-    "gardenNamePlaceholder": "مثلاً: شرفتي أو غرفة المعيشة"
+    "gardenNamePlaceholder": "مثلاً: شرفتي أو غرفة المعيشة",
+    "noPins": "لا توجد مدخلات"
   },
   "AuthCallbackPage": {
-    "loading": "جارٍ معالجة تسجيل الدخول… يُرجى الانتظار"
-  },
-  "SearchModal": {
-    "title": "بحث",
-    "placeholder": "اكتب للبحث...",
-    "resultsCount": "{count, plural, zero {لم يتم العثور على أي نتائج} one {تم العثور على نتيجة واحدة} two {تم العثور على نتيجتين} few {تم العثور على # نتائج} many {تم العثور على # نتيجة} other {تم العثور على # نتيجة}}",
-    "noResults": "لم يتم العثور على نتائج لـ \"{query}\"",
-    "aria": {
-      "close": "إغلاق البحث"
+    "loading": "جارٍ معالجة تسجيل الدخول… يُرجى الانتظار",
+    "SearchModal": {
+      "title": "بحث",
+      "placeholder": "اكتب للبحث...",
+      "resultsCount": "{count, plural, zero {لم يتم العثور على أي نتائج} one {تم العثور على نتيجة واحدة} two {تم العثور على نتيجتين} few {تم العثور على # نتائج} many {تم العثور على # نتيجة} other {تم العثور على # نتيجة}}",
+      "noResults": "لم يتم العثور على نتائج لـ \"{query}\"",
+      "aria": {
+        "close": "إغلاق البحث"
+      }
     }
   }
 }

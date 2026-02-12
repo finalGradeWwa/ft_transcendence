@@ -17,13 +17,7 @@
     "showMore": "Pokaż więcej roślin",
     "oauthLoginSuccess": "Logowanie przez GitHub zakończone sukcesem. Jesteś zalogowany.",
     "loginSuccess": "Zalogowano pomyślnie.",
-    "nav": [
-      "Strona Główna",
-      "Ogrody",
-      "O nas",
-      "Regulamin",
-      "Kontakt"
-    ],
+    "nav": ["Strona Główna", "Ogrody", "O nas", "Regulamin", "Kontakt"],
     "searchPlaceholder": "Wyszukiwanie jest aktywne",
     "searchInfo": "Tutaj będzie pełna logika wyszukiwania.",
     "rights": "Wszelkie prawa zastrzeżone.",
@@ -58,13 +52,21 @@
   },
   "ProfilePage": {
     "title": "Profil użytkownika",
-    "joinedLabel": "Dołączono",
+    "summary": "Statystyki profilu",
+    "joinedLabel": "Na portalu od:",
     "userPlantsTitle": "Twoja kolekcja roślin",
     "userCollection": "Kolekcja roślin użytkownika {name}",
     "profileDescription": "Podzielmy się pięknem roślin.",
     "stats": {
       "gardens": "Ogrody",
-      "plants": "Rośliny"
+      "plants": "Rośliny",
+      "followers": "Obserwujących",
+      "following": "Obserwowanych",
+      "pins": "Piny"
+    },
+    "actions": {
+      "follow": "Obserwuj",
+      "unfollow": "Przestań obserwować"
     },
     "settings": {
       "title": "Ustawienia",
@@ -84,7 +86,11 @@
     "aria": {
       "avatarAlt": "Zdjęcie profilowe użytkownika {name}",
       "gardensLink": "Przejdź do ogrodów użytkownika {name}",
-      "plantsLink": "Przejdź do roślin użytkownika {name}"
+      "plantsLink": "Przejdź do roślin użytkownika {name}",
+      "previousPage": "Poprzednia strona",
+      "nextPage": "Następna strona",
+      "pagination": "Nawigacja po galerii zdjęć",
+      "loadingAction": "Przetwarzanie danych"
     }
   },
   "RegisterPage": {
@@ -124,7 +130,10 @@
     "oauthFailed": "Logowanie przez GitHub nie powiodło się. Spróbuj ponownie.",
     "oauthAccessDenied": "Anulowano logowanie przez GitHub.",
     "genericError": "Coś poszło nie tak.",
-    "invalidImage": "Przesłany plik jest nieprawidłowy. Wybrany plik nie jest obrazem lub jest uszkodzony."
+    "invalidImage": "Przesłany plik jest nieprawidłowy. Wybrany plik nie jest obrazem lub jest uszkodzony.",
+    "tooManyRequests": "Zbyt wiele prób logowania. Odczekaj chwilę.",
+    "accountDisabled": "Twoje konto jest nieaktywne.",
+    "sessionExpired": "Twoja sesja wygasła. Proszę odświeżyć stronę."
   },
   "ChatPage": {
     "title": "Czat",
@@ -169,18 +178,19 @@
     "viewGarden": "Zobacz Ogród",
     "plantsCountLabel": "Liczba roślin",
     "gardenNameLabel": "Nazwa ogrodu",
-    "gardenNamePlaceholder": "np. Mój Balkon lub Salon"
+    "gardenNamePlaceholder": "np. Mój Balkon lub Salon",
+    "noPins": "Brak wpisów"
   },
   "AuthCallbackPage": {
-    "loading": "Przetwarzanie logowania, proszę czekać..."
-  },
-  "SearchModal": {
-    "title": "Wyszukiwanie",
-    "placeholder": "Wpisz aby wyszukać...",
-    "resultsCount": "{count, plural, one {Znaleziono # wynik} few {Znaleziono # wyniki} many {Znaleziono # wyników} other {Znaleziono # wyników}}",
-    "noResults": "Nie znaleziono wyników dla \"{query}\"",
-    "aria": {
-      "close": "Zamknij wyszukiwanie"
+    "loading": "Przetwarzanie logowania, proszę czekać...",
+    "SearchModal": {
+      "title": "Wyszukiwanie",
+      "placeholder": "Wpisz aby wyszukać...",
+      "resultsCount": "{count, plural, one {Znaleziono # wynik} few {Znaleziono # wyniki} many {Znaleziono # wyników} other {Znaleziono # wyników}}",
+      "noResults": "Nie znaleziono wyników dla \"{query}\"",
+      "aria": {
+        "close": "Zamknij wyszukiwanie"
+      }
     }
   }
 }

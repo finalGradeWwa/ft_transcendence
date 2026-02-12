@@ -262,8 +262,8 @@ SOCIAL_AUTH_LOGIN_ERROR_URL = f"{FRONTEND_URL.rstrip('/')}/?showLogin=true&error
 
 SOCIAL_AUTH_REDIRECT_IS_HTTPS = not DEBUG
 SOCIAL_AUTH_SANITIZE_REDIRECTS = True
-# SOCIAL_AUTH_LOGIN_REDIRECT_URL = f"{FRONTEND_URL.rstrip('/')}/pl/auth/callback"
-# SOCIAL_AUTH_NEW_USER_REDIRECT_URL = f"{FRONTEND_URL.rstrip('/')}/pl/auth/callback"
+# SOCIAL_AUTH_LOGIN_REDIRECT_URL = f"{FRONTEND_URL.rstrip('/')}/?auth=login_success&provider=github"
+# SOCIAL_AUTH_NEW_USER_REDIRECT_URL = f"{FRONTEND_URL.rstrip('/')}/?auth=login_success&provider=github"
 
 # Session configuration for OAuth
 # SESSION_COOKIE_AGE = 3600  # 1 hour

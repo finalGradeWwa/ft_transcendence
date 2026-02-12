@@ -17,13 +17,7 @@
     "showMore": "Show more plants",
     "oauthLoginSuccess": "GitHub login completed successfully. You are signed in.",
     "loginSuccess": "Successfully signed in.",
-    "nav": [
-      "Home",
-      "Gardens",
-      "About Us",
-      "Terms",
-      "Contact"
-    ],
+    "nav": ["Home", "Gardens", "About Us", "Terms", "Contact"],
     "searchPlaceholder": "Search is active",
     "searchInfo": "Full search logic will be here.",
     "rights": "All rights reserved.",
@@ -58,13 +52,21 @@
   },
   "ProfilePage": {
     "title": "User Profile",
+    "summary": "Profile statistics",
     "joinedLabel": "Joined",
     "userPlantsTitle": "Your Plant Collection",
     "userCollection": "{name}'s plant collection",
     "profileDescription": "Let's share the beauty of plants.",
     "stats": {
       "gardens": "Gardens",
-      "plants": "Plants"
+      "plants": "Plants",
+      "followers": "Followers",
+      "following": "Following",
+      "pins": "Pins"
+    },
+    "actions": {
+      "follow": "Follow",
+      "unfollow": "Unfollow"
     },
     "settings": {
       "title": "Settings",
@@ -84,7 +86,11 @@
     "aria": {
       "avatarAlt": "{name}'s profile picture",
       "gardensLink": "Go to {name}'s gardens",
-      "plantsLink": "Go to {name}'s plants"
+      "plantsLink": "Go to {name}'s plants",
+      "previousPage": "Previous page",
+      "nextPage": "Next page",
+      "pagination": "Photo gallery navigation",
+      "loadingAction": "Processing data"
     }
   },
   "RegisterPage": {
@@ -124,7 +130,10 @@
     "oauthFailed": "GitHub login failed. Please try again.",
     "oauthAccessDenied": "GitHub login was canceled.",
     "genericError": "Something went wrong.",
-    "invalidImage": "Upload a valid image. The file you uploaded was either not an image or a corrupted image."
+    "invalidImage": "Upload a valid image. The file you uploaded was either not an image or a corrupted image.",
+    "tooManyRequests": "Too many login attempts. Please wait a moment.",
+    "accountDisabled": "Your account is inactive.",
+    "sessionExpired": "Your session has expired. Please refresh the page."
   },
   "ChatPage": {
     "title": "Chat",
@@ -169,18 +178,19 @@
     "viewGarden": "View Garden",
     "plantsCountLabel": "Number of plants",
     "gardenNameLabel": "Garden name",
-    "gardenNamePlaceholder": "e.g., My Balcony or Living Room"
+    "gardenNamePlaceholder": "e.g., My Balcony or Living Room",
+    "noPins": "No entries"
   },
   "AuthCallbackPage": {
-    "loading": "Processing login, please wait..."
-  },
-  "SearchModal": {
-    "title": "Search",
-    "placeholder": "Type to search...",
-    "resultsCount": "{count, plural, one {# result found} other {# results found}}",
-    "noResults": "No results found for \"{query}\"",
-    "aria": {
-      "close": "Close search"
+    "loading": "Processing login, please wait...",
+    "SearchModal": {
+      "title": "Search",
+      "placeholder": "Type to search...",
+      "resultsCount": "{count, plural, one {# result found} other {# results found}}",
+      "noResults": "No results found for \"{query}\"",
+      "aria": {
+        "close": "Close search"
+      }
     }
   }
 }

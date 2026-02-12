@@ -1,216 +1,112 @@
 'use client';
 
-/** * PL: Nowoczesny komponent profilu (7xl). Dynamicznie wyświetla dane z backendu Django i obsługuje i18n.
- * EN: Modern profile component (7xl). Dynamically displays data from Django backend and supports i18n.
+/**
+ * PL: Główny komponent logiczny profilu użytkownika (Client Component).
+ * Zarządza stanem obserwowania, paginacją pinów oraz weryfikacją uprawnień właściciela.
+ * * EN: Main logical component for the user profile (Client Component).
+ * Manages following state, pin pagination, and owner permission verification.
  */
 
-import { Heading } from '@/components/Heading';
-import { Text } from '@/components/typography/Text';
-import { Link } from '@/i18n/navigation';
-import { useTranslations } from 'next-intl';
-import Image from 'next/image';
+import { useState, useEffect } from 'react';
+import { UserProfileProps, ProfileContent } from './UserProfileComponents';
 
-interface UserProfileProps {
-  user: {
-    username: string;
-    email: string;
-    joined: string;
-    gardens: number;
-    plants: number;
-    avatar_photo: string;
-  } | null;
-}
-
-/** * PL: Pomocnicze funkcje formatowania.
- * EN: Helper formatting functions.
- */
-const getAvatarUrl = (path?: string) => {
-  if (!path) return '/images/favicon/fav_480.webp';
-  return path.startsWith('http') ? path : `http://localhost:8000${path}`;
-};
-
-const formatDate = (dateString: string) => {
-  try {
-    const date = new Date(dateString);
-    return date.toISOString().split('T')[0];
-  } catch {
-    return dateString;
-  }
-};
-
-/** * PL: Sub-komponent sekcji danych osobowych.
- * EN: Personal data sub-component.
- */
-const PersonalInfo = ({
+export default function UserProfileClient({
   user,
-  t,
-}: {
-  user: UserProfileProps['user'];
-  t: any;
-}) => {
-  if (!user) {
-    return (
-      <div className="lg:col-span-2 flex flex-col md:flex-row items-center md:items-start gap-8 md:gap-12 p-6 sm:p-10 bg-header-main/50 rounded-xl shadow-md border border-subtle-gray/30 overflow-hidden">
-        <div className="w-40 h-40 sm:w-48 sm:h-48 rounded-full bg-neutral-200 animate-pulse shrink-0" />
-        <div className="flex-grow space-y-6 w-full">
-          <div className="h-10 bg-neutral-200 animate-pulse rounded-md w-3/4 mx-auto md:mx-0" />
-          <div className="space-y-4">
-            <div className="h-6 bg-neutral-200 animate-pulse rounded-md w-1/2 mx-auto md:mx-0" />
-            <div className="h-6 bg-neutral-200 animate-pulse rounded-md w-1/3 mx-auto md:mx-0" />
-          </div>
-        </div>
-      </div>
+  currentLoggedUser,
+}: UserProfileProps) {
+  /** PL: Stan bieżącej strony w galerii pinów | EN: Current page state in the pins gallery */
+  const [currentPage, setCurrentPage] = useState(1);
+
+  /** PL: Czy zalogowany użytkownik jest właścicielem profilu | EN: Is the logged-in user the profile owner */
+  const [isOwnProfile, setIsOwnProfile] = useState(false);
+
+  /** PL: Czy zalogowany użytkownik obserwuje ten profil | EN: Does the logged-in user follow this profile */
+  const [isFollowing, setIsFollowing] = useState(false);
+
+  /** PL: Licznik obserwujących (zarządzany lokalnie    dla natychmiastowego UI) | EN: Followers count (managed locally for instant UI update) */
+  const [followersCount, setFollowersCount] = useState(user?.followers || 0);
+
+  /** PL: Stan ładowania akcji (follow/unfollow) | EN: Loading state for actions (follow/unfollow) */
+  const [isActionLoading, setIsActionLoading] = useState(false);
+
+  const pins = user?.pins || [];
+  const totalPages = Math.ceil(pins.length / 4) || 1;
+  const isLoggedIn = !!currentLoggedUser;
+
+  /**
+   * PL: Synchronizacja stanu profilu na podstawie zalogowanego użytkownika.
+   * EN: Profile state synchronization based on the logged-in user.
+   */
+  useEffect(() => {
+    setIsOwnProfile(
+      !!(currentLoggedUser && user && currentLoggedUser === user.username)
     );
-  }
+    setFollowersCount(user?.followers || 0);
+  }, [user, currentLoggedUser]);
+
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [totalPages, currentPage]);
+
+  /**
+   * PL: Obsługuje proces obserwowania lub przestawania obserwowania użytkownika.
+   * EN: Handles the process of following or unfollowing a user.
+   */
+  const handleFollowAction = async () => {
+    if (!user || isActionLoading || !isLoggedIn) return;
+
+    const currentFollowing = isFollowing;
+    const action = currentFollowing ? 'unfollow' : 'follow';
+    const url = `${process.env.NEXT_PUBLIC_API_URL}/users/${user.id}/${action}/`;
+
+    setIsActionLoading(true);
+
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({}),
+      });
+
+      if (response.ok) {
+        const data = await response.json().catch(() => null);
+        if (
+          data &&
+          typeof data.isFollowing === 'boolean' &&
+          typeof data.followersCount === 'number'
+        ) {
+          setIsFollowing(data.isFollowing);
+          setFollowersCount(data.followersCount);
+        } else {
+          setIsFollowing(!currentFollowing);
+          setFollowersCount(prev => (currentFollowing ? prev - 1 : prev + 1));
+        }
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    } finally {
+      setIsActionLoading(false);
+    }
+  };
 
   return (
-    <div className="lg:col-span-2 flex flex-col md:flex-row items-center md:items-start gap-8 md:gap-12 p-6 sm:p-10 bg-container-light/70 rounded-xl shadow-md border border-subtle-gray/30 overflow-hidden">
-      <div className="relative w-40 h-40 sm:w-48 sm:h-48 overflow-hidden rounded-full border-4 border-secondary-beige shadow-lg flex-shrink-0">
-        <Image
-          src={getAvatarUrl(user.avatar_photo)}
-          alt={t('aria.avatarAlt', { name: user.username })}
-          fill
-          className="object-cover"
-          priority
-        />
-      </div>
-      <div className="flex-grow space-y-6 text-center md:text-left min-w-0 w-full">
-        <Heading
-          as="h1"
-          className="text-3xl sm:text-4xl font-black !text-primary-green uppercase tracking-tight break-words whitespace-normal block"
-        >
-          {user.username}
-        </Heading>
-        <div className="space-y-4 text-neutral-900 w-full">
-          <div className="flex items-center justify-center md:justify-start gap-4 min-w-0">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 640 640"
-              className="w-6 h-6 sm:w-7 sm:h-7 fill-primary-green shrink-0"
-              aria-hidden="true"
-            >
-              <path d="M112 128C85.5 128 64 149.5 64 176C64 191.1 71.1 205.3 83.2 214.4L291.2 370.4C308.3 383.2 331.7 383.2 348.8 370.4L556.8 214.4C568.9 205.3 576 191.1 576 176C576 149.5 554.5 128 528 128L112 128zM64 260L64 448C64 483.3 92.7 512 128 512L512 512C547.3 512 576 483.3 576 448L576 260L377.6 408.8C343.5 434.4 296.5 434.4 262.4 408.8L64 260z" />
-            </svg>
-            <Text className="text-base sm:text-lg font-medium break-all whitespace-normal">
-              {user.email}
-            </Text>
-          </div>
-          <div className="flex items-center justify-center md:justify-start gap-4">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 512 512"
-              className="w-6 h-6 sm:w-7 sm:h-7 fill-primary-green shrink-0"
-              aria-hidden="true"
-            >
-              <path d="M256 0a256 256 0 1 1 0 512A256 256 0 1 1 256 0zM232 120V256c0 8 4 15.5 10.7 20l96 64c11 7.4 25.9 4.4 33.3-6.7s4.4-25.9-6.7-33.3L280 243.2V120c0-13.3-10.7-24-24-24s-24 10.7-24 24z" />
-            </svg>
-            <Text className="text-base sm:text-lg font-medium">
-              <span className="sr-only">{t('joinedLabel')}: </span>
-              {/* Wywołaj tylko jeśli user i user.joined istnieją */}
-              {user?.joined ? formatDate(user.joined) : ''}
-            </Text>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-/** * PL: Sub-komponent statystyk.
- * EN: Statistics sub-component.
- */
-const StatCard = ({
-  count,
-  label,
-  href,
-  aria,
-  isLoading,
-}: {
-  count?: number;
-  label: string;
-  href: string;
-  aria: string;
-  isLoading: boolean;
-}) => (
-  <Link href={href} className="group flex-1" aria-label={aria}>
-    <div className="h-full bg-container-light/90 p-6 rounded-xl flex flex-col justify-center items-center text-center shadow-sm border border-subtle-gray/30 transition-all duration-300 group-hover:bg-white group-hover:border-primary-green group-hover:shadow-md">
-      {isLoading ? (
-        <div className="h-12 w-16 bg-neutral-200 animate-pulse rounded-md" />
-      ) : (
-        <span className="block text-4xl sm:text-5xl font-black text-primary-green leading-none">
-          {count}
-        </span>
-      )}
-      <span className="uppercase font-black text-sm sm:text-base mt-2 tracking-[0.2em] text-neutral-700 break-words whitespace-normal px-2">
-        {label}
-      </span>
-    </div>
-  </Link>
-);
-
-/** * PL: Główny komponent klienta.
- * EN: Main client component.
- */
-export default function UserProfileClient({ user }: UserProfileProps) {
-  const t = useTranslations('ProfilePage');
-
-  return (
-    <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pt-4 pb-12 flex flex-col justify-center h-full flex-grow">
-      <div className="bg-container-light/10 backdrop-blur-md p-6 sm:p-10 rounded-xl shadow-2xl w-full border border-primary-green/50 mt-12">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <PersonalInfo user={user} t={t} />
-
-          <div className="flex flex-col gap-4">
-            <StatCard
-              count={user?.gardens}
-              label={t('stats.gardens')}
-              href={user ? `/profiles/${user.username}/gardens` : '#'}
-              aria={user ? t('aria.gardensLink', { name: user.username }) : ''}
-              isLoading={!user}
-            />
-            <StatCard
-              count={user?.plants}
-              label={t('stats.plants')}
-              /* Użyj backticków i znaku dolara dla zmiennej */
-              href={user ? `/profiles/${user.username}/plants` : '#'}
-              aria={user ? t('aria.plantsLink', { name: user.username }) : ''}
-              isLoading={!user}
-            />
-          </div>
-        </div>
-
-        <div className="mt-8 pt-8 border-t border-white/20">
-          <Heading
-            as="h3"
-            className="text-xl font-black !text-white uppercase mb-6 tracking-widest drop-shadow-sm break-words whitespace-normal"
-          >
-            {t('settings.title')}
-          </Heading>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[
-              { key: 'edit', href: '/profile/edit' },
-              { key: 'notifications', href: '/profile/notifications' },
-              { key: 'privacy', href: '/profile/privacy' },
-            ].map(({ key, href }) => (
-              <Link
-                key={key}
-                href={href}
-                className="group block p-6 sm:p-8 bg-container-light/90 rounded-xl border border-transparent shadow-sm transition-all duration-300 hover:bg-white hover:border-primary-green hover:shadow-md overflow-hidden"
-              >
-                <Text className="font-black text-primary-green uppercase text-base sm:text-lg tracking-wider mb-3 break-words whitespace-normal">
-                  {t(`settings.${key}.label`)}
-                </Text>
-                <Text
-                  variant="small"
-                  className="text-neutral-700 font-medium leading-relaxed break-words whitespace-normal"
-                >
-                  {t(`settings.${key}.desc`)}
-                </Text>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
+    <ProfileContent
+      user={user}
+      isOwnProfile={isOwnProfile}
+      isFollowing={isFollowing}
+      handleFollowAction={handleFollowAction}
+      currentPage={currentPage}
+      setCurrentPage={setCurrentPage}
+      pins={pins}
+      totalPages={totalPages}
+      followersCount={followersCount}
+      isActionLoading={isActionLoading}
+      isLoggedIn={isLoggedIn}
+    />
   );
 }
