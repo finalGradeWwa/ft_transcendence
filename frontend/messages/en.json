@@ -17,7 +17,13 @@
     "showMore": "Show more plants",
     "oauthLoginSuccess": "GitHub login completed successfully. You are signed in.",
     "loginSuccess": "Successfully signed in.",
-    "nav": ["Home", "Gardens", "About Us", "Terms", "Contact"],
+    "nav": [
+      "Home",
+      "Gardens",
+      "About Us",
+      "Terms",
+      "Contact"
+    ],
     "searchPlaceholder": "Search is active",
     "searchInfo": "Full search logic will be here.",
     "rights": "All rights reserved.",
@@ -182,15 +188,16 @@
     "noPins": "No entries"
   },
   "AuthCallbackPage": {
-    "loading": "Processing login, please wait...",
-    "SearchModal": {
-      "title": "Search",
-      "placeholder": "Type to search...",
-      "resultsCount": "{count, plural, one {# result found} other {# results found}}",
-      "noResults": "No results found for \"{query}\"",
-      "aria": {
-        "close": "Close search"
-      }
-    }
+    "loading": "Processing login, please wait..."
+  },
+  "SearchModal": {
+    "title": "Search",
+    "placeholder": "Type to search...",
+    "resultsCount": "{count, plural, one {# result found} other {# results found}}",
+    "noResults": "No results found for \"{query}\"",
+    "aria": {
+      "close": "Close search"
+    },
+    "loading": "Processing login, please wait..."
   }
 }

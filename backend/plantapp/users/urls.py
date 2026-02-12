@@ -8,5 +8,5 @@ urlpatterns = [
     path("users/<int:user_id>/unfollow/", UnfollowUserAPIView.as_view(), name='unfollow-user'),
     path("users/<int:user_id>/followers/", ListFollowersAPIView.as_view(), name='list-followers'),
     path("users/<int:user_id>/following/", ListFollowingAPIView.as_view(), name='list-following'),
-	    path('users/search/', UserSearchAPIView.as_view(), name='user-search'),
+	path('users/search/', UserSearchAPIView.as_view(), name='user-search'),
 ]
