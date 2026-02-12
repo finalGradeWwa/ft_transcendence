@@ -72,7 +72,7 @@ export const FriendRequests: React.FC<FriendRequestsProps> = ({
   onRequestHandled,
 }) => {
   const { pendingRequests, isLoading, error, acceptFriendRequest, rejectFriendRequest } =
-    useFriends();
+   useFriends({ fetchPendingRequests: true });
   const [handling, setHandling] = useState<{ id: number; action: 'accept' | 'reject' } | null>(
     null
   );

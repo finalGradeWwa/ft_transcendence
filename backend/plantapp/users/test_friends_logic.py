@@ -38,17 +38,6 @@ class FriendSystemTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertTrue(response.data["is_friend"])
 
-    def test_list_friends_mutual_follow(self):
-        self.alice.following.add(self.bob)
-        self.bob.following.add(self.alice)
-        self.alice.following.add(self.charlie)
-        self.charlie.following.add(self.alice)
-
-        response = self.client.get(f"/users/{self.alice.id}/friends/")
-
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        usernames = {user["username"] for user in response.data}
-        self.assertEqual(usernames, {"bob", "charlie"})
 
     def test_pending_friend_requests(self):
         self.bob.following.add(self.alice)

@@ -54,7 +54,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def get_friends(self):
         """Return all mutual friends (users who follow each other)."""
-        return self.following.filter(followers=self)
+        return self.following.filter(followers=self).exclude(pk=self.pk)
 
     def count_friends(self):
         """Return count of mutual friends."""
@@ -74,6 +74,9 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def is_friend_with(self, user):
         """Check if the given user is a friend (mutual follow)."""
+        # Ensure we're not comparing with self
+        if user.pk == self.pk:
+            return False
         return self.following.filter(pk=user.pk).exists() and self.followers.filter(pk=user.pk).exists()
 
     def remove_friend(self, user):

@@ -35,6 +35,15 @@ export const useFriends = (options: UseFriendsOptions | number = {}): UseFriends
   const [loadingCount, setLoadingCount] = useState(0);
   const [error, setError] = useState<string | null>(null);
 
+    useEffect(() => {
+    if (userId == null) {
+      setIsFriend(false);
+      return;
+    }
+
+    const isCurrentFriend = friends.some((friend) => friend.id === userId);
+    setIsFriend(isCurrentFriend);
+  }, [userId, friends]);
   const isLoading = loadingCount > 0;
 
   const beginLoading = useCallback(() => {
@@ -107,7 +116,8 @@ export const useFriends = (options: UseFriendsOptions | number = {}): UseFriends
           `${API_URL}/users/${userId}/is-friend/?target_id=${targetId}`
         );
         if (!res.ok) throw new Error('Failed to check friend status');
-        const data = await res.json();
+      	const data = await res.json();
+        setError(null);
         return data.is_friend;
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Unknown error');
