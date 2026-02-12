@@ -8,10 +8,11 @@
  */
 
 import { useState, useEffect, useRef } from 'react';
+import { useRouter } from '@/i18n/navigation';
 import { useTranslations } from 'next-intl';
 import { Icon } from '@/components/icons/ui/Icon';
 import { useDebounce } from '@/hooks/useDebounce';
-import { getApiUrl, apiFetch } from '@/lib/auth';
+import { apiFetch } from '@/lib/auth';
 interface User {
   id: number;
   username: string;
@@ -31,9 +32,8 @@ interface SearchModalProps {
 const SearchModal = ({ isVisible, onClose }: SearchModalProps) => {
   const t = useTranslations('SearchModal');
 
-  const apiUrl = getApiUrl();
-
   const [searchQuery, setSearchQuery] = useState('');
+  const router = useRouter();
 
   // Debounced search value (waits 500ms).
   const debouncedQuery = useDebounce(searchQuery, 500)
@@ -85,12 +85,11 @@ const SearchModal = ({ isVisible, onClose }: SearchModalProps) => {
 
     fetchUsers();
     return () => controller.abort();
-  }, [debouncedQuery, apiUrl]);
+  }, [debouncedQuery]);
 
   const handleResultClick = (user: User) => {
     console.log('Selected user:', user);
-    // Here add example: router.push(`/profiles/${username}`)
-    onClose();
+    router.push(`/profiles/${user.username}`);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
