@@ -212,6 +212,16 @@ class FollowAPITests(APITestCase):
             self.alice.following.filter(id=self.bob.id).exists()
         )
 
+    def test_user_cannot_unfollow_when_not_following(self):
+        self.client.force_authenticate(user=self.alice)
+        
+        url = f"/users/{self.bob.id}/unfollow/"
+        response = self.client.post(url)
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("detail", response.data)
+        self.assertEqual(response.data["detail"], f"You are not following {self.bob.username}.")
+
     def test_list_followers(self):
         self.alice.following.add(self.bob)
 
@@ -247,3 +257,72 @@ class FollowAPITests(APITestCase):
         response = self.client.post(url)
 
         self.assertEqual(response.status_code, 400)
+
+
+class IsFriendAPITests(APITestCase):
+    def setUp(self):
+        self.alice = User.objects.create_user(
+            email="alice@example.com",
+            username="alice",
+            password="password123",
+        )
+        self.bob = User.objects.create_user(
+            email="bob@example.com",
+            username="bob",
+            password="password123",
+        )
+        self.charlie = User.objects.create_user(
+            email="charlie@example.com",
+            username="charlie",
+            password="password123",
+        )
+
+    def test_is_friend_returns_true_for_mutual_follows(self):
+        # Alice and Bob follow each other (mutual friends)
+        self.alice.following.add(self.bob)
+        self.bob.following.add(self.alice)
+
+        url = f"/users/{self.alice.id}/is-friend/?target_id={self.bob.id}"
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.data["is_friend"])
+
+    def test_is_friend_returns_false_for_one_way_follow(self):
+        # Alice follows Bob but Bob doesn't follow Alice
+        self.alice.following.add(self.bob)
+
+        url = f"/users/{self.alice.id}/is-friend/?target_id={self.bob.id}"
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(response.data["is_friend"])
+
+    def test_is_friend_returns_false_for_no_relationship(self):
+        # No relationship between Alice and Bob
+        url = f"/users/{self.alice.id}/is-friend/?target_id={self.bob.id}"
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(response.data["is_friend"])
+
+    def test_is_friend_missing_target_id_parameter(self):
+        # Test the error contract when target_id is missing
+        url = f"/users/{self.alice.id}/is-friend/"
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("detail", response.data)
+        self.assertEqual(response.data["detail"], "target_id query parameter required")
+
+    def test_is_friend_with_invalid_user_id(self):
+        url = f"/users/99999/is-friend/?target_id={self.bob.id}"
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 404)
+
+    def test_is_friend_with_invalid_target_id(self):
+        url = f"/users/{self.alice.id}/is-friend/?target_id=99999"
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 404)

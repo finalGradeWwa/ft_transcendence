@@ -1,6 +1,5 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
-from .models import Friend
 
 User = get_user_model()
 
@@ -49,15 +48,6 @@ class PublicUserSerializer(serializers.ModelSerializer):
         model = User
         fields = ("id", "username", "first_name", "last_name")
 
-
-class FriendSerializer(serializers.ModelSerializer):
-    user1 = PublicUserSerializer(read_only=True)
-    user2 = PublicUserSerializer(read_only=True)
-
-    class Meta:
-        model = Friend
-        fields = ("id", "user1", "user2", "created_at")
-        read_only_fields = fields
 
 class ListFollowersSerializer(serializers.ModelSerializer):
     class Meta:

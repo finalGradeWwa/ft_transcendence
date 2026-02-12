@@ -93,6 +93,7 @@ export const useFriends = (userId?: number): UseFriendsReturn => {
   // Check if users are friends
   const checkIsFriend = useCallback(
     async (userId: number, targetId: number): Promise<boolean> => {
+      beginLoading();
       try {
         const res = await fetch(
           `${API_URL}/users/${userId}/is-friend/?target_id=${targetId}`
@@ -103,14 +104,17 @@ export const useFriends = (userId?: number): UseFriendsReturn => {
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Unknown error');
         return false;
+      } finally {
+        endLoading();
       }
     },
-    [API_URL]
+    [API_URL, beginLoading, endLoading]
   );
 
   // Add friend (follow user)
   const addFriend = useCallback(
     async (targetUserId: number) => {
+      beginLoading();
       try {
         const token = getAuthToken();
         if (!token) {
@@ -130,14 +134,17 @@ export const useFriends = (userId?: number): UseFriendsReturn => {
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Unknown error');
         throw err;
+      } finally {
+        endLoading();
       }
     },
-    [API_URL, getAuthToken, userId, fetchFriends]
+    [API_URL, getAuthToken, userId, fetchFriends, beginLoading, endLoading]
   );
 
   // Remove friend (unfollow user)
   const removeFriend = useCallback(
     async (targetUserId: number) => {
+      beginLoading();
       try {
         const token = getAuthToken();
         if (!token) {
@@ -157,14 +164,17 @@ export const useFriends = (userId?: number): UseFriendsReturn => {
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Unknown error');
         throw err;
+      } finally {
+        endLoading();
       }
     },
-    [API_URL, getAuthToken, userId, fetchFriends]
+    [API_URL, getAuthToken, userId, fetchFriends, beginLoading, endLoading]
   );
 
   // Accept friend request (follow them back)
   const acceptFriendRequest = useCallback(
     async (targetUserId: number) => {
+      beginLoading();
       try {
         const token = getAuthToken();
         if (!token) {
@@ -185,14 +195,17 @@ export const useFriends = (userId?: number): UseFriendsReturn => {
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Unknown error');
         throw err;
+      } finally {
+        endLoading();
       }
     },
-    [API_URL, getAuthToken, fetchPendingRequests, userId, fetchFriends]
+    [API_URL, getAuthToken, fetchPendingRequests, userId, fetchFriends, beginLoading, endLoading]
   );
 
   // Reject friend request (block/ignore)
   const rejectFriendRequest = useCallback(
     async (targetUserId: number) => {
+      beginLoading();
       try {
         const token = getAuthToken();
         if (!token) {
@@ -212,18 +225,23 @@ export const useFriends = (userId?: number): UseFriendsReturn => {
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Unknown error');
         throw err;
+      } finally {
+        endLoading();
       }
     },
-    [API_URL, getAuthToken, fetchPendingRequests]
+    [API_URL, getAuthToken, fetchPendingRequests, beginLoading, endLoading]
   );
 
   // Initial fetch
   useEffect(() => {
+  const token = getAuthToken();
     if (userId) {
       fetchFriends();
     }
-    fetchPendingRequests();
-  }, [userId, fetchFriends, fetchPendingRequests]);
+    if (token) {
+      fetchPendingRequests();
+    }
+  }, [userId, fetchFriends, fetchPendingRequests, getAuthToken]);
 
   return {
     friends,

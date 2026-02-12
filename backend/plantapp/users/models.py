@@ -81,23 +81,3 @@ class User(AbstractBaseUser, PermissionsMixin):
         self.following.remove(user)
         user.following.remove(self)
 
-
-class Friend(models.Model):
-    """Model to track mutual friend relationships."""
-    user1 = models.ForeignKey(User, on_delete=models.CASCADE, related_name="friendships_initiated")
-    user2 = models.ForeignKey(User, on_delete=models.CASCADE, related_name="friendships_received")
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=["user1", "user2"],
-                name="unique_friendship",
-            ),
-        ]
-        indexes = [
-            models.Index(fields=["user1", "user2"]),
-        ]
-
-    def __str__(self):
-        return f"{self.user1.username} <-> {self.user2.username}"
