@@ -106,6 +106,36 @@ class UnfollowUserAPIView(APIView):
         )
 
 
+class UnfriendAPIView(APIView):
+    """Remove mutual friendship (both follow relationships)."""
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, user_id):
+        target = get_object_or_404(User, pk=user_id)
+        user = request.user
+
+        if target == user:
+            return Response(
+                {"detail": "You cannot unfriend yourself."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Check if they are actually friends (mutual follows)
+        if not user.is_friend_with(target):
+            return Response(
+                {"detail": f"You are not friends with {target.username}."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Remove both directions of the friendship
+        user.unfriend(target)
+
+        return Response(
+            {"detail": f"You are no longer friends with {target.username}."},
+            status=status.HTTP_200_OK,
+        )
+
+
 class ListFriendsAPIView(APIView):
     """Get all friends (mutual follows) for a user."""
     permission_classes = [AllowAny]
@@ -131,8 +161,16 @@ class IsFriendAPIView(APIView):
                 {"detail": "target_id query parameter required"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
+       
+        try:
+            target_id_int = int(target_id)
+        except (TypeError, ValueError):
+            return Response(
+                {"detail": "target_id must be an integer"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         
-        target = get_object_or_404(User, pk=target_id)
+        target = get_object_or_404(User, pk=target_id_int)
         is_friend = user.is_friend_with(target)
         
         return Response({"is_friend": is_friend})

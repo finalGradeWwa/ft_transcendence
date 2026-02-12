@@ -10,7 +10,7 @@ export const FriendsList: React.FC<FriendsListProps> = ({
   userId,
   onFriendRemoved,
 }) => {
-  const { friends, isLoading, error, removeFriend } = useFriends(userId);
+  const { friends, isFetching, error, removeFriend } = useFriends(userId);
   const [removing, setRemoving] = useState<number | null>(null);
 
   const handleRemove = async (friendId: number) => {
@@ -25,7 +25,7 @@ export const FriendsList: React.FC<FriendsListProps> = ({
     }
   };
 
-  if (isLoading) {
+  if (isFetching && friends.length === 0) {
     return <div className="text-center text-gray-500">Loading friends...</div>;
   }
 
@@ -33,7 +33,7 @@ export const FriendsList: React.FC<FriendsListProps> = ({
     return <div className="text-red-500">Error: {error}</div>;
   }
 
-  if (friends.length === 0) {
+  if (!isFetching && friends.length === 0) {
     return <div className="text-center text-gray-500">No friends yet</div>;
   }
 
@@ -71,7 +71,7 @@ interface FriendRequestsProps {
 export const FriendRequests: React.FC<FriendRequestsProps> = ({
   onRequestHandled,
 }) => {
-  const { pendingRequests, isLoading, error, acceptFriendRequest, rejectFriendRequest } =
+  const { pendingRequests, isFetching, error, acceptFriendRequest, rejectFriendRequest } =
    useFriends({ fetchPendingRequests: true });
   const [handling, setHandling] = useState<{ id: number; action: 'accept' | 'reject' } | null>(
     null
@@ -101,7 +101,7 @@ export const FriendRequests: React.FC<FriendRequestsProps> = ({
     }
   };
 
-  if (isLoading) {
+  if (isFetching && pendingRequests.length === 0) {
     return <div className="text-center text-gray-500">Loading requests...</div>;
   }
 
@@ -109,7 +109,7 @@ export const FriendRequests: React.FC<FriendRequestsProps> = ({
     return <div className="text-red-500">Error: {error}</div>;
   }
 
-  if (pendingRequests.length === 0) {
+  if (!isFetching && pendingRequests.length === 0) {
     return <div className="text-center text-gray-500">No pending friend requests</div>;
   }
 

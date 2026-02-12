@@ -1,8 +1,7 @@
 # Generated migration for Friend model
 
-from django.conf import settings
-from django.db import migrations, models
-import django.db.models.deletion
+from django.db import migrations
+
 
 
 class Migration(migrations.Migration):
@@ -11,4 +10,9 @@ class Migration(migrations.Migration):
         ('users', '0001_initial'),
     ]
 
-    operations = []
+    operations = [
+        migrations.RunPython(
+            migrations.RunPython.noop,
+            migrations.RunPython.noop,
+        ),
+    ]

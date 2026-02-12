@@ -17,6 +17,7 @@ interface UseFriendsReturn {
   pendingRequests: User[];
   isFriend: boolean;
   isLoading: boolean;
+  isFetching: boolean;
   error: string | null;
   addFriend: (userId: number) => Promise<void>;
   removeFriend: (userId: number) => Promise<void>;
@@ -31,20 +32,12 @@ export const useFriends = (options: UseFriendsOptions | number = {}): UseFriends
   const { userId, fetchPendingRequests: shouldFetchPendingRequests = false } = opts;
   const [friends, setFriends] = useState<User[]>([]);
   const [pendingRequests, setPendingRequests] = useState<User[]>([]);
-  const [isFriend, setIsFriend] = useState(false);
   const [loadingCount, setLoadingCount] = useState(0);
+  const [fetchingCount, setFetchingCount] = useState(0);
   const [error, setError] = useState<string | null>(null);
-
-    useEffect(() => {
-    if (userId == null) {
-      setIsFriend(false);
-      return;
-    }
-
-    const isCurrentFriend = friends.some((friend) => friend.id === userId);
-    setIsFriend(isCurrentFriend);
-  }, [userId, friends]);
+  const isFriend = false;
   const isLoading = loadingCount > 0;
+  const isFetching = fetchingCount > 0;
 
   const beginLoading = useCallback(() => {
     setLoadingCount((current) => current + 1);
@@ -52,6 +45,14 @@ export const useFriends = (options: UseFriendsOptions | number = {}): UseFriends
 
   const endLoading = useCallback(() => {
     setLoadingCount((current) => Math.max(0, current - 1));
+  }, []);
+
+  const beginFetching = useCallback(() => {
+    setFetchingCount((current) => current + 1);
+  }, []);
+
+  const endFetching = useCallback(() => {
+    setFetchingCount((current) => Math.max(0, current - 1));
   }, []);
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
@@ -68,7 +69,7 @@ export const useFriends = (options: UseFriendsOptions | number = {}): UseFriends
   const fetchFriends = useCallback(async () => {
     if (!userId) return;
 
-    beginLoading();
+    beginFetching();
     try {
       const res = await fetch(`${API_URL}/users/${userId}/friends/`);
       if (!res.ok) throw new Error('Failed to fetch friends');
@@ -78,13 +79,13 @@ export const useFriends = (options: UseFriendsOptions | number = {}): UseFriends
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error');
     } finally {
-      endLoading();
+      endFetching();
     }
-  }, [userId, API_URL, beginLoading, endLoading]);
+  }, [userId, API_URL, beginFetching, endFetching]);
 
   // Fetch pending friend requests
   const fetchPendingRequests = useCallback(async () => {
-    beginLoading();
+    beginFetching();
     try {
       const token = getAuthToken();
       if (!token) {
@@ -103,9 +104,9 @@ export const useFriends = (options: UseFriendsOptions | number = {}): UseFriends
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error');
     } finally {
-      endLoading();
+      endFetching();
     }
-  }, [API_URL, getAuthToken, beginLoading, endLoading]);
+  }, [API_URL, getAuthToken, beginFetching, endFetching]);
 
   // Check if users are friends
   const checkIsFriend = useCallback(
@@ -159,7 +160,7 @@ export const useFriends = (options: UseFriendsOptions | number = {}): UseFriends
     [API_URL, getAuthToken, userId, fetchFriends, beginLoading, endLoading]
   );
 
-  // Remove friend (unfollow user)
+  // Remove friend (removes both follow directions)
   const removeFriend = useCallback(
     async (targetUserId: number) => {
       beginLoading();
@@ -169,7 +170,7 @@ export const useFriends = (options: UseFriendsOptions | number = {}): UseFriends
           setError('Not authenticated');
           throw new Error('Not authenticated');
         }
-        const res = await fetch(`${API_URL}/users/${targetUserId}/unfollow/`, {
+        const res = await fetch(`${API_URL}/users/${targetUserId}/unfriend/`, {
           method: 'POST',
           headers: {
             Authorization: `Bearer ${token}`,
@@ -265,6 +266,7 @@ export const useFriends = (options: UseFriendsOptions | number = {}): UseFriends
     pendingRequests,
     isFriend,
     isLoading,
+    isFetching,
     error,
     addFriend,
     removeFriend,

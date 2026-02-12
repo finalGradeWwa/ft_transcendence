@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import (AbstractBaseUser,
  BaseUserManager, PermissionsMixin)
 from django.utils import timezone
+from django.db.models import Q
 
 # Create your models here.
 
@@ -54,7 +55,14 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def get_friends(self):
         """Return all mutual friends (users who follow each other)."""
-        return self.following.filter(followers=self).exclude(pk=self.pk)
+        # Get the set of users we follow
+        following_set = set(self.following.values_list('pk', flat=True))
+        # Get the set of users who follow us
+        followers_set = set(self.followers.values_list('pk', flat=True))
+        # Find the intersection (mutual friends), excluding self
+        mutual_pks = (following_set & followers_set) - {self.pk}
+        # Return the User objects in the same order for consistency
+        return self.following.filter(pk__in=mutual_pks).exclude(pk=self.pk)
 
     def count_friends(self):
         """Return count of mutual friends."""
@@ -79,8 +87,12 @@ class User(AbstractBaseUser, PermissionsMixin):
             return False
         return self.following.filter(pk=user.pk).exists() and self.followers.filter(pk=user.pk).exists()
 
-    def remove_friend(self, user):
-        """Remove friend (unfollow and they unfollow back)."""
+    def unfriend(self, user):
+        """Remove mutual friendship by removing both follow relationships."""
+        # Remove this user's follow of the other user
         self.following.remove(user)
+        # Remove the other user's follow of this user
         user.following.remove(self)
+
+
 
