@@ -214,7 +214,7 @@ class GardenAPITests(APITestCase):
         data = {"name": "Hacked Name", "environment": "O"}
         response = self.client.put(self.detail_url, data)
         
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.garden.refresh_from_db()
         self.assertEqual(self.garden.name, "Alice's Garden")  # Unchanged
 
@@ -229,7 +229,7 @@ class GardenAPITests(APITestCase):
         data = {"environment": "O"}
         response = self.client.patch(self.detail_url, data)
         
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.garden.refresh_from_db()
         self.assertEqual(self.garden.environment, "I")  # Unchanged
 
@@ -242,7 +242,7 @@ class GardenAPITests(APITestCase):
         self.client.force_authenticate(user=self.bob)
         response = self.client.delete(self.detail_url)
 
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_owner_can_add_new_garden_user(self):
         self.client.force_authenticate(user=self.alice)
