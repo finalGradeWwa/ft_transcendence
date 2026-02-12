@@ -7,6 +7,11 @@ interface User {
   last_name: string;
 }
 
+interface UseFriendsOptions {
+  userId?: number;
+  fetchPendingRequests?: boolean;
+}
+
 interface UseFriendsReturn {
   friends: User[];
   pendingRequests: User[];
@@ -20,7 +25,10 @@ interface UseFriendsReturn {
   checkIsFriend: (userId: number, targetId: number) => Promise<boolean>;
 }
 
-export const useFriends = (userId?: number): UseFriendsReturn => {
+export const useFriends = (options: UseFriendsOptions | number = {}): UseFriendsReturn => {
+  // Support both old and new API: useFriends(123) or useFriends({ userId: 123 })
+  const opts: UseFriendsOptions = typeof options === 'number' ? { userId: options } : options;
+  const { userId, fetchPendingRequests: shouldFetchPendingRequests = false } = opts;
   const [friends, setFriends] = useState<User[]>([]);
   const [pendingRequests, setPendingRequests] = useState<User[]>([]);
   const [isFriend, setIsFriend] = useState(false);
@@ -234,14 +242,13 @@ export const useFriends = (userId?: number): UseFriendsReturn => {
 
   // Initial fetch
   useEffect(() => {
-  const token = getAuthToken();
     if (userId) {
       fetchFriends();
     }
-    if (token) {
+    if (shouldFetchPendingRequests) {
       fetchPendingRequests();
     }
-  }, [userId, fetchFriends, fetchPendingRequests, getAuthToken]);
+  }, [userId, shouldFetchPendingRequests, fetchFriends, fetchPendingRequests]);
 
   return {
     friends,

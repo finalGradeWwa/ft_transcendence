@@ -326,3 +326,124 @@ class IsFriendAPITests(APITestCase):
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 404)
+
+
+class UserFriendsListAPIViewTests(APITestCase):
+    """Tests for GET /api/friends/ endpoint"""
+
+    def setUp(self):
+        self.alice = User.objects.create_user(
+            email="alice@example.com",
+            username="alice",
+            password="password123",
+        )
+        self.bob = User.objects.create_user(
+            email="bob@example.com",
+            username="bob",
+            password="password123",
+        )
+        self.charlie = User.objects.create_user(
+            email="charlie@example.com",
+            username="charlie",
+            password="password123",
+        )
+        self.diana = User.objects.create_user(
+            email="diana@example.com",
+            username="diana",
+            password="password123",
+        )
+
+    def test_get_friends_returns_mutual_follows_only(self):
+        # Alice follows Bob, Bob follows Alice back (mutual)
+        self.alice.following.add(self.bob)
+        self.bob.following.add(self.alice)
+
+        # Alice follows Charlie but Charlie doesn't follow back (one-way)
+        self.alice.following.add(self.charlie)
+
+        # Diana follows Alice but Alice doesn't follow back (one-way)
+        self.diana.following.add(self.alice)
+
+        self.client.force_authenticate(user=self.alice)
+        response = self.client.get("/api/friends/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]["username"], "bob")
+
+    def test_get_friends_returns_empty_list_when_no_mutual_follows(self):
+        # Alice follows Bob but Bob doesn't follow back
+        self.alice.following.add(self.bob)
+
+        self.client.force_authenticate(user=self.alice)
+        response = self.client.get("/api/friends/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 0)
+
+    def test_get_friends_with_multiple_mutual_follows(self):
+        # Alice and Bob are mutual friends
+        self.alice.following.add(self.bob)
+        self.bob.following.add(self.alice)
+
+        # Alice and Charlie are mutual friends
+        self.alice.following.add(self.charlie)
+        self.charlie.following.add(self.alice)
+
+        # Alice and Diana are mutual friends
+        self.alice.following.add(self.diana)
+        self.diana.following.add(self.alice)
+
+        self.client.force_authenticate(user=self.alice)
+        response = self.client.get("/api/friends/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 3)
+
+        usernames = {friend["username"] for friend in response.data}
+        self.assertEqual(usernames, {"bob", "charlie", "diana"})
+
+    def test_get_friends_includes_correct_user_fields(self):
+        # Alice and Bob are mutual friends
+        self.alice.following.add(self.bob)
+        self.bob.following.add(self.alice)
+
+        self.client.force_authenticate(user=self.alice)
+        response = self.client.get("/api/friends/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+
+        friend = response.data[0]
+        self.assertIn("id", friend)
+        self.assertIn("username", friend)
+        self.assertIn("first_name", friend)
+        self.assertIn("last_name", friend)
+        self.assertEqual(friend["username"], "bob")
+
+    def test_get_friends_unauthenticated_returns_401(self):
+        response = self.client.get("/api/friends/")
+
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_get_friends_respects_mutual_follow_not_one_way(self):
+        # Bob follows Alice but Alice doesn't follow Bob
+        self.bob.following.add(self.alice)
+
+        self.client.force_authenticate(user=self.alice)
+        response = self.client.get("/api/friends/")
+
+        # Alice should not see Bob as a friend
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 0)
+
+    def test_get_friends_does_not_include_self(self):
+        # Alice follows herself (shouldn't happen in practice but let's be safe)
+        self.alice.following.add(self.alice)
+
+        self.client.force_authenticate(user=self.alice)
+        response = self.client.get("/api/friends/")
+
+        # Self-follow should not appear in friends list
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 0)
