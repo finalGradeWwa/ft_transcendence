@@ -2,7 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.shortcuts import get_object_or_404
-from rest_framework import status
+from rest_framework import status , generics, filters
 from .serializers import UserSerializer, UserUpdateSerializer, PublicUserSerializer
 from django.contrib.auth import get_user_model
 
@@ -76,7 +76,7 @@ class FollowUserAPIView(APIView):
             {"detail": f"You are already following {target.username}."},
             status=status.HTTP_400_BAD_REQUEST,
         )
-            
+
 
         user.following.add(target)
 
@@ -98,3 +98,13 @@ class UnfollowUserAPIView(APIView):
             {"detail": f"You have unfollowed {target.username}."},
             status=status.HTTP_200_OK,
         )
+
+class UserSearchAPIView(generics.ListAPIView):
+    permission_classes = [AllowAny]
+    # permission_classes = [IsAuthenticated]
+
+    queryset = User.objects.all()
+    serializer_class = PublicUserSerializer
+    filter_backends = [filters.SearchFilter]
+
+    search_fields = ['username', 'first_name', 'last_name']
