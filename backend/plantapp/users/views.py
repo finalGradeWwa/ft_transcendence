@@ -100,8 +100,7 @@ class UnfollowUserAPIView(APIView):
         )
 
 class UserSearchAPIView(generics.ListAPIView):
-    permission_classes = [AllowAny]
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     queryset = User.objects.all()
     serializer_class = PublicUserSerializer

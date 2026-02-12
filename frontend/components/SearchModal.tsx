@@ -11,7 +11,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import { Icon } from '@/components/icons/ui/Icon';
 import { useDebounce } from '@/hooks/useDebounce';
-import { getApiUrl } from '@/lib/auth';
+import { getApiUrl, apiFetch } from '@/lib/auth';
 interface User {
   id: number;
   username: string;
@@ -60,10 +60,11 @@ const SearchModal = ({ isVisible, onClose }: SearchModalProps) => {
       try {
         // Request to Django backend.
         const encoded = encodeURIComponent(q);
-        const response = await fetch(
-          `${apiUrl}/users/search/?search=${encoded}`,
-          { signal: controller.signal }
-        );
+
+        const response = await apiFetch(`/users/search/?search=${encoded}`, {
+          method: 'GET',
+          signal: controller.signal,
+        });
         if (!response.ok) {
           throw new Error(`Network response was not ok (${response.status})`);
         }
