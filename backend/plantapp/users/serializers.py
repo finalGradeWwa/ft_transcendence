@@ -12,7 +12,6 @@ class UserSerializer(serializers.ModelSerializer):
             "last_name",
             "username",
 			"email",
-			"bio",
 			"date_joined",
 			"is_active",
 		)
@@ -23,7 +22,7 @@ class UserUpdateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ("username", "email", "first_name", "last_name", "bio")
+        fields = ("username", "email", "first_name", "last_name")
 
     def validate_email(self, value: str) -> str:
         user = self.instance

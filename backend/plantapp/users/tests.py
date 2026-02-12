@@ -15,7 +15,6 @@ class UserModelTests(TestCase):
             username="testuser",
             email="test@example.com",
             password="strongpassword123",
-            bio="hello! my name is User123!",
         )
 
         self.assertEqual(user.username, "testuser")
@@ -24,7 +23,6 @@ class UserModelTests(TestCase):
         self.assertTrue(user.is_active)
         self.assertFalse(user.is_staff)
         self.assertFalse(user.is_superuser)
-        self.assertEqual(user.bio, "hello! my name is User123!")
 
     def test_email_is_normalized(self):
         user = User.objects.create_user(
@@ -71,7 +69,6 @@ class MeViewTests(APITestCase):
             password='SecurePass123!',
             first_name='Test',
             last_name='User',
-            bio='Test bio'
         )
         self.client.force_authenticate(user=self.user)
 
@@ -83,7 +80,6 @@ class MeViewTests(APITestCase):
         self.assertEqual(response.data['email'], 'test@example.com')
         self.assertEqual(response.data['first_name'], 'Test')
         self.assertEqual(response.data['last_name'], 'User')
-        self.assertEqual(response.data['bio'], 'Test bio')
         self.assertIn('id', response.data)
         self.assertIn('date_joined', response.data)
 
@@ -98,13 +94,11 @@ class MeViewTests(APITestCase):
         response = self.client.patch(self.url, {
             'first_name': 'Updated',
             'last_name': 'Name',
-            'bio': 'Updated bio'
         }, format='json')
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['first_name'], 'Updated')
         self.assertEqual(response.data['last_name'], 'Name')
-        self.assertEqual(response.data['bio'], 'Updated bio')
 
         # Verify in database
         self.user.refresh_from_db()
@@ -113,11 +107,9 @@ class MeViewTests(APITestCase):
 
     def test_patch_me_partial_update(self):
         response = self.client.patch(self.url, {
-            'bio': 'Only bio updated'
         }, format='json')
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['bio'], 'Only bio updated')
         self.assertEqual(response.data['first_name'], 'Test')  # Unchanged
         self.assertEqual(response.data['last_name'], 'User')  # Unchanged
 
