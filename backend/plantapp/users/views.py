@@ -92,9 +92,134 @@ class UnfollowUserAPIView(APIView):
         target = get_object_or_404(User, pk=user_id)
         user = request.user
 
+        if not user.following.filter(pk=target.pk).exists():
+            return Response(
+                {"detail": f"You are not following {target.username}."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
         user.following.remove(target)
 
         return Response(
             {"detail": f"You have unfollowed {target.username}."},
+            status=status.HTTP_200_OK,
+        )
+
+
+class UnfriendAPIView(APIView):
+    """Remove mutual friendship (both follow relationships)."""
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, user_id):
+        target = get_object_or_404(User, pk=user_id)
+        user = request.user
+
+        if target == user:
+            return Response(
+                {"detail": "You cannot unfriend yourself."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Check if they are actually friends (mutual follows)
+        if not user.is_friend_with(target):
+            return Response(
+                {"detail": f"You are not friends with {target.username}."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Remove both directions of the friendship
+        user.unfriend(target)
+
+        return Response(
+            {"detail": f"You are no longer friends with {target.username}."},
+            status=status.HTTP_200_OK,
+        )
+
+
+class ListFriendsAPIView(APIView):
+    """Get all friends (mutual follows) for a user."""
+    permission_classes = [AllowAny]
+
+    def get(self, request, user_id):
+        user = get_object_or_404(User, pk=user_id)
+        friends = user.get_friends()
+        
+        serializer = PublicUserSerializer(friends, many=True)
+        return Response(serializer.data)
+
+
+class IsFriendAPIView(APIView):
+    """Check if two users are friends."""
+    permission_classes = [AllowAny]
+
+    def get(self, request, user_id):
+        user = get_object_or_404(User, pk=user_id)
+        target_id = request.query_params.get("target_id")
+        
+        if not target_id:
+            return Response(
+                {"detail": "target_id query parameter required"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+       
+        try:
+            target_id_int = int(target_id)
+        except (TypeError, ValueError):
+            return Response(
+                {"detail": "target_id must be an integer"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        
+        target = get_object_or_404(User, pk=target_id_int)
+        is_friend = user.is_friend_with(target)
+        
+        return Response({"is_friend": is_friend})
+
+
+class UserFriendsListAPIView(APIView):
+    """Get all of current user's friends (mutual follows)."""
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        friends = request.user.get_friends()
+        serializer = PublicUserSerializer(friends, many=True)
+        return Response(serializer.data)
+
+
+class FriendRequestsListAPIView(APIView):
+    """Get pending friend requests (users who follow you but you don't follow back)."""
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        pending = user.get_pending_requests()
+        serializer = PublicUserSerializer(pending, many=True)
+        return Response(serializer.data)
+
+
+class RejectFriendRequestAPIView(APIView):
+    """Reject a friend request by removing the follower relationship."""
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, user_id):
+        target = get_object_or_404(User, pk=user_id)
+        user = request.user
+
+        if target == user:
+            return Response(
+                {"detail": "You cannot reject yourself."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if not user.followers.filter(pk=target.pk).exists():
+            return Response(
+                {"detail": f"{target.username} is not following you."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        target.following.remove(user)
+
+        return Response(
+            {"detail": f"You have rejected {target.username}."},
             status=status.HTTP_200_OK,
         )
