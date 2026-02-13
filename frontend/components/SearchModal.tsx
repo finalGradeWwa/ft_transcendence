@@ -36,7 +36,7 @@ const SearchModal = ({ isVisible, onClose }: SearchModalProps) => {
   const router = useRouter();
 
   // Debounced search value (waits 500ms).
-  const debouncedQuery = useDebounce(searchQuery, 500)
+  const debouncedQuery = useDebounce(searchQuery, 500);
 
   // State storing search results (now User objects, not strings).
   const [results, setResults] = useState<User[]>([]);
@@ -88,6 +88,7 @@ const SearchModal = ({ isVisible, onClose }: SearchModalProps) => {
   }, [debouncedQuery]);
 
   const handleResultClick = (user: User) => {
+    // Delete console.log in production
     console.log('Selected user:', user);
     router.push(`/profiles/${user.username}`);
   };

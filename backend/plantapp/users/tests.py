@@ -239,3 +239,70 @@ class FollowAPITests(APITestCase):
         response = self.client.post(url)
 
         self.assertEqual(response.status_code, 400)
+
+class UserSearchAPIViewTests(APITestCase):
+    def setUp(self):
+        self.url = reverse('user-search')
+        self.user = User.objects.create_user(
+            username='searcher',
+            email='searcher@example.com',
+            password='password123'
+        )
+        self.target_user = User.objects.create_user(
+            username='target',
+            email='target@example.com',
+            password='password123',
+            first_name='John',
+            last_name='Doe'
+        )
+        self.other_user = User.objects.create_user(
+            username='other',
+            email='other@example.com',
+            password='password123',
+            first_name='Jane',
+            last_name='Smith'
+        )
+
+    def test_search_unauthenticated(self):
+        self.client.force_authenticate(user=None)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_search_by_username(self):
+        self.client.force_authenticate(user=self.user)
+        response = self.client.get(self.url, {'search': 'target'})
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['username'], 'target')
+
+    def test_search_by_first_name(self):
+        self.client.force_authenticate(user=self.user)
+        response = self.client.get(self.url, {'search': 'John'})
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['username'], 'target')
+
+    def test_search_by_last_name(self):
+        self.client.force_authenticate(user=self.user)
+        response = self.client.get(self.url, {'search': 'Doe'})
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['username'], 'target')
+
+    def test_search_response_shape(self):
+        self.client.force_authenticate(user=self.user)
+        response = self.client.get(self.url, {'search': 'target'})
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        result = response.data[0]
+
+        self.assertIn('id', result)
+        self.assertIn('username', result)
+        self.assertIn('first_name', result)
+        self.assertIn('last_name', result)
+
+        self.assertNotIn('email', result)
+        self.assertNotIn('password', result)

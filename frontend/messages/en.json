@@ -198,6 +198,6 @@
     "aria": {
       "close": "Close search"
     },
-    "loading": "Processing login, please wait..."
+    "loading": "Searching, please wait..."
   }
 }
