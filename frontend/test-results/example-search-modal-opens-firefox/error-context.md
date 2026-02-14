@@ -1,0 +1,260 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e7]:
+    - banner [ref=e8]:
+      - link "Skip to main content" [ref=e9] [cursor=pointer]:
+        - /url: "#main-content"
+      - generic [ref=e10]:
+        - link "Plant Portal" [ref=e11] [cursor=pointer]:
+          - /url: /en
+          - heading "Plant Portal" [level=1] [ref=e12]
+        - generic [ref=e14]:
+          - combobox "Select language" [ref=e15]:
+            - option "PL"
+            - option "EN" [selected]
+            - option "DE"
+            - option "AR"
+          - navigation [ref=e16]:
+            - link "Search" [ref=e17] [cursor=pointer]:
+              - /url: /en?showSearch=true
+              - img [ref=e18]
+            - link "Add new plant" [ref=e21] [cursor=pointer]:
+              - /url: /en?showLogin=true
+              - img [ref=e22]
+            - link "Login" [ref=e24] [cursor=pointer]:
+              - /url: /en?showLogin=true
+              - img [ref=e25]
+      - navigation "Main navigation" [ref=e27]:
+        - list [ref=e28]:
+          - listitem [ref=e29]:
+            - link "Home" [ref=e30] [cursor=pointer]:
+              - /url: /en
+          - listitem [ref=e31]:
+            - link "Gardens" [ref=e32] [cursor=pointer]:
+              - /url: /en/gardens
+          - listitem [ref=e33]:
+            - link "About Us" [ref=e34] [cursor=pointer]:
+              - /url: /en/about-us
+          - listitem [ref=e35]:
+            - link "Terms" [ref=e36] [cursor=pointer]:
+              - /url: /en/terms
+          - listitem [ref=e37]:
+            - link "Contact" [ref=e38] [cursor=pointer]:
+              - /url: /en/contact
+    - main [ref=e39]:
+      - generic [ref=e45]:
+        - heading "RECOMMENDED" [level=1] [ref=e46]
+        - generic [ref=e47]:
+          - article [ref=e48]:
+            - img "Roslina Zwykla 1" [ref=e50]
+            - generic [ref=e51]:
+              - heading "Roslina Zwykla 1" [level=2] [ref=e52]
+              - paragraph [ref=e53]: Plantae magnificum 1
+              - generic [ref=e54]:
+                - generic [ref=e55]:
+                  - img [ref=e56]
+                  - generic [ref=e58]: user_1
+                - paragraph [ref=e59]: "Ogród: Brak ogrodu"
+          - article [ref=e60]:
+            - img "Roslina Zwykla 2" [ref=e62]
+            - generic [ref=e63]:
+              - heading "Roslina Zwykla 2" [level=2] [ref=e64]
+              - paragraph [ref=e65]: Plantae magnificum 2
+              - generic [ref=e66]:
+                - generic [ref=e67]:
+                  - img [ref=e68]
+                  - generic [ref=e70]: user_2
+                - paragraph [ref=e71]: "Ogród: Brak ogrodu"
+          - article [ref=e72]:
+            - img "Roslina Zwykla 3" [ref=e74]
+            - generic [ref=e75]:
+              - heading "Roslina Zwykla 3" [level=2] [ref=e76]
+              - paragraph [ref=e77]: Plantae magnificum 3
+              - generic [ref=e78]:
+                - generic [ref=e79]:
+                  - img [ref=e80]
+                  - generic [ref=e82]: user_3
+                - paragraph [ref=e83]: "Ogród: Brak ogrodu"
+          - article [ref=e84]:
+            - img "Roslina Zwykla 4" [ref=e86]
+            - generic [ref=e87]:
+              - heading "Roslina Zwykla 4" [level=2] [ref=e88]
+              - paragraph [ref=e89]: Plantae magnificum 4
+              - generic [ref=e90]:
+                - generic [ref=e91]:
+                  - img [ref=e92]
+                  - generic [ref=e94]: user_4
+                - paragraph [ref=e95]: "Ogród: Brak ogrodu"
+          - article [ref=e96]:
+            - img "Roslina Zwykla 5" [ref=e98]
+            - generic [ref=e99]:
+              - heading "Roslina Zwykla 5" [level=2] [ref=e100]
+              - paragraph [ref=e101]: Plantae magnificum 5
+              - generic [ref=e102]:
+                - generic [ref=e103]:
+                  - img [ref=e104]
+                  - generic [ref=e106]: user_5
+                - paragraph [ref=e107]: "Ogród: Brak ogrodu"
+          - article [ref=e108]:
+            - img "Roslina Zwykla 6" [ref=e110]
+            - generic [ref=e111]:
+              - heading "Roslina Zwykla 6" [level=2] [ref=e112]
+              - paragraph [ref=e113]: Plantae magnificum 6
+              - generic [ref=e114]:
+                - generic [ref=e115]:
+                  - img [ref=e116]
+                  - generic [ref=e118]: user_1
+                - paragraph [ref=e119]: "Ogród: Brak ogrodu"
+          - article [ref=e120]:
+            - img "Roslina Zwykla 7" [ref=e122]
+            - generic [ref=e123]:
+              - heading "Roslina Zwykla 7" [level=2] [ref=e124]
+              - paragraph [ref=e125]: Plantae magnificum 7
+              - generic [ref=e126]:
+                - generic [ref=e127]:
+                  - img [ref=e128]
+                  - generic [ref=e130]: user_2
+                - paragraph [ref=e131]: "Ogród: Brak ogrodu"
+          - article [ref=e132]:
+            - img "Roslina Zwykla 8" [ref=e134]
+            - generic [ref=e135]:
+              - heading "Roslina Zwykla 8" [level=2] [ref=e136]
+              - paragraph [ref=e137]: Plantae magnificum 8
+              - generic [ref=e138]:
+                - generic [ref=e139]:
+                  - img [ref=e140]
+                  - generic [ref=e142]: user_3
+                - paragraph [ref=e143]: "Ogród: Brak ogrodu"
+          - article [ref=e144]:
+            - img "Roslina Zwykla 9" [ref=e146]
+            - generic [ref=e147]:
+              - heading "Roslina Zwykla 9" [level=2] [ref=e148]
+              - paragraph [ref=e149]: Plantae magnificum 9
+              - generic [ref=e150]:
+                - generic [ref=e151]:
+                  - img [ref=e152]
+                  - generic [ref=e154]: user_4
+                - paragraph [ref=e155]: "Ogród: Brak ogrodu"
+          - article [ref=e156]:
+            - img "Roslina Zwykla 10" [ref=e158]
+            - generic [ref=e159]:
+              - heading "Roslina Zwykla 10" [level=2] [ref=e160]
+              - paragraph [ref=e161]: Plantae magnificum 10
+              - generic [ref=e162]:
+                - generic [ref=e163]:
+                  - img [ref=e164]
+                  - generic [ref=e166]: user_5
+                - paragraph [ref=e167]: "Ogród: Brak ogrodu"
+          - article [ref=e168]:
+            - img "Roslina Zwykla 11" [ref=e170]
+            - generic [ref=e171]:
+              - heading "Roslina Zwykla 11" [level=2] [ref=e172]
+              - paragraph [ref=e173]: Plantae magnificum 11
+              - generic [ref=e174]:
+                - generic [ref=e175]:
+                  - img [ref=e176]
+                  - generic [ref=e178]: user_1
+                - paragraph [ref=e179]: "Ogród: Brak ogrodu"
+          - article [ref=e180]:
+            - img "Roslina Zwykla 12" [ref=e182]
+            - generic [ref=e183]:
+              - heading "Roslina Zwykla 12" [level=2] [ref=e184]
+              - paragraph [ref=e185]: Plantae magnificum 12
+              - generic [ref=e186]:
+                - generic [ref=e187]:
+                  - img [ref=e188]
+                  - generic [ref=e190]: user_2
+                - paragraph [ref=e191]: "Ogród: Brak ogrodu"
+          - article [ref=e192]:
+            - img "Roslina Zwykla 13" [ref=e194]
+            - generic [ref=e195]:
+              - heading "Roslina Zwykla 13" [level=2] [ref=e196]
+              - paragraph [ref=e197]: Plantae magnificum 13
+              - generic [ref=e198]:
+                - generic [ref=e199]:
+                  - img [ref=e200]
+                  - generic [ref=e202]: user_3
+                - paragraph [ref=e203]: "Ogród: Brak ogrodu"
+          - article [ref=e204]:
+            - img "Roslina Zwykla 14" [ref=e206]
+            - generic [ref=e207]:
+              - heading "Roslina Zwykla 14" [level=2] [ref=e208]
+              - paragraph [ref=e209]: Plantae magnificum 14
+              - generic [ref=e210]:
+                - generic [ref=e211]:
+                  - img [ref=e212]
+                  - generic [ref=e214]: user_4
+                - paragraph [ref=e215]: "Ogród: Brak ogrodu"
+          - article [ref=e216]:
+            - img "Roslina Zwykla 15" [ref=e218]
+            - generic [ref=e219]:
+              - heading "Roslina Zwykla 15" [level=2] [ref=e220]
+              - paragraph [ref=e221]: Plantae magnificum 15
+              - generic [ref=e222]:
+                - generic [ref=e223]:
+                  - img [ref=e224]
+                  - generic [ref=e226]: user_5
+                - paragraph [ref=e227]: "Ogród: Brak ogrodu"
+          - article [ref=e228]:
+            - img "Roslina Zwykla 16" [ref=e230]
+            - generic [ref=e231]:
+              - heading "Roslina Zwykla 16" [level=2] [ref=e232]
+              - paragraph [ref=e233]: Plantae magnificum 16
+              - generic [ref=e234]:
+                - generic [ref=e235]:
+                  - img [ref=e236]
+                  - generic [ref=e238]: user_1
+                - paragraph [ref=e239]: "Ogród: Brak ogrodu"
+          - article [ref=e240]:
+            - img "Roslina Zwykla 17" [ref=e242]
+            - generic [ref=e243]:
+              - heading "Roslina Zwykla 17" [level=2] [ref=e244]
+              - paragraph [ref=e245]: Plantae magnificum 17
+              - generic [ref=e246]:
+                - generic [ref=e247]:
+                  - img [ref=e248]
+                  - generic [ref=e250]: user_2
+                - paragraph [ref=e251]: "Ogród: Brak ogrodu"
+          - article [ref=e252]:
+            - img "Roslina Zwykla 18" [ref=e254]
+            - generic [ref=e255]:
+              - heading "Roslina Zwykla 18" [level=2] [ref=e256]
+              - paragraph [ref=e257]: Plantae magnificum 18
+              - generic [ref=e258]:
+                - generic [ref=e259]:
+                  - img [ref=e260]
+                  - generic [ref=e262]: user_3
+                - paragraph [ref=e263]: "Ogród: Brak ogrodu"
+          - article [ref=e264]:
+            - img "Roslina Zwykla 19" [ref=e266]
+            - generic [ref=e267]:
+              - heading "Roslina Zwykla 19" [level=2] [ref=e268]
+              - paragraph [ref=e269]: Plantae magnificum 19
+              - generic [ref=e270]:
+                - generic [ref=e271]:
+                  - img [ref=e272]
+                  - generic [ref=e274]: user_4
+                - paragraph [ref=e275]: "Ogród: Brak ogrodu"
+          - article [ref=e276]:
+            - img "Roslina Zwykla 20" [ref=e278]
+            - generic [ref=e279]:
+              - heading "Roslina Zwykla 20" [level=2] [ref=e280]
+              - paragraph [ref=e281]: Plantae magnificum 20
+              - generic [ref=e282]:
+                - generic [ref=e283]:
+                  - img [ref=e284]
+                  - generic [ref=e286]: user_5
+                - paragraph [ref=e287]: "Ogród: Brak ogrodu"
+    - contentinfo [ref=e288]:
+      - paragraph [ref=e289]: © 2026 Plant Portal. All rights reserved.
+      - navigation "Footer navigation" [ref=e290]:
+        - link "Privacy Policy" [ref=e291] [cursor=pointer]:
+          - /url: /en/privacy-policy
+        - link "Terms" [ref=e292] [cursor=pointer]:
+          - /url: /en/terms
+  - button "Open Next.js Dev Tools" [ref=e298] [cursor=pointer]:
+    - img [ref=e299]
+  - alert [ref=e303]
+```
