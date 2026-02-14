@@ -20,6 +20,7 @@ const LANGS = ['pl', 'en', 'de', 'ar'];
 
 /**
  * PL: Uniwersalny przycisk z ikoną (Link lub Button).
+ * EN: Universal icon button (Link or Button).
  */
 const IconButton = ({ onClick, icon, label, href }: any) => {
   const content = <Icon name={icon} size={18} aria-hidden="true" />;
@@ -41,6 +42,7 @@ const IconButton = ({ onClick, icon, label, href }: any) => {
 
 /**
  * PL: Menu szybkiego dodawania rośliny lub ogrodu.
+ * EN: Quick add menu for plant or garden.
  */
 const AddMenu = ({ user, tP, tG, close }: any) => (
   <div className="absolute right-0 md:right-[-48px] mt-4 w-64 bg-primary-green rounded-xl shadow-2xl overflow-hidden z-[100] py-1 flex flex-col">
@@ -64,6 +66,7 @@ const AddMenu = ({ user, tP, tG, close }: any) => (
 
 /**
  * PL: Widok zalogowanego użytkownika (Avatar + Nick + Wyloguj).
+ * EN: Logged-in user view (Avatar + Username + Logout).
  */
 const ProfileArea = ({ user, logout, t }: any) => (
   <div className="flex items-center gap-2 bg-primary-green p-1 pr-4 rounded-full shadow-md border border-primary-green/20 w-fit">
@@ -90,6 +93,7 @@ const ProfileArea = ({ user, logout, t }: any) => (
 
 /**
  * PL: Hook zarządzający danymi użytkownika z localStorage.
+ * EN: Hook managing user data from localStorage.
  */
 function useUsername() {
   const [username, setUsername] = useState<string | null>(null);
@@ -131,22 +135,34 @@ function useUsername() {
 }
 
 /**
- * PL: Hook zamykający menu po kliknięciu poza element.
+ * PL: Hook zamykający menu po kliknięciu poza element lub naciśnięciu ESC.
+ * EN: Hook to close menu when clicking outside or pressing ESC.
  */
 function useOutsideClose<T extends HTMLElement>(onClose: () => void) {
   const ref = useRef<T>(null);
   useEffect(() => {
-    const handle = (e: MouseEvent) => {
+    const handleClickOutside = (e: MouseEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node)) onClose();
     };
-    document.addEventListener('mousedown', handle);
-    return () => document.removeEventListener('mousedown', handle);
+
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleEscape);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleEscape);
+    };
   }, [onClose]);
   return ref;
 }
 
 /**
  * PL: Warunkowe renderowanie logowania lub obszaru profilu.
+ * EN: Conditional rendering of login button or profile area.
  */
 const UserSection = ({
   username,
