@@ -8,8 +8,17 @@
  */
 
 import { useState, useEffect, useRef } from 'react';
+import { useRouter } from '@/i18n/navigation';
 import { useTranslations } from 'next-intl';
 import { Icon } from '@/components/icons/ui/Icon';
+import { useDebounce } from '@/hooks/useDebounce';
+import { apiFetch } from '@/lib/auth';
+interface User {
+  id: number;
+  username: string;
+  first_name: string;
+  last_name: string;
+}
 
 interface SearchModalProps {
   isVisible: boolean;
@@ -24,46 +33,76 @@ const SearchModal = ({ isVisible, onClose }: SearchModalProps) => {
   const t = useTranslations('SearchModal');
 
   const [searchQuery, setSearchQuery] = useState('');
+  const router = useRouter();
 
-  // State storing search results (mock data).
-  const [results, setResults] = useState<string[]>([]);
+  // Debounced search value (waits 500ms).
+  const debouncedQuery = useDebounce(searchQuery, 500);
+
+  // State storing search results (now User objects, not strings).
+  const [results, setResults] = useState<User[]>([]);
+  const [loading, setLoading] = useState(false);
 
   // Ref to input field for autofocus.
   const searchInputRef = useRef<HTMLInputElement>(null);
 
-  /**
-   * TODO: Replace mock data with actual API call.
-   */
   useEffect(() => {
-    if (searchQuery.trim() === '') {
-      setResults([]);
-      return;
-    }
+    const controller = new AbortController();
 
-    //  Example mock results - to be replaced by API call
-    const mockResults = [
-      'User',
-      'Profile',
-      'Settings',
-      'Messages',
-      'Notifications',
-    ].filter(item => item.toLowerCase().includes(searchQuery.toLowerCase()));
+    const fetchUsers = async () => {
+      const q = debouncedQuery.trim();
+      if (!q) {
+        setResults([]);
+        setLoading(false);
+        return;
+      }
 
-    setResults(mockResults);
-  }, [searchQuery]);
+      setLoading(true);
+      try {
+        // Request to Django backend.
+        const encoded = encodeURIComponent(q);
 
-  //--------------
-  /** TODO: Add search logic, API calls, sending form submission */
+        const response = await apiFetch(`/users/search/?search=${encoded}`, {
+          method: 'GET',
+          signal: controller.signal,
+        });
+        if (!response.ok) {
+          throw new Error(`Network response was not ok (${response.status})`);
+        }
 
-  const handleResultClick = (result: string) => {
-    console.log('Selected:', result);
-    onClose();
+        const data = (await response.json()) as User[];
+        setResults(data);
+      } catch (error) {
+        if ((error as any)?.name !== 'AbortError') {
+          console.error('Search error:', error);
+          setResults([]);
+        }
+      } finally {
+        if (!controller.signal.aborted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchUsers();
+    return () => controller.abort();
+  }, [debouncedQuery]);
+
+  const handleResultClick = (user: User) => {
+    // Delete console.log in production
+    console.log('Selected user:', user);
+    router.push(`/profiles/${user.username}`);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
   };
-  //---------------
+
+  useEffect(() => {
+    if (!isVisible) {
+      setSearchQuery('');
+      setResults([]);
+    }
+  }, [isVisible]);
 
   /**
    * PL: Efekt obsługujący fokusowanie pierwszego pola oraz nasłuchiwanie klawisza Escape.
@@ -136,8 +175,13 @@ const SearchModal = ({ isVisible, onClose }: SearchModalProps) => {
 
           {/** Scrollable results container - displays results, no results, or initial prompt. */}
           <nav className="max-h-96 overflow-y-auto">
+            {loading && debouncedQuery.trim() && (
+              <div className="px-4 pb-4 text-center text-gray-500">
+                <p>{t('loading')}</p>
+              </div>
+            )}
             {/** Display search results list. */}
-            {searchQuery && results.length > 0 && (
+            {debouncedQuery.trim() && results.length > 0 && (
               <div className="px-4 pb-4">
                 <p className="text-sm text-dark-text/80 mb-2">
                   {t('resultsCount', { count: results.length })}
@@ -145,10 +189,10 @@ const SearchModal = ({ isVisible, onClose }: SearchModalProps) => {
 
                 {/** Mapping results to clickable list items. */}
                 <ul className="space-y-2">
-                  {results.map(result => (
-                    <li key={result}>
+                  {results.map(user => (
+                    <li key={user.id}>
                       <button
-                        onClick={() => handleResultClick(result)}
+                        onClick={() => handleResultClick(user)}
                         className="w-full text-left px-4 py-3 rounded-lg hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-green"
                       >
                         <div className="flex items-center gap-3">
@@ -157,7 +201,15 @@ const SearchModal = ({ isVisible, onClose }: SearchModalProps) => {
                             size={16}
                             className="text-dark-text"
                           />
-                          <span className="text-gray-900">{result}</span>
+                          <div className="flex flex-col">
+                            <span className="font-semibold text-gray-900">{user.username}</span>
+                            {/* Displays firstNames and lastNames if exists */}
+                            {(user.first_name || user.last_name) && (
+                              <span className="text-xs text-gray-500">
+                                {user.first_name} {user.last_name}
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </button>
                     </li>
@@ -167,9 +219,9 @@ const SearchModal = ({ isVisible, onClose }: SearchModalProps) => {
             )}
 
             {/** No results message. */}
-            {searchQuery && results.length === 0 && (
+            {debouncedQuery.trim() && !loading && results.length === 0 && (
               <div className="px-4 pb-4 text-center text-gray-500">
-                <p>{t('noResults', { query: searchQuery })}</p>
+                <p>{t('noResults', { query: debouncedQuery.trim() })}</p>
               </div>
             )}
           </nav>

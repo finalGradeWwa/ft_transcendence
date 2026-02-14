@@ -17,7 +17,13 @@
     "showMore": "Pokaż więcej roślin",
     "oauthLoginSuccess": "Logowanie przez GitHub zakończone sukcesem. Jesteś zalogowany.",
     "loginSuccess": "Zalogowano pomyślnie.",
-    "nav": ["Strona Główna", "Ogrody", "O nas", "Regulamin", "Kontakt"],
+    "nav": [
+      "Strona Główna",
+      "Ogrody",
+      "O nas",
+      "Regulamin",
+      "Kontakt"
+    ],
     "searchPlaceholder": "Wyszukiwanie jest aktywne",
     "searchInfo": "Tutaj będzie pełna logika wyszukiwania.",
     "rights": "Wszelkie prawa zastrzeżone.",
@@ -182,15 +188,16 @@
     "noPins": "Brak wpisów"
   },
   "AuthCallbackPage": {
-    "loading": "Przetwarzanie logowania, proszę czekać...",
-    "SearchModal": {
-      "title": "Wyszukiwanie",
-      "placeholder": "Wpisz aby wyszukać...",
-      "resultsCount": "{count, plural, one {Znaleziono # wynik} few {Znaleziono # wyniki} many {Znaleziono # wyników} other {Znaleziono # wyników}}",
-      "noResults": "Nie znaleziono wyników dla \"{query}\"",
-      "aria": {
-        "close": "Zamknij wyszukiwanie"
-      }
-    }
+    "loading": "Przetwarzanie logowania, proszę czekać..."
+  },
+  "SearchModal": {
+    "title": "Wyszukiwanie",
+    "placeholder": "Wpisz aby wyszukać...",
+    "resultsCount": "{count, plural, one {Znaleziono # wynik} few {Znaleziono # wyniki} many {Znaleziono # wyników} other {Znaleziono # wyników}}",
+    "noResults": "Nie znaleziono wyników dla \"{query}\"",
+    "aria": {
+      "close": "Zamknij wyszukiwanie"
+    },
+    "loading": "Trwa wyszukiwanie, proszę czekać..."
   }
 }
