@@ -36,7 +36,8 @@
       "add": "Dodaj nową roślinę",
       "profile": "Profil użytkownika",
       "logout": "Wyloguj się",
-      "userTools": "Narzędzia użytkownika"
+      "userTools": "Narzędzia użytkownika",
+      "chat": "Otwórz czat"
     },
     "contact": {
       "name": "John Weeder",
@@ -182,15 +183,15 @@
     "noPins": "Brak wpisów"
   },
   "AuthCallbackPage": {
-    "loading": "Przetwarzanie logowania, proszę czekać...",
-    "SearchModal": {
-      "title": "Wyszukiwanie",
-      "placeholder": "Wpisz aby wyszukać...",
-      "resultsCount": "{count, plural, one {Znaleziono # wynik} few {Znaleziono # wyniki} many {Znaleziono # wyników} other {Znaleziono # wyników}}",
-      "noResults": "Nie znaleziono wyników dla \"{query}\"",
-      "aria": {
-        "close": "Zamknij wyszukiwanie"
-      }
+    "loading": "Przetwarzanie logowania, proszę czekać..."
+  },
+  "SearchModal": {
+    "title": "Wyszukiwanie",
+    "placeholder": "Wpisz aby wyszukać...",
+    "resultsCount": "{count, plural, one {Znaleziono # wynik} few {Znaleziono # wyniki} many {Znaleziono # wyników} other {Znaleziono # wyników}}",
+    "noResults": "Nie znaleziono wyników dla \"{query}\"",
+    "aria": {
+      "close": "Zamknij wyszukiwanie"
     }
   }
 }

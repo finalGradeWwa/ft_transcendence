@@ -43,6 +43,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.username
 
     date_joined = models.DateTimeField(default=timezone.now)
+    bio = models.TextField(verbose_name="Biography", max_length=600, null=True, blank=True)
     following = models.ManyToManyField("self", blank=True,symmetrical=False, related_name="followers")
 
     def count_following(self):

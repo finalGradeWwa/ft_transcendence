@@ -36,7 +36,8 @@
       "add": "Add new plant",
       "profile": "User profile",
       "logout": "Logout",
-      "userTools": "User tools"
+      "userTools": "User tools",
+      "chat": "Open chat"
     },
     "contact": {
       "name": "John Weeder",
@@ -182,15 +183,15 @@
     "noPins": "No entries"
   },
   "AuthCallbackPage": {
-    "loading": "Processing login, please wait...",
-    "SearchModal": {
-      "title": "Search",
-      "placeholder": "Type to search...",
-      "resultsCount": "{count, plural, one {# result found} other {# results found}}",
-      "noResults": "No results found for \"{query}\"",
-      "aria": {
-        "close": "Close search"
-      }
+    "loading": "Processing login, please wait..."
+  },
+  "SearchModal": {
+    "title": "Search",
+    "placeholder": "Type to search...",
+    "resultsCount": "{count, plural, one {# result found} other {# results found}}",
+    "noResults": "No results found for \"{query}\"",
+    "aria": {
+      "close": "Close search"
     }
   }
 }
