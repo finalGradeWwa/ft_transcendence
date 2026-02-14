@@ -144,7 +144,8 @@
   "AboutUs": {
     "title": "About Us",
     "description": "To spice up our binary programming adventure at 42Warsaw, we decided to add a splash of nature's colors. This is our final project within the so-called Common Core, so we are leaving this portal as a souvenir of a wonderful journey. Photos included for reach. 😏",
-    "footerText": "You can be a gardener too!"
+    "footerText": "You can be a gardener too!",
+    "about_image_alt": "Decorative photo showing plants in the About Us section"
   },
   "AddPlantPage": {
     "title": "Add a new plant",

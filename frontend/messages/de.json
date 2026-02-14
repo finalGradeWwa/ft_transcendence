@@ -151,7 +151,8 @@
   "AboutUs": {
     "title": "Über uns",
     "description": "Um unser binäres Programmierabenteuer bei 42Warsaw etwas lebendiger zu gestalten, haben wir beschlossen, ihm einen Hauch von Naturfarben zu verleihen. Dies ist unser letztes Projekt im Rahmen des sogenannten Common Core – deshalb hinterlassen wir dieses Portal als Erinnerung an ein großartiges Abenteuer. Fotos für die Reichweite. 😏",
-    "footerText": "Werde auch du zum Gärtner!"
+    "footerText": "Werde auch du zum Gärtner!",
+    "about_image_alt": "Dekoratives Bild mit Pflanzen im Bereich Über uns"
   },
   "AddPlantPage": {
     "title": "Neue Pflanze hinzufügen",

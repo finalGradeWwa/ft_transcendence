@@ -144,7 +144,8 @@
   "AboutUs": {
     "title": "O nas",
     "description": "Aby ożywić naszą zero-jedynkową przygodę z programowaniem w 42Warsaw postanowiliśmy dodać do niej lekkiego kolorytu w barwach natury. To nasz ostatni projekt w ramach tzw. Common Core, zostawiamy zatem ten portal na pamiątkę wspaniałej przygody. Zdjęcia dla zasięgu. 😏",
-    "footerText": "I Ty zostań ogrodnikiem!"
+    "footerText": "I Ty zostań ogrodnikiem!",
+    "about_image_alt": "Dekoracyjne zdjęcie przedstawiające rośliny w sekcji O nas"
   },
   "AddPlantPage": {
     "title": "Dodaj nową roślinę",
