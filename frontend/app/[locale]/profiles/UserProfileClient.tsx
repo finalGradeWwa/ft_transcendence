@@ -9,11 +9,17 @@
 
 import { useState, useEffect } from 'react';
 import { UserProfileProps, ProfileContent } from './UserProfileComponents';
+import { fetchCurrentUser } from '@/lib/auth';
 
 export default function UserProfileClient({
   user,
-  currentLoggedUser,
+  currentLoggedUser: _unused, // Server nie może pobrać, ignorujemy
 }: UserProfileProps) {
+  /** PL: Aktualnie zalogowany użytkownik | EN: Currently logged in user */
+  const [currentLoggedUser, setCurrentLoggedUser] = useState<string | null>(
+    null
+  );
+
   /** PL: Stan bieżącej strony w galerii pinów | EN: Current page state in the pins gallery */
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -23,7 +29,7 @@ export default function UserProfileClient({
   /** PL: Czy zalogowany użytkownik obserwuje ten profil | EN: Does the logged-in user follow this profile */
   const [isFollowing, setIsFollowing] = useState(false);
 
-  /** PL: Licznik obserwujących (zarządzany lokalnie    dla natychmiastowego UI) | EN: Followers count (managed locally for instant UI update) */
+  /** PL: Licznik obserwujących (zarządzany lokalnie dla natychmiastowego UI) | EN: Followers count (managed locally for instant UI update) */
   const [followersCount, setFollowersCount] = useState(user?.followers || 0);
 
   /** PL: Stan ładowania akcji (follow/unfollow) | EN: Loading state for actions (follow/unfollow) */
@@ -32,6 +38,16 @@ export default function UserProfileClient({
   const pins = user?.pins || [];
   const totalPages = Math.ceil(pins.length / 4) || 1;
   const isLoggedIn = !!currentLoggedUser;
+
+  /**
+   * PL: Pobiera aktualnie zalogowanego użytkownika z sessionStorage.
+   * EN: Fetches the currently logged in user from sessionStorage.
+   */
+  useEffect(() => {
+    fetchCurrentUser()
+      .then(userData => setCurrentLoggedUser(userData.username))
+      .catch(() => setCurrentLoggedUser(null));
+  }, []);
 
   /**
    * PL: Synchronizacja stanu profilu na podstawie zalogowanego użytkownika.
