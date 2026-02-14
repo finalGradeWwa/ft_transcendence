@@ -182,7 +182,22 @@
     "gardenNameLabel": "Garden name",
     "gardenNamePlaceholder": "e.g., My Balcony or Living Room",
     "noPins": "No entries",
-    "defaultGardenName": "Home Garden"
+    "defaultGardenName": "Main Garden",
+    "environmentLabel": "Environment",
+    "environments": {
+      "indoor": "Indoor",
+      "outdoor": "Outdoor",
+      "greenhouse": "Greenhouse"
+    },
+    "errors": {
+      "fillName": "Please provide a garden name",
+      "addFailed": "Error creating garden",
+      "unexpected": "An unexpected error occurred"
+    },
+    "success": {
+      "title": "Garden created!",
+      "message": "Your new garden has been added."
+    }
   },
   "AuthCallbackPage": {
     "loading": "Processing login, please wait..."

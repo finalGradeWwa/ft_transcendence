@@ -5,6 +5,7 @@ User = get_user_model()
 
 class UserSerializer(serializers.ModelSerializer):
 	plants_count = serializers.SerializerMethodField()
+	gardens_count = serializers.SerializerMethodField()
 	
 	class Meta:
 		model = User
@@ -19,6 +20,7 @@ class UserSerializer(serializers.ModelSerializer):
 			"is_active",
 			"avatar_photo",
 			"plants_count",
+			"gardens_count",
 		)
 		read_only_fields = fields
 	
@@ -28,6 +30,13 @@ class UserSerializer(serializers.ModelSerializer):
 		EN: Returns the count of plants belonging to the user.
 		"""
 		return obj.plants.count()
+	
+	def get_gardens_count(self, obj):
+		"""
+		PL: Zwraca liczbę ogrodów należących do użytkownika.
+		EN: Returns the count of gardens belonging to the user.
+		"""
+		return obj.memberships.count()
 
 
 class UserUpdateSerializer(serializers.ModelSerializer):
@@ -64,4 +73,3 @@ class ListFollowersSerializer(serializers.ModelSerializer):
         model = User
         fields = ("followers",)
         read_only_fields = fields
-		

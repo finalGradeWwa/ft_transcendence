@@ -189,7 +189,22 @@
     "gardenNameLabel": "Gartenname",
     "gardenNamePlaceholder": "z. B. Mein Balkon oder Wohnzimmer",
     "noPins": "Keine Einträge",
-    "defaultGardenName": "Heimgarten"
+    "defaultGardenName": "Hauptgarten",
+    "environmentLabel": "Umgebung",
+    "environments": {
+      "indoor": "Drinnen",
+      "outdoor": "Draußen",
+      "greenhouse": "Gewächshaus"
+    },
+    "errors": {
+      "fillName": "Bitte geben Sie einen Gartennamen an",
+      "addFailed": "Fehler beim Erstellen des Gartens",
+      "unexpected": "Ein unerwarteter Fehler ist aufgetreten"
+    },
+    "success": {
+      "title": "Garten erstellt!",
+      "message": "Ihr neuer Garten wurde hinzugefügt."
+    }
   },
   "AuthCallbackPage": {
     "loading": "Anmeldung wird verarbeitet, bitte warten..."

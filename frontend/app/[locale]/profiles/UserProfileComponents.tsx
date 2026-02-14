@@ -21,11 +21,10 @@ export interface UserProfileProps {
     bio?: string;
     date_joined: string;
     avatar_photo?: string;
-    followers: number;
-    following: number;
     gardens: number;
     plants: number;
     plants_count?: number;
+    gardens_count?: number;
     pins: Array<{
       id: number;
       title: string;
@@ -134,42 +133,6 @@ export const UserAvatar = ({ user }: { user: UserProfileProps['user'] }) => {
 };
 
 /**
- * PL: Prezentuje statystyki obserwujących i obserwowanych.
- * EN: Presents followers and following statistics.
- */
-export const UserStats = ({
-  user,
-  t,
-  followersCount,
-}: {
-  user: NonNullable<UserProfileProps['user']>;
-  t: any;
-  followersCount: number;
-}) => (
-  <div
-    className="md:w-full w-fit mx-auto flex flex-col items-start text-start text-xs sm:text-sm font-bold uppercase text-neutral-600"
-    role="group"
-    aria-label={t('summary')}
-  >
-    <div className="flex items-baseline gap-1.5 leading-tight">
-      <span className="text-lg sm:text-xl font-black text-primary-green">
-        {followersCount}
-      </span>
-      <span className="sr-only"> </span>
-      <span>{t('stats.followers')}</span>
-    </div>
-
-    <div className="flex items-baseline gap-1.5 leading-tight -mt-1">
-      <span className="text-lg sm:text-xl font-black text-primary-green">
-        {user.following ?? 0}
-      </span>
-      <span className="sr-only"> </span>
-      <span>{t('stats.following')}</span>
-    </div>
-  </div>
-);
-
-/**
  * PL: Wyświetla datę dołączenia użytkownika do serwisu.
  * EN: Displays the user's registration date.
  */
@@ -240,7 +203,6 @@ export const PersonalInfoContent = ({
           >
             {user.username}
           </Heading>
-          <UserStats user={user} t={t} followersCount={followersCount} />
         </div>
         <UserJoinedInfo dateJoined={dateJoined} t={t} />
         <div className="mt-4 h-[42px] flex items-center">
@@ -307,24 +269,45 @@ export const StatCard = ({
   count,
   label,
   isLoading,
+  href,
 }: {
   count?: number;
   label: string;
   isLoading: boolean;
-}) => (
-  <div className="h-full bg-container-light/90 p-6 rounded-xl flex flex-col justify-center items-center text-center shadow-sm border border-subtle-gray/30">
-    {isLoading ? (
-      <div className="h-12 w-16 bg-neutral-200 animate-pulse rounded-md" />
-    ) : (
-      <span className="block text-4xl sm:text-5xl font-black text-primary-green leading-none">
-        {count ?? 0}
-      </span>
-    )}
-    <span className="uppercase font-black text-sm sm:text-base mt-2 tracking-[0.2em] text-neutral-700">
-      {label}
-    </span>
-  </div>
-);
+  href?: string;
+}) => {
+  const content = (
+    <>
+      <div className="text-5xl font-black text-primary-green">
+        {isLoading ? (
+          <div className="h-14 w-14 bg-neutral-200 animate-pulse rounded" />
+        ) : (
+          count || 0
+        )}
+      </div>
+      <div className="text-sm font-bold uppercase tracking-widest text-neutral-600 mt-2">
+        {label}
+      </div>
+    </>
+  );
+
+  if (href) {
+    return (
+      <Link
+        href={href}
+        className="bg-container-light p-6 rounded-xl border border-primary-green/20 shadow-sm text-center hover:shadow-md hover:border-primary-green hover:bg-container-light/90 transition-all duration-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-header-main focus-visible:outline-offset-2"
+      >
+        {content}
+      </Link>
+    );
+  }
+
+  return (
+    <div className="bg-container-light p-6 rounded-xl border border-primary-green/20 shadow-sm text-center">
+      {content}
+    </div>
+  );
+};
 
 /**
  * PL: Kontrolki nawigacji stronicowaniem dla galerii pinów.
@@ -429,7 +412,7 @@ export const PinsGallery = ({
 export const EditProfileButton = ({ t }: { t: any }) => (
   <Link
     href="/profile/edit"
-    className="flex items-center gap-2 px-4 py-2 bg-primary-green/90 text-white rounded-lg font-bold uppercase text-[10px] tracking-widest transition-all hover:bg-green-700 shadow-sm w-fit"
+    className="flex items-center whitespace-nowrap gap-2 px-4 py-2 bg-primary-green/90 text-white rounded-lg font-bold uppercase text-[10px] tracking-widest transition-all hover:bg-green-700 shadow-sm w-fit leading-none"
   >
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -453,14 +436,16 @@ export const StatsSection = ({ user }: { user: UserProfileProps['user'] }) => {
   return (
     <div className="flex flex-col gap-4">
       <StatCard
-        count={user?.gardens}
+        count={user?.gardens_count}
         label={t('stats.gardens')}
         isLoading={!user}
+        href={`/profiles/${user?.username}/gardens`}
       />
       <StatCard
         count={user?.plants_count}
         label={t('stats.plants')}
         isLoading={!user}
+        href={`/profiles/${user?.username}/plants`} // ← DODAJ
       />
     </div>
   );
@@ -491,7 +476,7 @@ export const ProfileFooter = ({
     <div className="lg:col-span-2 flex justify-center lg:justify-start">
       {isOwnProfile && <EditProfileButton t={t} />}
     </div>
-    <div className="lg:col-span-10 bg-white/5 p-5 rounded-xl border border-white/5">
+    <div className="lg:col-span-10 bg-white/5 p-5 ml-4 rounded-xl border border-white/5">
       <div className="flex justify-between items-center mb-4">
         <PaginationControls
           currentPage={currentPage}
@@ -537,13 +522,14 @@ export const ProfileContent = ({
   followersCount: number;
   isActionLoading: boolean;
   isLoggedIn: boolean;
+  gardens_count?: number;
 }) => {
   const t = useTranslations('ProfilePage');
   const itemsPerPage = 4;
 
   return (
     <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pt-4 pb-12 flex flex-col justify-center h-full flex-grow">
-      <div className="bg-container-light/10 backdrop-blur-md p-6 sm:p-10 rounded-xl shadow-2xl w-full border border-primary-green/50 mt-12">
+      <div className="bg-container-light/10 backdrop-blur-md p-6 sm:p-10 rounded-xl shadow-2xl w-full mt-12">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <PersonalInfo
             user={user}

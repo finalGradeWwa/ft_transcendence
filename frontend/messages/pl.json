@@ -182,7 +182,22 @@
     "gardenNameLabel": "Nazwa ogrodu",
     "gardenNamePlaceholder": "np. Mój Balkon lub Salon",
     "noPins": "Brak wpisów",
-    "defaultGardenName": "Ogród Domowy"
+    "defaultGardenName": "Ogród Główny",
+    "environmentLabel": "Środowisko",
+    "environments": {
+      "indoor": "Wewnątrz (Indoor)",
+      "outdoor": "Na zewnątrz (Outdoor)",
+      "greenhouse": "Szklarnia (Greenhouse)"
+    },
+    "errors": {
+      "fillName": "Proszę podać nazwę ogrodu",
+      "addFailed": "Błąd podczas tworzenia ogrodu",
+      "unexpected": "Wystąpił nieoczekiwany błąd"
+    },
+    "success": {
+      "title": "Ogród utworzony!",
+      "message": "Twój nowy ogród został dodany."
+    }
   },
   "AuthCallbackPage": {
     "loading": "Przetwarzanie logowania, proszę czekać..."

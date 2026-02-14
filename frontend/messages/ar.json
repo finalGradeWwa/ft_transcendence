@@ -182,7 +182,22 @@
     "gardenNameLabel": "اسم الحديقة",
     "gardenNamePlaceholder": "مثلاً: شرفتي أو غرفة المعيشة",
     "noPins": "لا توجد مدخلات",
-    "defaultGardenName": "حديقة المنزل"
+    "defaultGardenName": "الحديقة الرئيسية",
+    "environmentLabel": "البيئة",
+    "environments": {
+      "indoor": "داخلي",
+      "outdoor": "خارجي",
+      "greenhouse": "دفيئة"
+    },
+    "errors": {
+      "fillName": "يرجى إدخال اسم الحديقة",
+      "addFailed": "خطأ في إنشاء الحديقة",
+      "unexpected": "حدث خطأ غير متوقع"
+    },
+    "success": {
+      "title": "تم إنشاء الحديقة!",
+      "message": "تمت إضافة حديقتك الجديدة."
+    }
   },
   "AuthCallbackPage": {
     "loading": "جارٍ معالجة تسجيل الدخول… يُرجى الانتظار"
