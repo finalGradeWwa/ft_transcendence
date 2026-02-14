@@ -98,3 +98,16 @@ class UnfollowUserAPIView(APIView):
             {"detail": f"You have unfollowed {target.username}."},
             status=status.HTTP_200_OK,
         )
+
+
+"""
+PL: Endpoint do pobierania publicznego profilu użytkownika po nazwie użytkownika.
+EN: Endpoint for fetching a user's public profile by username.
+"""
+class UserProfileView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request, username):
+        user = get_object_or_404(User, username=username)
+        serializer = UserSerializer(user, context={'request': request})
+        return Response(serializer.data)

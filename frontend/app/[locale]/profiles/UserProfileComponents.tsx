@@ -116,15 +116,17 @@ export const FollowButton = ({
  * EN: Displays the user's circular avatar.
  */
 export const UserAvatar = ({ user }: { user: UserProfileProps['user'] }) => {
+  const avatarUrl = getAvatarUrl(user?.avatar_photo);
   return (
     <div className="relative w-40 h-40 sm:w-48 sm:h-48 overflow-hidden rounded-full border-4 border-secondary-beige shadow-lg flex-shrink-0">
       <Image
-        src={getAvatarUrl(user?.avatar_photo)}
+        src={avatarUrl}
         alt={user?.username || 'User'}
         fill
         sizes="(max-width: 640px) 160px, 192px"
         className="object-cover"
         priority
+        unoptimized // PL: Wyłącza Next.js Image Optimizer dla external URLs EN: Disables Next.js Image Optimizer for external URLs
       />
     </div>
   );

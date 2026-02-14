@@ -56,7 +56,6 @@ const SearchModal = ({ isVisible, onClose }: SearchModalProps) => {
   /** TODO: Add search logic, API calls, sending form submission */
 
   const handleResultClick = (result: string) => {
-    console.log('Selected:', result);
     onClose();
   };
 
