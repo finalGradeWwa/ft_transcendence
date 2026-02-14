@@ -187,7 +187,8 @@
     "plantsCountLabel": "Anzahl der Pflanzen",
     "gardenNameLabel": "Gartenname",
     "gardenNamePlaceholder": "z. B. Mein Balkon oder Wohnzimmer",
-    "noPins": "Keine Einträge"
+    "noPins": "Keine Einträge",
+    "defaultGardenName": "Heimgarten"
   },
   "AuthCallbackPage": {
     "loading": "Anmeldung wird verarbeitet, bitte warten..."

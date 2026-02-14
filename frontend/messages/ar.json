@@ -180,7 +180,8 @@
     "plantsCountLabel": "عدد النباتات",
     "gardenNameLabel": "اسم الحديقة",
     "gardenNamePlaceholder": "مثلاً: شرفتي أو غرفة المعيشة",
-    "noPins": "لا توجد مدخلات"
+    "noPins": "لا توجد مدخلات",
+    "defaultGardenName": "حديقة المنزل"
   },
   "AuthCallbackPage": {
     "loading": "جارٍ معالجة تسجيل الدخول… يُرجى الانتظار"

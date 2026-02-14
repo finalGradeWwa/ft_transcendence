@@ -20,11 +20,12 @@ export interface UserProfileProps {
     username: string;
     bio?: string;
     date_joined: string;
-    avatar_photo: string;
+    avatar_photo?: string;
     followers: number;
     following: number;
     gardens: number;
     plants: number;
+    plants_count?: number;
     pins: Array<{
       id: number;
       title: string;
@@ -457,7 +458,7 @@ export const StatsSection = ({ user }: { user: UserProfileProps['user'] }) => {
         isLoading={!user}
       />
       <StatCard
-        count={user?.plants}
+        count={user?.plants_count}
         label={t('stats.plants')}
         isLoading={!user}
       />

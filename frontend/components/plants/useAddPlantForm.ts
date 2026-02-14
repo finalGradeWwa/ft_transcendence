@@ -17,7 +17,7 @@ export const useAddPlantForm = ({
   username,
   onSuccess,
 }: UseAddPlantFormProps) => {
-  const t = useTranslations('Plants');
+  const t = useTranslations('AddPlantPage');
 
   const [species, setSpecies] = useState('');
   const [nickname, setNickname] = useState('');
@@ -82,8 +82,12 @@ export const useAddPlantForm = ({
        */
       const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
-      const response = await fetch(`${apiUrl}/api/plants/`, {
+      const response = await fetch(`${apiUrl}/api/plant/`, {
         method: 'POST',
+        credentials: 'include',
+        headers: {
+          Authorization: 'Bearer ' + sessionStorage.getItem('accessToken'),
+        },
         body: formData,
       });
 

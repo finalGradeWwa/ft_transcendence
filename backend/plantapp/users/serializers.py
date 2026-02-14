@@ -4,20 +4,30 @@ from rest_framework import serializers
 User = get_user_model()
 
 class UserSerializer(serializers.ModelSerializer):
+	plants_count = serializers.SerializerMethodField()
+	
 	class Meta:
 		model = User
 		fields = (
-			"id", # Do we need 'id' in users model?
+			"id",
 			"first_name",
-            "last_name",
-            "username",
+			"last_name",
+			"username",
 			"email",
 			"bio",
 			"date_joined",
 			"is_active",
 			"avatar_photo",
+			"plants_count",
 		)
 		read_only_fields = fields
+	
+	def get_plants_count(self, obj):
+		"""
+		PL: Zwraca liczbę roślin należących do użytkownika.
+		EN: Returns the count of plants belonging to the user.
+		"""
+		return obj.plants.count()
 
 
 class UserUpdateSerializer(serializers.ModelSerializer):
@@ -54,3 +64,4 @@ class ListFollowersSerializer(serializers.ModelSerializer):
         model = User
         fields = ("followers",)
         read_only_fields = fields
+		

@@ -180,7 +180,8 @@
     "plantsCountLabel": "Number of plants",
     "gardenNameLabel": "Garden name",
     "gardenNamePlaceholder": "e.g., My Balcony or Living Room",
-    "noPins": "No entries"
+    "noPins": "No entries",
+    "defaultGardenName": "Home Garden"
   },
   "AuthCallbackPage": {
     "loading": "Processing login, please wait..."

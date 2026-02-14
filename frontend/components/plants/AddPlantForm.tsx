@@ -11,7 +11,7 @@ import { Text } from '@/components/typography/Text';
 import { useAddPlantForm } from './useAddPlantForm';
 
 interface Garden {
-  id: string;
+  garden_id: string;
   name: string;
 }
 interface AddPlantFormProps {
@@ -31,6 +31,7 @@ export function AddPlantForm({
   onSuccess,
 }: AddPlantFormProps) {
   const t = useTranslations('AddPlantPage');
+  const tGardens = useTranslations('GardensPage');
   const tr = useTranslations('RegisterPage');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -92,16 +93,22 @@ export function AddPlantForm({
             value={form.garden}
             onChange={e => form.setGarden(e.target.value)}
           >
-            <option value="" className="text-dark-text font-normal">
+            <option
+              value=""
+              className="text-dark-text font-normal"
+              key="placeholder"
+            >
               {t('fields.selectGarden')}
             </option>
             {gardens?.map(g => (
               <option
-                key={g.id}
-                value={g.id}
+                key={g.garden_id}
+                value={g.garden_id}
                 className="text-dark-text font-bold"
               >
-                {g.name}
+                {g.name === 'Home Garden'
+                  ? tGardens('defaultGardenName')
+                  : g.name}
               </option>
             ))}
           </select>

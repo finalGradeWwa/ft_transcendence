@@ -180,7 +180,8 @@
     "plantsCountLabel": "Liczba roślin",
     "gardenNameLabel": "Nazwa ogrodu",
     "gardenNamePlaceholder": "np. Mój Balkon lub Salon",
-    "noPins": "Brak wpisów"
+    "noPins": "Brak wpisów",
+    "defaultGardenName": "Ogród Domowy"
   },
   "AuthCallbackPage": {
     "loading": "Przetwarzanie logowania, proszę czekać..."
