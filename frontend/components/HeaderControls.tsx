@@ -215,15 +215,18 @@ export function HeaderControls({
           }
         );
 
-        // PL: Sprawdzamy, czy odpowiedź to faktycznie JSON
         const contentType = response.headers.get('content-type');
-        if (
-          response.ok &&
-          contentType &&
-          contentType.includes('application/json')
-        ) {
+        const isJson = contentType && contentType.includes('application/json');
+
+        if (isJson) {
           const data = await response.json();
-          setHasNewMessages(data.unread_count > 0);
+          if (response.ok) {
+            setHasNewMessages(data.unread_count > 0);
+          } else {
+            // Obsługa błędów API zwróconych w JSONie (np. 401, 403)
+            console.error('Chat count error details:', data);
+            setHasNewMessages(false);
+          }
         } else {
           // PL: Jeśli to nie JSON, nie robimy nic (zapobiega SyntaxError)
           console.warn('Chat count endpoint returned non-JSON response');
@@ -231,6 +234,7 @@ export function HeaderControls({
         }
       } catch (error) {
         console.error('Failed to fetch unread messages', error);
+        setHasNewMessages(false);
       }
     };
 
@@ -324,7 +328,10 @@ export function HeaderControls({
           <div className="relative">
             <IconButton href="/chat" icon="chat" label={tAria('chat')} />
             {hasNewMessages && (
-              <span className="absolute top-0 right-0 block h-3 w-3 rounded-full bg-red-500 border-2 border-secondary-beige animate-pulse" />
+              <span
+                aria-hidden="true"
+                className="absolute top-0 right-0 block h-3 w-3 rounded-full bg-red-500 border-2 border-secondary-beige animate-pulse"
+              />
             )}
           </div>
         )}
