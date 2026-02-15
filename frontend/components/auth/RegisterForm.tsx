@@ -117,7 +117,7 @@ export const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
 
     try {
       const response = await fetch(
-        `${getApiUrl()}/api/auth/register/"`,
+        `${getApiUrl()}/api/auth/register/`,
         {
           method: 'POST',
           body: formData,
