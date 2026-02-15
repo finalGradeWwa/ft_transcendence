@@ -44,8 +44,8 @@ jobs:
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
           DEBUG_VALUE: 'false'
           ALLOWED_HOSTS: 'localhost'
-          GITHUB_OAUTH_KEY: ${{ secrets.GITHUB_OAUTH_KEY }}
-          GITHUB_OAUTH_SECRET: ${{ secrets.GITHUB_OAUTH_SECRET }}
+          GITHUB_OAUTH_KEY: ${{ secrets.OAUTH_KEY }}
+          GITHUB_OAUTH_SECRET: ${{ secrets.OAUTH_SECRET }}
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
