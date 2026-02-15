@@ -3,6 +3,46 @@ import { test, expect } from '@playwright/test';
 const generateUniqueEmail = () => `test${Date.now()}@example.com`;
 const generateUniqueUsername = () => `testuser${Date.now()}`;
 
+test.describe('Homepage & Navigation', () => {
+  test('homepage has title', async ({ page }) => {
+    await page.goto('/');
+    await expect(page).toHaveTitle(/Plant Portal/);
+  });
+
+  test('homepage has login button', async ({ page }) => {
+    await page.goto('/en/');
+    await page.getByRole('link', { name: /Login/i }).click();
+    await expect(page).toHaveURL(/showLogin/);
+  });
+
+  test('navigation to gardens page', async ({ page }) => {
+    await page.goto('/en/');
+    await page.getByRole('link', { name: /Gardens/i }).click();
+    await expect(page).toHaveURL('/en/gardens');
+  });
+
+  test('language switcher changes locale', async ({ page }) => {
+    await page.goto('/en/');
+    await page.waitForSelector('select');
+    await page.getByRole('combobox').selectOption('PL');
+    await expect(page).toHaveURL(/\/pl\/?/);
+  });
+
+  test('search modal opens', async ({ page }) => {
+    await page.goto('/en/');
+    await page.getByRole('link', { name: 'Search' }).waitFor();
+    await page.getByRole('link', { name: 'Search' }).click();
+    await page.waitForURL(/showSearch/);
+    await expect(page).toHaveURL(/showSearch/);
+  });
+
+  test('footer links work', async ({ page }) => {
+    await page.goto('/en/');
+    await page.getByRole('link', { name: /Terms/i }).click();
+    await expect(page).toHaveURL('/en/terms');
+  });
+});
+
 test.describe('Sign Up (Registration)', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/en/register');
