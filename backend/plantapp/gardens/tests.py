@@ -56,7 +56,7 @@ class GardenAPITests(APITestCase):
     def test_list_all_gardens(self):
         """Test that all gardens are visible to authenticated users"""
         # Create a garden for Bob
-        bob_garden = create_garden(
+        create_garden(
             creator=self.bob,
             data={"name": "Bob's Garden"}
         )
@@ -74,7 +74,7 @@ class GardenAPITests(APITestCase):
     def test_list_gardens_filter_by_owner_me(self):
         """Test filtering gardens by ?owner=me"""
         # Create a garden for Bob
-        bob_garden = create_garden(
+        create_garden(
             creator=self.bob,
             data={"name": "Bob's Garden"}
         )
@@ -99,7 +99,7 @@ class GardenAPITests(APITestCase):
     def test_list_gardens_filter_by_owner_id(self):
         """Test filtering gardens by ?owner=<user_id>"""
         # Create a garden for Bob
-        bob_garden = create_garden(
+        create_garden(
             creator=self.bob,
             data={"name": "Bob's Garden"}
         )

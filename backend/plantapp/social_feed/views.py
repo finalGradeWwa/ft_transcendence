@@ -4,7 +4,6 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
-from rest_framework.parsers import FormParser, MultiPartParser
 from .serializers import PinWriteModeSerializer, PinDetailReadModeSerializer, PinListReadModeSerializer
 from .services import create_pin
 from .models import Pin
@@ -26,7 +25,7 @@ class PinViewSet(viewsets.ViewSet):
         serializer = PinDetailReadModeSerializer(pin)
         return Response(
             {
-            "detail": f"added new pin!",
+            "detail": "added new pin!",
             "pin": serializer.data
             },
             status=status.HTTP_201_CREATED,

@@ -141,7 +141,7 @@ class PlantAPITests(APITestCase):
         # Create another garden and plant for other_user
         other_garden = Garden.objects.create(name="Other Garden", slug="other-garden")
         GardenUser.objects.create(organization=other_garden, user=self.other_user)
-        other_plant = Plant.objects.create(
+        Plant.objects.create(
             owner=self.other_user,
             garden=other_garden,
             nickname="Other Plant",
@@ -161,7 +161,7 @@ class PlantAPITests(APITestCase):
         # Create another plant for other_user
         other_garden = Garden.objects.create(name="Other Garden", slug="other-garden")
         GardenUser.objects.create(organization=other_garden, user=self.other_user)
-        other_plant = Plant.objects.create(
+        Plant.objects.create(
             owner=self.other_user,
             garden=other_garden,
             nickname="Other Plant",
@@ -182,7 +182,7 @@ class PlantAPITests(APITestCase):
         # Create another plant for other_user
         other_garden = Garden.objects.create(name="Other Garden", slug="other-garden")
         GardenUser.objects.create(organization=other_garden, user=self.other_user)
-        other_plant = Plant.objects.create(
+        Plant.objects.create(
             owner=self.other_user,
             garden=other_garden,
             nickname="Other Plant",
@@ -201,7 +201,7 @@ class PlantAPITests(APITestCase):
     def test_list_plants_filter_by_garden(self):
         """Test filtering plants by ?garden=<garden_id>"""
         # Create another plant in the same garden
-        plant2 = Plant.objects.create(
+        Plant.objects.create(
             owner=self.user,
             garden=self.garden,
             nickname="Succulent",
@@ -211,7 +211,7 @@ class PlantAPITests(APITestCase):
         # Create a plant in another garden
         other_garden = Garden.objects.create(name="Other Garden", slug="other-garden")
         GardenUser.objects.create(organization=other_garden, user=self.user)
-        plant3 = Plant.objects.create(
+        Plant.objects.create(
             owner=self.user,
             garden=other_garden,
             nickname="Rose",
@@ -234,7 +234,7 @@ class PlantAPITests(APITestCase):
         """Test combining ?garden=<id> and ?owner=me filters"""
         # Create another plant in the same garden by other_user
         GardenUser.objects.create(organization=self.garden, user=self.other_user)
-        other_plant = Plant.objects.create(
+        Plant.objects.create(
             owner=self.other_user,
             garden=self.garden,
             nickname="Other's Fern",
