@@ -5,4 +5,4 @@ class GardensConfig(AppConfig):
     name = 'gardens'
     
     def ready(self):
-        pass
+        import gardens.signals
