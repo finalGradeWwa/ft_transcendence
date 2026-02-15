@@ -4,4 +4,4 @@ class GardensConfig(AppConfig):
     name = 'gardens'
     
     def ready(self):
-       import gardens.signals  # noqa: F401
+        import gardens.signals  # noqa: F401

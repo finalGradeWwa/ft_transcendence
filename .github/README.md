@@ -1,6 +1,6 @@
 # GitHub Actions Workflows
 
-This directory contains CI/CD workflows for the ft_transendence project.
+This directory contains CI/CD workflows for the ft_transcendence project.
 
 ## Overview
 
