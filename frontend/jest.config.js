@@ -13,7 +13,7 @@ const config = {
   },
   testMatch: [
     '<rootDir>/**/__tests__/**/*.(ts|tsx)',
-    '<rootDir>/**/*.(test|spec).(ts|tsx)',
+    '<rootDir>/**/*.test.(ts|tsx)',
   ],
   collectCoverageFrom: [
     '**/*.(ts|tsx)',

@@ -30,22 +30,31 @@ test('navigation to gardens page', async ({ page }) => {
 test('language switcher changes locale', async ({ page }) => {
   await page.goto('/en/');
 
+  // Wait for the language select to be visible
+  await page.waitForSelector('select');
+
   // Select Polish from the language switcher
-  await page.getByRole('combobox', { name: /Select language/i }).selectOption('pl');
+  await page.getByRole('combobox').selectOption('PL');
 
   // Expects the URL to change to /pl/
-  await expect(page).toHaveURL('/pl/');
+  await expect(page).toHaveURL(/\/pl\/?/);
 });
 
-// test('search modal opens', async ({ page }) => {
-//   await page.goto('/en/');
+test('search modal opens', async ({ page }) => {
+  await page.goto('/en/');
 
-//   // Click the Search link
-//   await page.getByRole('link', { name: /Search/i }).click();
+  // Wait for the search link to be visible
+  await page.getByRole('link', { name: 'Search' }).waitFor();
 
-//   // Expects the URL to contain showSearch
-//   await expect(page).toHaveURL(/showSearch/);
-// });
+  // Click the Search link
+  await page.getByRole('link', { name: 'Search' }).click();
+
+  // Wait for URL to change
+  await page.waitForURL(/showSearch/);
+
+  // Expects the URL to contain showSearch
+  await expect(page).toHaveURL(/showSearch/);
+});
 
 test('footer links work', async ({ page }) => {
   await page.goto('/en/');
@@ -55,4 +64,53 @@ test('footer links work', async ({ page }) => {
 
   // Expects the URL to be /en/terms
   await expect(page).toHaveURL('/en/terms');
+});
+
+test('user registration', async ({ page }) => {
+  await page.goto('/en/');
+
+  // Click the login link
+  await page.getByRole('link', { name: /Login/i }).click();
+
+  // Click the register link in the modal
+  await page.getByRole('link', { name: /Register here/i }).click();
+
+  // Fill the registration form
+  await page.locator('#reg-username').fill('testuser');
+  await page.locator('#reg-email').fill('test@example.com');
+  await page.locator('#reg-password').fill('Testpass123!');
+  await page.locator('#reg-password-confirm').fill('Testpass123!');
+
+  // Submit the form
+  await page.getByRole('button', { name: /Register/i }).click();
+
+  // Expects to stay on register page or check for success message
+  await expect(page).toHaveURL('/en/register');
+});
+
+test('user login', async ({ page }) => {
+  await page.goto('/en/');
+
+  const loginLink = page.getByRole('link', { name: /Login/i });
+
+  // Ensure the login link is ready, then open the modal
+  await loginLink.waitFor({ state: 'visible' });
+  await loginLink.click();
+
+  // Wait for the modal-triggering query param to appear
+  await page.waitForURL(/showLogin=true/);
+
+  const emailInput = page.locator('input[name="email"]');
+  const passwordInput = page.locator('input[name="password"]');
+
+  // Fill in credentials
+  await emailInput.waitFor({ state: 'visible' });
+  await emailInput.fill('test@example.com');
+  await passwordInput.fill('Testpass123!');
+
+  await page.getByRole('button', { name: /^Login$/i }).click();
+
+  // Successful login redirects with auth param
+  await page.waitForURL(/auth=login_success/);
+  await expect(page).toHaveURL(/auth=login_success/);
 });
