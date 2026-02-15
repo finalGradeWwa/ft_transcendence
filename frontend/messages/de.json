@@ -216,6 +216,7 @@
     "noResults": "Keine Ergebnisse für \"{query}\" gefunden",
     "aria": {
       "close": "Suche schließen"
-    }
+    },
+    "loading": "Suche wird ausgeführt, bitte warten..."
   }
 }
