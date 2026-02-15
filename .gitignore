@@ -4,6 +4,7 @@ plantapp/.env
 __pycache__/
 .DS_Store
 .env
+venv
 
 # user avatar images
 backend/plantapp/media/

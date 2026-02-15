@@ -192,6 +192,7 @@
     "noResults": "No results found for \"{query}\"",
     "aria": {
       "close": "Close search"
-    }
+    },
+    "loading": "Searching, please wait..."
   }
 }

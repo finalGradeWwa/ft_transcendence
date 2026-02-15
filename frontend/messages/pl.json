@@ -192,6 +192,7 @@
     "noResults": "Nie znaleziono wyników dla \"{query}\"",
     "aria": {
       "close": "Zamknij wyszukiwanie"
-    }
+    },
+    "loading": "Trwa wyszukiwanie, proszę czekać..."
   }
 }
