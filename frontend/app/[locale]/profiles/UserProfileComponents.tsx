@@ -18,7 +18,6 @@ export interface UserProfileProps {
   user: {
     id: number;
     username: string;
-    bio?: string;
     date_joined: string;
     avatar_photo: string;
     followers: number;
@@ -81,11 +80,10 @@ export const FollowButton = ({
   <button
     onClick={onFollow}
     disabled={isLoading}
-    className={`inline-flex items-center gap-2 px-6 py-2 rounded-lg font-black uppercase text-[10px] tracking-widest transition-all duration-500 ease-in-out shadow-sm border border-primary-green overflow-hidden whitespace-nowrap active:scale-95 disabled:opacity-50 ${
-      isFollowing
+    className={`inline-flex items-center gap-2 px-6 py-2 rounded-lg font-black uppercase text-[10px] tracking-widest transition-all duration-500 ease-in-out shadow-sm border border-primary-green overflow-hidden whitespace-nowrap active:scale-95 disabled:opacity-50 ${isFollowing
         ? 'bg-transparent text-primary-green hover:bg-primary-green/10'
         : 'bg-primary-green text-white hover:bg-green-700'
-    }`}
+      }`}
   >
     {isFollowing && !isLoading && (
       <svg

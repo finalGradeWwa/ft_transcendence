@@ -73,6 +73,7 @@ INSTALLED_APPS = [
     'social_django',
     'social_feed',
     'chat_app',
+    'django_filters',
 ]
 
 MIDDLEWARE = [
