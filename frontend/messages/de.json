@@ -42,7 +42,8 @@
       "add": "Neue Pflanze hinzufügen",
       "profile": "Benutzerprofil",
       "logout": "Abmelden",
-      "userTools": "Benutzer-Tools"
+      "userTools": "Benutzer-Tools",
+      "chat": "Chat öffnen"
     },
     "contact": {
       "name": "John Weeder",
