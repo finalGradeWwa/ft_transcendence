@@ -1,0 +1,47 @@
+name: Backend CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install ruff
+        run: pip install ruff
+
+      - name: Run ruff linter
+        run: ruff check backend/plantapp/
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install -r backend/requirements.txt
+
+      - name: Run Django tests
+        run: |
+          cd backend/plantapp
+          python manage.py test .
+        env:
+          DJANGO_SETTINGS_MODULE: mysite.settings
+          PYTHONPATH: backend/plantapp
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          DEBUG_VALUE: 'false'
+          ALLOWED_HOSTS: 'localhost'
+          GITHUB_OAUTH_KEY: ${{ secrets.OAUTH_KEY }}
+          GITHUB_OAUTH_SECRET: ${{ secrets.OAUTH_SECRET }}
