@@ -8,3 +8,5 @@ venv
 
 # user avatar images
 backend/plantapp/media/
+frontend/playwright-report
+frontend/test-results

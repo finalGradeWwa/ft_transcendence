@@ -1,7 +1,6 @@
 from .models import Garden, GardenUser, GardenOwner
-from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated,IsAuthenticatedOrReadOnly
+from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
@@ -161,7 +160,7 @@ class GardenViewSet(viewsets.ViewSet):
             )
         return Response(
         {  
-            "detail": f"new garden member has been added.",
+            "detail": "new garden member has been added.",
             "garden_id": garden.id,
             "added_user_id": user_id,
         },
