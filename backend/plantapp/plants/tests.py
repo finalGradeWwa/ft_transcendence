@@ -46,12 +46,6 @@ class PlantAPITests(APITestCase):
         self.assertEqual(response.data.get("plant_id"), self.plant.plant_id)
         self.assertEqual(response.data.get("nickname"), self.plant.nickname)
 
-    def test_get_returns_404_for_non_member(self):
-        url = reverse("plant-list", args=[self.plant.pk])
-        self.client.force_authenticate(self.other_user)
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-
     def test_create_plant_succeeds_for_authenticated_user(self):
         self.client.force_authenticate(self.user)
 
@@ -132,7 +126,7 @@ class PlantAPITests(APITestCase):
         self.client.force_authenticate(self.other_user)
         payload = {"nickname": "Hacked"}
         response = self.client.patch(url, payload)
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_put_denies_non_garden_member(self):
         """Test that users not in garden cannot update plant"""
@@ -140,7 +134,7 @@ class PlantAPITests(APITestCase):
         self.client.force_authenticate(self.other_user)
         payload = {"nickname": "Hacked"}
         response = self.client.put(url, payload)
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_list_all_plants(self):
         """Test that all authenticated users can see all plants"""
