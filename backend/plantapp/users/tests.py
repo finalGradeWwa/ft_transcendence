@@ -730,9 +730,6 @@ class ListFriendsAPIViewTests(APITestCase):
         url = f"/users/{self.alice.id}/friends/"
         response = self.client.get(url)
 
-        # Get friends via endpoint
-        friends_from_endpoint = {f["username"] for f in response.data}
-
         # Verify consistency: everyone in the endpoint response should also satisfy is_friend_with
         for friend in response.data:
             friend_obj = User.objects.get(pk=friend["id"])

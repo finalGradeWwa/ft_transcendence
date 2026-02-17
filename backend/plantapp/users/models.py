@@ -2,7 +2,6 @@ from django.db import models
 from django.contrib.auth.models import (AbstractBaseUser,
  BaseUserManager, PermissionsMixin)
 from django.utils import timezone
-from django.db.models import Q
 
 # Create your models here.
 

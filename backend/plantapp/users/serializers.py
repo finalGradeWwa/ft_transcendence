@@ -11,11 +11,11 @@ class UserSerializer(serializers.ModelSerializer):
             "first_name",
             "last_name",
             "username",
-			"email",
-			"date_joined",
-			"is_active",
-		)
-		read_only_fields = fields
+            "email",
+            "date_joined",
+            "is_active",
+        )
+        read_only_fields = fields
 
 
 class UserUpdateSerializer(serializers.ModelSerializer):
