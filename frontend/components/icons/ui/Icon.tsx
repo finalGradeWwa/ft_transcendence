@@ -13,7 +13,8 @@ type IconName =
   | 'people'
   | 'close'
   | 'menu'
-  | 'mail';
+  | 'mail'
+  | 'chat';
 
 interface IconProps {
   name: IconName;
@@ -48,6 +49,7 @@ export const Icon = ({ name, className, size = 24 }: IconProps) => {
         <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
       </>
     ),
+    chat: <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z" />,
   };
 
   return (

@@ -5,8 +5,10 @@
  * EN: Main client-side home page component. Displays a grid of recommended plants.
  */
 
+import React from 'react';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Icon } from '@/components/icons/ui/Icon';
 
 export type PlantType = {
@@ -28,10 +30,71 @@ export const HomePageClient = ({
   hideTitle?: boolean;
 }) => {
   const t = useTranslations('HomePage');
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const authStatus = searchParams.get('auth');
+  const authProvider = searchParams.get('provider');
+
+  // Keep a local flag so the banner stays visible after we clean the URL.
+  const [showLoginSuccess, setShowLoginSuccess] = React.useState(false);
+  const [isExiting, setIsExiting] = React.useState(false);
+  const [loginProvider, setLoginProvider] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    if (authStatus !== 'login_success') return;
+
+    setShowLoginSuccess(true);
+    setLoginProvider(authProvider);
+
+    // Clean the URL so the message doesn't reappear on refresh.
+    // Delay the replace slightly so the user actually sees the banner.
+    const timeout = window.setTimeout(() => {
+      const url = new URL(window.location.href);
+      url.searchParams.delete('auth');
+      url.searchParams.delete('provider');
+      url.searchParams.delete('showLogin');
+      url.searchParams.delete('error');
+
+      router.replace(url.pathname + url.search);
+    }, 800);
+
+    return () => window.clearTimeout(timeout);
+  }, [authProvider, authStatus, router]);
+
+  React.useEffect(() => {
+    if (!showLoginSuccess) return;
+
+    const startExitTimeout = window.setTimeout(() => {
+      setIsExiting(true);
+    }, 4000);
+
+    const finalRemoveTimeout = window.setTimeout(() => {
+      setShowLoginSuccess(false);
+      setIsExiting(false);
+    }, 4500);
+
+    return () => {
+      window.clearTimeout(startExitTimeout);
+      window.clearTimeout(finalRemoveTimeout);
+    };
+  }, [showLoginSuccess]);
 
   return (
     <>
       <section className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
+        {showLoginSuccess && (
+          <div
+            className={`rounded-lg border border-primary-green bg-secondary-beige px-4 text-md font-bold text-primary-green text-center overflow-hidden
+        transition-all duration-500
+        ${isExiting ? 'animate-fade-out py-0 mb-0' : 'animate-fade-in py-3 mb-6'}
+      `}
+          >
+            {loginProvider === 'github'
+              ? t('oauthLoginSuccess')
+              : t('loginSuccess')}
+          </div>
+        )}
+
         {!hideTitle && (
           <h1 className="text-2xl md:text-3xl font-bold mb-6 text-white-text overflow-hidden">
             {t('recommended')}

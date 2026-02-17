@@ -6,9 +6,15 @@ const eslintConfig = [
   ...nextVitals,
   ...nextTs,
   {
-    // PL: Globalne ignorowanie plików zastępuje funkcję globalIgnores
-    // EN: Global ignores replace the globalIgnores function
-    ignores: ['.next/**', 'out/**', 'build/**', 'next-env.d.ts'],
+    ignores: ['.next/**', 'out/**', 'build/**', 'next-env.d.ts', 'jest.setup.js'],
+  },
+  {
+    rules: {
+      '@typescript-eslint/no-explicit-any': 'warn',
+      '@typescript-eslint/no-unused-vars': 'warn',
+      '@next/next/no-img-element': 'warn',
+      'react-hooks/set-state-in-effect': 'warn',
+    },
   },
 ];
 

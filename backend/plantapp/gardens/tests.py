@@ -56,7 +56,7 @@ class GardenAPITests(APITestCase):
     def test_list_all_gardens(self):
         """Test that all gardens are visible to authenticated users"""
         # Create a garden for Bob
-        bob_garden = create_garden(
+        create_garden(
             creator=self.bob,
             data={"name": "Bob's Garden"}
         )
@@ -74,7 +74,7 @@ class GardenAPITests(APITestCase):
     def test_list_gardens_filter_by_owner_me(self):
         """Test filtering gardens by ?owner=me"""
         # Create a garden for Bob
-        bob_garden = create_garden(
+        create_garden(
             creator=self.bob,
             data={"name": "Bob's Garden"}
         )
@@ -99,7 +99,7 @@ class GardenAPITests(APITestCase):
     def test_list_gardens_filter_by_owner_id(self):
         """Test filtering gardens by ?owner=<user_id>"""
         # Create a garden for Bob
-        bob_garden = create_garden(
+        create_garden(
             creator=self.bob,
             data={"name": "Bob's Garden"}
         )
@@ -149,6 +149,90 @@ class GardenAPITests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertFalse(Garden.objects.filter(pk=self.garden.pk).exists())
 
+    def test_owner_can_update_garden_name(self):
+        """Test that garden owner can update garden name"""
+        self.client.force_authenticate(user=self.alice)
+        
+        data = {
+            "name": "Updated Garden Name",
+            "environment": "I"
+        }
+        response = self.client.put(self.detail_url, data)
+        
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.garden.refresh_from_db()
+        self.assertEqual(self.garden.name, "Updated Garden Name")
+
+    def test_owner_can_update_garden_environment(self):
+        """Test that garden owner can update garden environment"""
+        self.client.force_authenticate(user=self.alice)
+        
+        data = {
+            "name": "Alice's Garden",
+            "environment": "O"
+        }
+        response = self.client.put(self.detail_url, data)
+        
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.garden.refresh_from_db()
+        self.assertEqual(self.garden.environment, "O")
+
+    def test_owner_can_partially_update_garden_name(self):
+        """Test that garden owner can partially update just the name"""
+        self.client.force_authenticate(user=self.alice)
+        
+        original_environment = self.garden.environment
+        data = {"name": "New Name Only"}
+        response = self.client.patch(self.detail_url, data)
+        
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.garden.refresh_from_db()
+        self.assertEqual(self.garden.name, "New Name Only")
+        self.assertEqual(self.garden.environment, original_environment)  # Unchanged
+
+    def test_owner_can_partially_update_garden_environment(self):
+        """Test that garden owner can partially update just the environment"""
+        self.client.force_authenticate(user=self.alice)
+        
+        original_name = self.garden.name
+        data = {"environment": "G"}  # Greenhouse
+        response = self.client.patch(self.detail_url, data)
+        
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.garden.refresh_from_db()
+        self.assertEqual(self.garden.environment, "G")
+        self.assertEqual(self.garden.name, original_name)  # Unchanged
+
+    def test_non_owner_cannot_update_garden(self):
+        """Test that non-owner cannot update garden"""
+        GardenUser.objects.create(
+            organization=self.garden,
+            user=self.bob
+        )
+        
+        self.client.force_authenticate(user=self.bob)
+        data = {"name": "Hacked Name", "environment": "O"}
+        response = self.client.put(self.detail_url, data)
+        
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.garden.refresh_from_db()
+        self.assertEqual(self.garden.name, "Alice's Garden")  # Unchanged
+
+    def test_non_owner_cannot_partially_update_garden(self):
+        """Test that non-owner cannot partially update garden"""
+        GardenUser.objects.create(
+            organization=self.garden,
+            user=self.bob
+        )
+        
+        self.client.force_authenticate(user=self.bob)
+        data = {"environment": "O"}
+        response = self.client.patch(self.detail_url, data)
+        
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.garden.refresh_from_db()
+        self.assertEqual(self.garden.environment, "I")  # Unchanged
+
     def test_non_owner_cannot_delete_garden(self):
         GardenUser.objects.create(
             organization=self.garden,
@@ -158,7 +242,7 @@ class GardenAPITests(APITestCase):
         self.client.force_authenticate(user=self.bob)
         response = self.client.delete(self.detail_url)
 
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_owner_can_add_new_garden_user(self):
         self.client.force_authenticate(user=self.alice)

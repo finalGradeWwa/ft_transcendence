@@ -11,19 +11,18 @@ class UserSerializer(serializers.ModelSerializer):
             "first_name",
             "last_name",
             "username",
-            "email",
-            "bio",
-            "date_joined",
-            "is_active",
-        )
-        read_only_fields = fields
+			"email",
+			"date_joined",
+			"is_active",
+		)
+		read_only_fields = fields
 
 
 class UserUpdateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ("username", "email", "first_name", "last_name", "bio")
+        fields = ("username", "email", "first_name", "last_name")
 
     def validate_email(self, value: str) -> str:
         user = self.instance
@@ -47,10 +46,3 @@ class PublicUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ("id", "username", "first_name", "last_name")
-
-
-class ListFollowersSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ("followers",)
-        read_only_fields = fields

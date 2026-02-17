@@ -15,7 +15,6 @@ class UserModelTests(TestCase):
             username="testuser",
             email="test@example.com",
             password="strongpassword123",
-            bio="hello! my name is User123!",
         )
 
         self.assertEqual(user.username, "testuser")
@@ -24,7 +23,6 @@ class UserModelTests(TestCase):
         self.assertTrue(user.is_active)
         self.assertFalse(user.is_staff)
         self.assertFalse(user.is_superuser)
-        self.assertEqual(user.bio, "hello! my name is User123!")
 
     def test_email_is_normalized(self):
         user = User.objects.create_user(
@@ -71,7 +69,6 @@ class MeViewTests(APITestCase):
             password='SecurePass123!',
             first_name='Test',
             last_name='User',
-            bio='Test bio'
         )
         self.client.force_authenticate(user=self.user)
 
@@ -83,7 +80,6 @@ class MeViewTests(APITestCase):
         self.assertEqual(response.data['email'], 'test@example.com')
         self.assertEqual(response.data['first_name'], 'Test')
         self.assertEqual(response.data['last_name'], 'User')
-        self.assertEqual(response.data['bio'], 'Test bio')
         self.assertIn('id', response.data)
         self.assertIn('date_joined', response.data)
 
@@ -98,13 +94,11 @@ class MeViewTests(APITestCase):
         response = self.client.patch(self.url, {
             'first_name': 'Updated',
             'last_name': 'Name',
-            'bio': 'Updated bio'
         }, format='json')
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['first_name'], 'Updated')
         self.assertEqual(response.data['last_name'], 'Name')
-        self.assertEqual(response.data['bio'], 'Updated bio')
 
         # Verify in database
         self.user.refresh_from_db()
@@ -113,11 +107,9 @@ class MeViewTests(APITestCase):
 
     def test_patch_me_partial_update(self):
         response = self.client.patch(self.url, {
-            'bio': 'Only bio updated'
         }, format='json')
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['bio'], 'Only bio updated')
         self.assertEqual(response.data['first_name'], 'Test')  # Unchanged
         self.assertEqual(response.data['last_name'], 'User')  # Unchanged
 
@@ -165,7 +157,7 @@ class MeViewTests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-class FollowAPITests(APITestCase):
+class FriendRequestAPITests(APITestCase):
     def setUp(self):
         self.alice = User.objects.create_user(
             email="alice@a.com",
@@ -177,34 +169,34 @@ class FollowAPITests(APITestCase):
             username="bob",
             password="password123",
         )
-    def test_user_can_follow_another_user(self):
+    
+    def test_user_can_send_friend_request(self):
         self.client.force_authenticate(user=self.alice)
 
-        url = f"/users/{self.bob.id}/follow/"
+        url = f"/users/{self.bob.id}/send-request/"
         response = self.client.post(url)
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue(
             self.alice.following.filter(id=self.bob.id).exists()
         )
-        self.assertTrue(
-            self.bob.followers.filter(id=self.alice.id).exists()
-        )
-    def test_user_cannot_follow_self(self):
+    
+    def test_user_cannot_send_request_to_self(self):
         self.client.force_authenticate(user=self.alice)
 
-        url = f"/users/{self.alice.id}/follow/"
+        url = f"/users/{self.alice.id}/send-request/"
         response = self.client.post(url)
 
         self.assertEqual(response.status_code, 400)
         self.assertFalse(
             self.alice.following.filter(id=self.alice.id).exists()
         )
-    def test_user_can_unfollow(self):
+    
+    def test_user_can_cancel_friend_request(self):
         self.alice.following.add(self.bob)
 
         self.client.force_authenticate(user=self.alice)
-        url = f"/users/{self.bob.id}/unfollow/"
+        url = f"/users/{self.bob.id}/cancel-request/"
         response = self.client.post(url)
 
         self.assertEqual(response.status_code, 200)
@@ -212,51 +204,92 @@ class FollowAPITests(APITestCase):
             self.alice.following.filter(id=self.bob.id).exists()
         )
 
-    def test_user_cannot_unfollow_when_not_following(self):
+    def test_user_cannot_cancel_nonexistent_request(self):
         self.client.force_authenticate(user=self.alice)
         
-        url = f"/users/{self.bob.id}/unfollow/"
+        url = f"/users/{self.bob.id}/cancel-request/"
         response = self.client.post(url)
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("detail", response.data)
-        self.assertEqual(response.data["detail"], f"You are not following {self.bob.username}.")
 
-    def test_list_followers(self):
+    def test_list_friends(self):
+        # Make them mutual friends
         self.alice.following.add(self.bob)
+        self.bob.following.add(self.alice)
 
-        url = f"/users/{self.bob.id}/followers/"
+        url = f"/users/{self.bob.id}/friends/"
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 1)
         self.assertEqual(response.data[0]["username"], "alice")
 
-    def test_list_following(self):
+    def test_list_incoming_requests(self):
+        # Alice sends request to Bob
         self.alice.following.add(self.bob)
 
-        url = f"/users/{self.alice.id}/following/"
+        self.client.force_authenticate(user=self.bob)
+        url = "/api/friend-requests/"
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]["username"], "alice")
+    
+    def test_list_outgoing_requests(self):
+        # Alice sends request to Bob
+        self.alice.following.add(self.bob)
+
+        self.client.force_authenticate(user=self.alice)
+        url = "/api/friend-requests/outgoing/"
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
         self.assertEqual(response.data[0]["username"], "bob")
 
-    def test_user_cannot_follow_non_existent(self):
+    def test_user_cannot_send_request_to_non_existent(self):
         self.client.force_authenticate(user=self.alice)
 
-        url = "/users/99999/follow/"
+        url = "/users/99999/send-request/"
         response = self.client.post(url)
 
         self.assertEqual(response.status_code, 404)
 
-    def test_user_cannot_follow_twice(self):
+    def test_user_cannot_send_request_twice(self):
         self.client.force_authenticate(user=self.alice)
 
-        url = f"/users/{self.bob.id}/follow/"
+        url = f"/users/{self.bob.id}/send-request/"
         response = self.client.post(url)
         response = self.client.post(url)
 
         self.assertEqual(response.status_code, 400)
+    
+    def test_user_can_accept_friend_request(self):
+        # Alice sends request to Bob
+        self.alice.following.add(self.bob)
+        
+        self.client.force_authenticate(user=self.bob)
+        url = f"/users/{self.alice.id}/accept/"
+        response = self.client.post(url)
+
+        self.assertEqual(response.status_code, 200)
+        # Now they should be mutual friends
+        self.assertTrue(self.bob.following.filter(id=self.alice.id).exists())
+        self.assertTrue(self.alice.following.filter(id=self.bob.id).exists())
+    
+    def test_user_can_reject_friend_request(self):
+        # Alice sends request to Bob
+        self.alice.following.add(self.bob)
+        
+        self.client.force_authenticate(user=self.bob)
+        url = f"/users/{self.alice.id}/reject/"
+        response = self.client.post(url)
+
+        self.assertEqual(response.status_code, 200)
+        # Alice should no longer be following Bob
+        self.assertFalse(self.alice.following.filter(id=self.bob.id).exists())
 
 
 class UnfriendAPITests(APITestCase):

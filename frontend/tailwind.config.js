@@ -23,6 +23,39 @@ const tailwindConfig = {
   ],
   theme: {
     extend: {
+      keyframes: {
+        fadeIn: {
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
+        },
+        fadeOut: {
+          '0%': {
+            opacity: '1',
+            maxHeight: '64px',
+            marginBottom: '1.5rem',
+            paddingTop: '0.75rem',
+            paddingBottom: '0.75rem',
+          },
+          '70%': {
+            opacity: '0',
+            maxHeight: '0',
+            marginBottom: '-1rem',
+            paddingTop: '0',
+            paddingBottom: '0',
+          },
+          '100%': {
+            opacity: '0',
+            maxHeight: '0',
+            marginBottom: '0',
+            paddingTop: '0',
+            paddingBottom: '0',
+          },
+        },
+      },
+      animation: {
+        'fade-in': 'fadeIn 1s ease-out forwards',
+        'fade-out': 'fadeOut 0.44s ease-in forwards',
+      },
       /**
        * PL: Niestandardowa paleta kolorów zdefiniowana dla zachowania spójności wizualnej marki.
        * EN: Custom color palette defined to maintain brand visual consistency.

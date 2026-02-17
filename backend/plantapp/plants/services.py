@@ -1,6 +1,5 @@
 from .models import Plant
 from django.core.exceptions import ValidationError
-from gardens.models import Garden
 
 def create_plant(*, creator, data):
     allowed_fields = {"nickname", "garden", "species", "image"}

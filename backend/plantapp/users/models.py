@@ -44,54 +44,41 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.username
 
     date_joined = models.DateTimeField(default=timezone.now)
-    bio = models.TextField(verbose_name="Biography", max_length=600, null=True, blank=True)
+    # Internal field: stores friend connections/requests (mutual = friends, one-way = pending request)
     following = models.ManyToManyField("self", blank=True,symmetrical=False, related_name="followers")
 
-    def count_following(self):
-        return self.following.count()
-
-    def count_followers(self):
-        return self.followers.count()
-
     def get_friends(self):
-        """Return all mutual friends (users who follow each other)."""
-        # Get the set of users we follow
-        following_set = set(self.following.values_list('pk', flat=True))
-        # Get the set of users who follow us
-        followers_set = set(self.followers.values_list('pk', flat=True))
-        # Find the intersection (mutual friends), excluding self
-        mutual_pks = (following_set & followers_set) - {self.pk}
-        # Return the User objects in the same order for consistency
-        return self.following.filter(pk__in=mutual_pks).exclude(pk=self.pk)
+        """Return all mutual friends (users with mutual friend connections)."""
+        # Get users we have a connection with who also have a connection back to us
+        mutual_friends = self.following.filter(following=self).exclude(pk=self.pk)
+        return mutual_friends
 
     def count_friends(self):
         """Return count of mutual friends."""
         return self.get_friends().count()
 
     def get_pending_requests(self):
-        """Return users who follow you but you don't follow back."""
-        return self.followers.exclude(followers=self)
+        """Return incoming friend requests (users who sent you a friend request)."""
+        # Find users who have sent us a request but we haven't accepted yet
+        return User.objects.filter(following=self).exclude(pk__in=self.following.values_list('pk', flat=True))
 
     def get_outgoing_requests(self):
-        """Return users you follow but who don't follow you back."""
+        """Return outgoing friend requests (users you've sent requests to but haven't been accepted)."""
         return self.following.exclude(following=self)
 
-    def is_following(self, user):
-        """Check if this user is following another user."""
-        return self.following.filter(pk=user.pk).exists()
 
     def is_friend_with(self, user):
-        """Check if the given user is a friend (mutual follow)."""
+        """Check if the given user is a friend (mutual connection)."""
         # Ensure we're not comparing with self
         if user.pk == self.pk:
             return False
-        return self.following.filter(pk=user.pk).exists() and self.followers.filter(pk=user.pk).exists()
+        # Check for mutual friend connection
+        return self.following.filter(pk=user.pk).exists() and user.following.filter(pk=self.pk).exists()
 
     def unfriend(self, user):
-        """Remove mutual friendship by removing both follow relationships."""
-        # Remove this user's follow of the other user
+        """Remove mutual friendship by removing both connections."""
+        # Remove both directions of the friendship
         self.following.remove(user)
-        # Remove the other user's follow of this user
         user.following.remove(self)
 
 
