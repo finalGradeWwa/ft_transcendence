@@ -9,7 +9,18 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
+import { useRouter } from 'next/navigation';
 import { Icon } from '@/components/icons/ui/Icon';
+
+// PL: Definicja typu użytkownika zgodna z PublicUserSerializer z backendu.
+// EN: User type definition matching PublicUserSerializer from the backend.
+interface SearchResult {
+  id: number;
+  username: string;
+  first_name?: string;
+  last_name?: string;
+  avatar_photo?: string;
+}
 
 interface SearchModalProps {
   isVisible: boolean;
@@ -22,47 +33,60 @@ interface SearchModalProps {
  */
 const SearchModal = ({ isVisible, onClose }: SearchModalProps) => {
   const t = useTranslations('SearchModal');
+  const router = useRouter();
 
   const [searchQuery, setSearchQuery] = useState('');
 
   // State storing search results (mock data).
-  const [results, setResults] = useState<string[]>([]);
+  const [results, setResults] = useState<SearchResult[]>([]);
 
   // Ref to input field for autofocus.
   const searchInputRef = useRef<HTMLInputElement>(null);
 
-  /**
-   * TODO: Replace mock data with actual API call.
-   */
   useEffect(() => {
-    if (searchQuery.trim() === '') {
-      setResults([]);
-      return;
-    }
+    const fetchUsers = async () => {
+      if (searchQuery.trim() === '') {
+        setResults([]);
+        return;
+      }
 
-    //  Example mock results - to be replaced by API call
-    const mockResults = [
-      'User',
-      'Profile',
-      'Settings',
-      'Messages',
-      'Notifications',
-    ].filter(item => item.toLowerCase().includes(searchQuery.toLowerCase()));
+      try {
+        const token = sessionStorage.getItem('accessToken');
 
-    setResults(mockResults);
+        const response = await fetch(
+          `http://localhost:8000/users/search/?search=${searchQuery}`,
+          {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (response.ok) {
+          const data = await response.json();
+          setResults(data);
+        } else {
+          setResults([]);
+        }
+      } catch (error) {
+        setResults([]);
+      }
+    };
+
+    const timeoutId = setTimeout(fetchUsers, 300);
+    return () => clearTimeout(timeoutId);
   }, [searchQuery]);
 
-  //--------------
-  /** TODO: Add search logic, API calls, sending form submission */
-
-  const handleResultClick = (result: string) => {
+  const handleResultClick = (result: SearchResult) => {
     onClose();
+    router.push(`/profiles/${result.username}`);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
   };
-  //---------------
 
   /**
    * PL: Efekt obsługujący fokusowanie pierwszego pola oraz nasłuchiwanie klawisza Escape.
@@ -80,6 +104,17 @@ const SearchModal = ({ isVisible, onClose }: SearchModalProps) => {
     window.addEventListener('keydown', handleEsc);
     return () => window.removeEventListener('keydown', handleEsc);
   }, [isVisible, onClose]);
+
+  /**
+   * PL:Resetowanie pola i wyników po zamknięciu modalu
+   * EN: Resetting the field and results when the modal is closed
+   */
+  useEffect(() => {
+    if (!isVisible) {
+      setSearchQuery('');
+      setResults([]);
+    }
+  }, [isVisible]);
 
   if (!isVisible) return null;
 
@@ -142,21 +177,39 @@ const SearchModal = ({ isVisible, onClose }: SearchModalProps) => {
                   {t('resultsCount', { count: results.length })}
                 </p>
 
-                {/** Mapping results to clickable list items. */}
                 <ul className="space-y-2">
                   {results.map(result => (
-                    <li key={result}>
+                    <li key={result.id}>
                       <button
                         onClick={() => handleResultClick(result)}
-                        className="w-full text-left px-4 py-3 rounded-lg hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-green"
+                        className="w-full text-left px-4 py-3 rounded-lg hover:bg-white/50 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-green border border-transparent hover:border-primary-green/20"
                       >
                         <div className="flex items-center gap-3">
-                          <Icon
-                            name="search"
-                            size={16}
-                            className="text-dark-text"
-                          />
-                          <span className="text-gray-900">{result}</span>
+                          {/* --- AWATAR --- */}
+                          <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-200 shrink-0 border border-black/5">
+                            {result.avatar_photo ? (
+                              <img
+                                src={result.avatar_photo}
+                                alt={result.username}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center bg-primary-green/10 text-primary-green text-xs font-bold uppercase">
+                                {result.username.substring(0, 2)}
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="flex flex-col">
+                            <span className="text-gray-900 font-bold leading-none">
+                              {result.username}
+                            </span>
+                            {(result.first_name || result.last_name) && (
+                              <span className="text-xs text-gray-500 mt-1">
+                                {result.first_name} {result.last_name}
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </button>
                     </li>

@@ -63,53 +63,6 @@ export const getAvatarUrl = (path?: string) => {
 };
 
 /**
- * PL: Komponent przycisku "Obserwuj / Przestań obserwować".
- * EN: Follow / Unfollow button component.
- */
-export const FollowButton = ({
-  isFollowing,
-  onFollow,
-  t,
-  isLoading,
-}: {
-  isFollowing: boolean;
-  onFollow: () => void;
-  t: any;
-  isLoading: boolean;
-}) => (
-  <button
-    onClick={onFollow}
-    disabled={isLoading}
-    className={`inline-flex items-center gap-2 px-6 py-2 rounded-lg font-black uppercase text-[10px] tracking-widest transition-all duration-500 ease-in-out shadow-sm border border-primary-green overflow-hidden whitespace-nowrap active:scale-95 disabled:opacity-50 ${isFollowing
-        ? 'bg-transparent text-primary-green hover:bg-primary-green/10'
-        : 'bg-primary-green text-white hover:bg-green-700'
-      }`}
-  >
-    {isFollowing && !isLoading && (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 448 512"
-        className="w-3.5 h-3.5 fill-current animate-in fade-in zoom-in slide-in-from-start-2 duration-500"
-      >
-        <path d="M438.6 105.4c12.5 12.5 12.5 32.8 0 45.3l-256 256c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L160 338.7 393.4 105.4c12.5-12.5 32.8-12.5 45.3 0z" />
-      </svg>
-    )}
-    <span aria-live="polite">
-      {isLoading ? (
-        <>
-          <span aria-hidden="true">...</span>
-          <span className="sr-only">{t('aria.loadingAction')}</span>{' '}
-        </>
-      ) : isFollowing ? (
-        t('actions.unfollow')
-      ) : (
-        t('actions.follow')
-      )}
-    </span>
-  </button>
-);
-
-/**
  * PL: Wyświetla okrągły awatar użytkownika.
  * EN: Displays the user's circular avatar.
  */
@@ -170,21 +123,11 @@ export const PersonalInfoSkeleton = () => (
 export const PersonalInfoContent = ({
   user,
   t,
-  isFollowing,
-  onFollow,
   isOwnProfile,
-  followersCount,
-  isActionLoading,
-  isLoggedIn,
 }: {
   user: NonNullable<UserProfileProps['user']>;
   t: any;
-  isFollowing: boolean;
-  onFollow: () => void;
   isOwnProfile: boolean;
-  followersCount: number;
-  isActionLoading: boolean;
-  isLoggedIn: boolean;
 }) => {
   const dateJoined = user.date_joined
     ? new Date(user.date_joined).toISOString().split('T')[0]
@@ -203,16 +146,8 @@ export const PersonalInfoContent = ({
           </Heading>
         </div>
         <UserJoinedInfo dateJoined={dateJoined} t={t} />
-        <div className="mt-4 h-[42px] flex items-center">
-          {isLoggedIn && !isOwnProfile && (
-            <FollowButton
-              isFollowing={isFollowing}
-              onFollow={onFollow}
-              t={t}
-              isLoading={isActionLoading}
-            />
-          )}
-        </div>
+
+        {/* FolloButton removed */}
       </div>
     </div>
   );
@@ -225,40 +160,18 @@ export const PersonalInfoContent = ({
 export const PersonalInfo = ({
   user,
   t,
-  isFollowing,
-  onFollow,
   isOwnProfile,
-  followersCount,
-  isActionLoading,
-  isLoggedIn,
 }: {
   user: UserProfileProps['user'];
   t: any;
-  isFollowing: boolean;
-  onFollow: () => void;
   isOwnProfile: boolean;
-  followersCount: number;
-  isActionLoading: boolean;
-  isLoggedIn: boolean;
 }) => {
   if (!user) {
     return <PersonalInfoSkeleton />;
   }
 
-  return (
-    <PersonalInfoContent
-      user={user}
-      t={t}
-      isFollowing={isFollowing}
-      onFollow={onFollow}
-      isOwnProfile={isOwnProfile}
-      followersCount={followersCount}
-      isActionLoading={isActionLoading}
-      isLoggedIn={isLoggedIn}
-    />
-  );
+  return <PersonalInfoContent user={user} t={t} isOwnProfile={isOwnProfile} />;
 };
-
 /**
  * PL: Karta statystyki (np. liczba ogrodów, roślin) z obsługą stanu ładowania.
  * EN: Statistic card (e.g., number of gardens, plants) with loading state support.
@@ -496,31 +409,24 @@ export const ProfileFooter = ({
  * PL: Główny komponent strukturalny profilu, łączący wszystkie sekcje w jedną całość.
  * EN: Main structural component of the profile, combining all sections into one whole.
  */
+/**
+ * PL: Główny komponent strukturalny profilu, łączący wszystkie sekcje w jedną całość.
+ * EN: Main structural component of the profile, combining all sections into one whole.
+ */
 export const ProfileContent = ({
   user,
   isOwnProfile,
-  isFollowing,
-  handleFollowAction,
   currentPage,
   setCurrentPage,
   pins,
   totalPages,
-  followersCount,
-  isActionLoading,
-  isLoggedIn,
 }: {
   user: UserProfileProps['user'];
   isOwnProfile: boolean;
-  isFollowing: boolean;
-  handleFollowAction: () => void;
   currentPage: number;
   setCurrentPage: (page: number) => void;
   pins: Array<{ id: number; title: string; image: string }>;
   totalPages: number;
-  followersCount: number;
-  isActionLoading: boolean;
-  isLoggedIn: boolean;
-  gardens_count?: number;
 }) => {
   const t = useTranslations('ProfilePage');
   const itemsPerPage = 4;
@@ -529,16 +435,7 @@ export const ProfileContent = ({
     <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pt-4 pb-12 flex flex-col justify-center h-full flex-grow">
       <div className="bg-container-light/10 backdrop-blur-md p-6 sm:p-10 rounded-xl shadow-2xl w-full mt-12">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <PersonalInfo
-            user={user}
-            t={t}
-            isFollowing={isFollowing}
-            onFollow={handleFollowAction}
-            isOwnProfile={isOwnProfile}
-            followersCount={followersCount}
-            isActionLoading={isActionLoading}
-            isLoggedIn={isLoggedIn}
-          />
+          <PersonalInfo user={user} t={t} isOwnProfile={isOwnProfile} />
           <StatsSection user={user} />
         </div>
         <ProfileFooter

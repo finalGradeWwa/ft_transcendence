@@ -65,7 +65,7 @@ class UserUpdateSerializer(serializers.ModelSerializer):
 class PublicUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ("id", "username", "first_name", "last_name")
+        fields = ("id", "username", "first_name", "last_name", "avatar_photo")
 
 class ListFollowersSerializer(serializers.ModelSerializer):
      class Meta:

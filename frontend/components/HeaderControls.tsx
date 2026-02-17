@@ -10,6 +10,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import { useRouter, usePathname, Link } from '@/i18n/navigation';
 import { useSearchParams } from 'next/navigation';
 import { Icon } from '@/components/icons/ui/Icon';
+import { apiFetch } from '@/lib/api';
 // PL: Importujemy poprawną funkcję fetchCurrentUser z Twojej biblioteki auth.
 // EN: Importing the correct fetchCurrentUser function from your auth library.
 import { fetchCurrentUser } from '@/lib/auth';
@@ -191,8 +192,10 @@ const UserSection = ({
 
 export function HeaderControls({
   onSearchClick,
+  showSearch,
 }: {
   onSearchClick?: () => void;
+  showSearch?: boolean;
 }) {
   const {
     username,
@@ -224,22 +227,24 @@ export function HeaderControls({
 
     const checkMessages = async () => {
       try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/chat/unread-count/`,
-          {
-            credentials: 'include',
-          }
-        );
+        // PL: Używamy apiFetch, który automatycznie doda token Bearer i bazowy URL.
+        // EN: Using apiFetch, which automatically adds the Bearer token and base URL.
+        const response = await apiFetch('/api/chat/unread-count/');
 
-        // PL: Sprawdzamy, czy odpowiedź to faktycznie JSON
         const contentType = response.headers.get('content-type');
-        if (
-          response.ok &&
-          contentType &&
-          contentType.includes('application/json')
-        ) {
+        const isJson = contentType && contentType.includes('application/json');
+
+        if (isJson) {
           const data = await response.json();
-          setHasNewMessages(data.unread_count > 0);
+          if (response.ok) {
+            // PL: Ustawiamy stan na podstawie liczby wiadomości z API
+            // EN: Setting state based on message count from API
+            setHasNewMessages(data.unread_count > 0);
+          } else {
+            // Obsługa błędów API zwróconych w JSONie (np. 401, 403)
+            console.error('Chat count error details:', data);
+            setHasNewMessages(false);
+          }
         } else {
           // PL: Jeśli to nie JSON, nie robimy nic (zapobiega SyntaxError)
           console.warn('Chat count endpoint returned non-JSON response');
@@ -247,6 +252,7 @@ export function HeaderControls({
         }
       } catch (error) {
         console.error('Failed to fetch unread messages', error);
+        setHasNewMessages(false);
       }
     };
 
@@ -310,28 +316,33 @@ export function HeaderControls({
       </select>
 
       <nav className="flex flex-wrap md:flex-nowrap items-center justify-center gap-3">
-        <IconButton
-          href={{ pathname, query: { showSearch: 'true' } }}
-          icon="search"
-          label={tAria('searchBtn')}
-        />
-
-        <div className="relative" ref={addMenuRef}>
+        {/**
+         * PL: Przycisk wyszukiwania - widoczny tylko dla zalogowanych.
+         * EN: Search button - visible only for logged-in users.
+         */}
+        {username && (
           <IconButton
-            onClick={
-              username ? () => setIsAddMenuOpen(!isAddMenuOpen) : undefined
-            }
-            href={
-              !username && !isLoading ? `${pathname}?showLogin=true` : undefined
-            }
-            icon="plus"
-            label={tAria('add')}
+            href={{ pathname, query: { showSearch: 'true' } }}
+            icon="search"
+            label={tAria('searchBtn')}
           />
-          {username && isAddMenuOpen && (
-            <AddMenu user={username} tP={tP} tG={tG} close={closeMenu} />
-          )}
-        </div>
-
+        )}
+        {/**
+         *  PL: Przycisk dodawania - widoczny tylko dla zalogowanych.
+         *  EN: Add button - visible only for logged-in users.
+         */}
+        {username && (
+          <div className="relative" ref={addMenuRef}>
+            <IconButton
+              onClick={() => setIsAddMenuOpen(!isAddMenuOpen)}
+              icon="plus"
+              label={tAria('add')}
+            />
+            {isAddMenuOpen && (
+              <AddMenu user={username} tP={tP} tG={tG} close={closeMenu} />
+            )}
+          </div>
+        )}
         {/**
          * PL: Przycisk przejścia do czatu - widoczny tylko dla zalogowanych.
          * EN: Chat button - visible only for logged-in users.
@@ -340,11 +351,13 @@ export function HeaderControls({
           <div className="relative">
             <IconButton href="/chat" icon="chat" label={tAria('chat')} />
             {hasNewMessages && (
-              <span className="absolute top-0 right-0 block h-3 w-3 rounded-full bg-red-500 border-2 border-secondary-beige animate-pulse" />
+              <span
+                aria-hidden="true"
+                className="absolute top-0 right-0 block h-3 w-3 rounded-full bg-red-500 border-2 border-secondary-beige animate-pulse"
+              />
             )}
           </div>
         )}
-
         <UserSection
           username={username}
           logout={logout}

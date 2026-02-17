@@ -1,4 +1,3 @@
-from django.test import TestCase
 from django.contrib.auth import get_user_model
 from rest_framework.test import APITestCase
 from rest_framework import status
@@ -290,9 +289,9 @@ class PinViewSetTestCase(APITestCase):
 
     def test_pin_ordering(self):
         """Test that pins are ordered by created_at (newest first)"""
-        pin1 = Pin.objects.create(content='First pin', creator=self.user1)
-        pin2 = Pin.objects.create(content='Second pin', creator=self.user1)
-        pin3 = Pin.objects.create(content='Third pin', creator=self.user1)
+        Pin.objects.create(content='First pin', creator=self.user1)
+        Pin.objects.create(content='Second pin', creator=self.user1)
+        Pin.objects.create(content='Third pin', creator=self.user1)
         
         self.client.force_authenticate(user=self.user1)
         response = self.client.get('/api/pins/')
@@ -323,9 +322,9 @@ class PinViewSetTestCase(APITestCase):
 
     def test_profile_feed_ordered_by_newest(self):
         """Test that profile_feed returns pins ordered by newest first"""
-        pin1 = Pin.objects.create(content='First', creator=self.user1)
-        pin2 = Pin.objects.create(content='Second', creator=self.user1)
-        pin3 = Pin.objects.create(content='Third', creator=self.user1)
+        Pin.objects.create(content='First', creator=self.user1)
+        Pin.objects.create(content='Second', creator=self.user1)
+        Pin.objects.create(content='Third', creator=self.user1)
         
         self.client.force_authenticate(user=self.user1)
         response = self.client.get('/api/pins/profile_feed/')
@@ -414,10 +413,10 @@ class PinViewSetTestCase(APITestCase):
         """Test that feed returns pins ordered by newest first"""
         self.user1.following.add(self.user2)
         
-        pin1 = Pin.objects.create(content='Alice first', creator=self.user1)
-        pin2 = Pin.objects.create(content='Bob second', creator=self.user2)
-        pin3 = Pin.objects.create(content='Alice third', creator=self.user1)
-        pin4 = Pin.objects.create(content='Bob fourth', creator=self.user2)
+        Pin.objects.create(content='Alice first', creator=self.user1)
+        Pin.objects.create(content='Bob second', creator=self.user2)
+        Pin.objects.create(content='Alice third', creator=self.user1)
+        Pin.objects.create(content='Bob fourth', creator=self.user2)
         
         self.client.force_authenticate(user=self.user1)
         response = self.client.get('/api/pins/feed/')

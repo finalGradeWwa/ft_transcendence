@@ -156,6 +156,13 @@ const MobileMenu = ({ items }: { items: string[] }) => {
  */
 export const Navigation = () => {
   const t = useTranslations('HomePage');
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  // PL: Sprawdzenie stanu zalogowania na podstawie tokena. EN: Checking login state based on token.
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    setIsLoggedIn(!!token);
+  }, []);
 
   let navItems = [];
   try {
@@ -171,7 +178,8 @@ export const Navigation = () => {
 
       <div className="header-top-wrapper flex flex-col md:flex-row justify-between items-center space-y-10 md:space-y-0 md:gap-8">
         <Logo title={t('title')} />
-        <HeaderControls />
+        {/* PL: Przekazujemy stan zalogowania do kontrolek nagłówka. EN: Passing login state to header controls. */}
+        <HeaderControls showSearch={isLoggedIn} />
       </div>
       <MobileMenu items={navItems} />
     </header>

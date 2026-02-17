@@ -92,7 +92,7 @@ export default function AddGardenPage({
             <div className="relative w-16 h-16">
               <NextImage
                 src="/images/other/garden.webp"
-                alt="Garden"
+                alt=""
                 fill
                 className="object-contain"
                 sizes="64px"
