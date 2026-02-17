@@ -64,7 +64,6 @@ export default function UserProfileClient({
       setCurrentPage={setCurrentPage}
       pins={pins}
       totalPages={totalPages}
-      isLoggedIn={isLoggedIn}
     />
   );
 }

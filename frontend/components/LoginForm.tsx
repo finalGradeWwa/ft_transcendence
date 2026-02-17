@@ -171,6 +171,7 @@ export const LoginForm = ({
           required
           onChange={update} // PL: Użycie funkcji 'update' z hooka
           disabled={isLoading}
+          autoComplete="current-password"
         />
         <button
           type="button"
