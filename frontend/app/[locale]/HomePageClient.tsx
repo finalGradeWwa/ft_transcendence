@@ -37,6 +37,7 @@ export const HomePageClient = ({
 
   // Keep a local flag so the banner stays visible after we clean the URL.
   const [showLoginSuccess, setShowLoginSuccess] = React.useState(false);
+  const [isExiting, setIsExiting] = React.useState(false);
   const [loginProvider, setLoginProvider] = React.useState<string | null>(null);
 
   React.useEffect(() => {
@@ -60,21 +61,39 @@ export const HomePageClient = ({
     return () => window.clearTimeout(timeout);
   }, [authProvider, authStatus, router]);
 
-  // Auto-hide the banner after a short time (optional, feels like a toast).
   React.useEffect(() => {
     if (!showLoginSuccess) return;
-    const timeout = window.setTimeout(() => setShowLoginSuccess(false), 3500);
-    return () => window.clearTimeout(timeout);
-  }, [showLoginSuccess]);
 
+    const startExitTimeout = window.setTimeout(() => {
+      setIsExiting(true);
+    }, 4000);
+
+    const finalRemoveTimeout = window.setTimeout(() => {
+      setShowLoginSuccess(false);
+      setIsExiting(false);
+    }, 4500);
+
+    return () => {
+      window.clearTimeout(startExitTimeout);
+      window.clearTimeout(finalRemoveTimeout);
+    };
+  }, [showLoginSuccess]);
 
   return (
     <>
       <section className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
         {showLoginSuccess && (
-          <div className="mb-6 rounded-lg border border-green-600 bg-green-50 px-4 py-3 text-sm font-semibold text-green-800">
-            {loginProvider === 'github' ? t('oauthLoginSuccess') : t('loginSuccess')}
-          </div>)}
+          <div
+            className={`rounded-lg border border-primary-green bg-secondary-beige px-4 text-md font-bold text-primary-green text-center overflow-hidden
+        transition-all duration-500
+        ${isExiting ? 'animate-fade-out py-0 mb-0' : 'animate-fade-in py-3 mb-6'}
+      `}
+          >
+            {loginProvider === 'github'
+              ? t('oauthLoginSuccess')
+              : t('loginSuccess')}
+          </div>
+        )}
 
         {!hideTitle && (
           <h1 className="text-2xl md:text-3xl font-bold mb-6 text-white-text overflow-hidden">

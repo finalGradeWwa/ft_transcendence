@@ -16,8 +16,8 @@ class Plant(models.Model):
         'gardens.Garden', 
         related_name="plants",
         on_delete=models.CASCADE,
-        null=True,
-        blank=True,
+        null=False,
+        blank=False,
         )
     nickname = models.CharField(max_length=25, unique=True)
     created_at = models.DateTimeField(default=timezone.now)

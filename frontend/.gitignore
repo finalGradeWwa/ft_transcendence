@@ -19,6 +19,8 @@
 
 # production
 /build
+PRODUCTION.md
+pr.txt
 
 # misc
 .DS_Store
@@ -36,8 +38,8 @@ yarn-error.log*
 .env.development.local
 .env.test.local
 .env.production.local
-.env.*.local
 .env*.local
+.env.production
 
 # vercel
 .vercel
@@ -49,7 +51,7 @@ next-env.d.ts
 # files generated when running or building Docker
 /.docker
 /.compose
-docker-compose.local.yml # Jesli uzywasz lokalnej wersji
+docker-compose.local.yml
 
 # moje informacje - samouczek
 AAA_info/

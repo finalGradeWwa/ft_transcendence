@@ -47,3 +47,25 @@
 	node:20
 		Next.js jest frameworkiem React renderowanym po stronie serwera (SSR), 
 		co oznacza, że kod musi być uruchamiany w środowisku Node.js.
+
+# ------------------------------------------------
+
+# Tryb czytania - Reading mode
+
+## 🇵🇱 Instrukcja: Naprawa Czytania w Chrome (Linux)
+
+Jeśli Tryb Czytania "kręci się" w nieskończoność:
+
+Uruchom silnik mowy: Otwórz terminal i wpisz: systemctl --user start speech-dispatcher
+Sprawdź, czy system "mówi": Wpisz: spd-say "test"
+Zrestartuj Chrome: Zamknij wszystkie okna przeglądarki i otwórz ją ponownie.
+Wybierz głos lokalny: W ustawieniach Trybu Czytania (ikona litery A) wybierz głos bez dopisku "Naturalny" (np. Google Polski lub eSpeak).
+
+## 🇬🇧 Instructions: Fix Chrome Reading Mode (Linux)
+
+If the Reading Mode spinner hangs indefinitely:
+
+Start the speech engine: Open terminal and run: systemctl --user start speech-dispatcher
+Verify system speech: Type: spd-say "test"
+Restart Chrome: Close all browser instances and relaunch.
+Select local voice: In Reading Mode settings (the A icon), choose a non-"Natural" voice (e.g., Google English or eSpeak).
