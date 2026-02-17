@@ -51,9 +51,3 @@ class GardenOwner(OrganizationOwnerBase):
         on_delete=models.CASCADE,
     )
 
-class GardenInvitation(OrganizationInvitationBase):
-    organization = models.ForeignKey(
-        Garden,
-        related_name="invitations",
-        on_delete=models.CASCADE,
-    )
