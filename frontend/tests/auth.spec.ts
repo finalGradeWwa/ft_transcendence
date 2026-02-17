@@ -37,9 +37,9 @@ test.describe('Homepage & Navigation', () => {
   });
 
   test('footer links work', async ({ page }) => {
-    test.skip(true, 'requires fix');
+    // test.skip(true, 'requires fix');
     await page.goto('/en/');
-    await page.getByRole('link', { name: /Terms/i }).click();
+    await page.locator('a.text-primary-green[href="/en/terms"]').click();
     await expect(page).toHaveURL('/en/terms');
   });
 });
@@ -180,14 +180,14 @@ test.describe('Sign In (Login)', () => {
   });
 
   test('2.1 - Login with valid credentials', async ({ page }) => {
-    test.skip(true, 'Requires backend CORS/cookie configuration');
+    // test.skip(true, 'Requires backend CORS/cookie configuration');
     await page.fill('input[name="email"]', 'test@example.com');
     await page.fill('input[name="password"]', 'Testpass123!');
 
     await page.click('button[type="submit"]');
 
-    await page.waitForURL(/auth=login_success/, { timeout: 15000 });
-    await expect(page).toHaveURL(/auth=login_success/);
+    await page.waitForURL(/\/en(\/?|\?.*)$/, { timeout: 15000 });
+
   });
 
   test('2.2 - Show error for invalid email', async ({ page }) => {
@@ -255,23 +255,23 @@ test.describe('Combined Authentication Flows', () => {
   });
 
   test('3.3 - Logged-in user sees username in header', async ({ page }) => {
-    test.skip(true, 'Requires backend CORS/cookie configuration');
+    // test.skip(true, 'Requires backend CORS/cookie configuration');
     await page.goto('/en/?showLogin=true');
     await page.fill('input[name="email"]', 'test@example.com');
     await page.fill('input[name="password"]', 'Testpass123!');
     await page.click('button[type="submit"]');
-    await page.waitForURL(/auth=login_success/, { timeout: 15000 });
+    await page.waitForURL(/\/en(\/?|\?.*)$/, { timeout: 15000 });
 
-    await expect(page.locator('header')).toContainText(/test/i);
+    await expect(page.locator('.header-top-wrapper')).toContainText(/test/i);
   });
 
   test('3.4 - Logged-in user can log out', async ({ page }) => {
-    test.skip(true, 'Requires backend CORS/cookie configuration');
+    // test.skip(true, 'Requires backend CORS/cookie configuration');
     await page.goto('/en/?showLogin=true');
     await page.fill('input[name="email"]', 'test@example.com');
     await page.fill('input[name="password"]', 'Testpass123!');
     await page.click('button[type="submit"]');
-    await page.waitForURL(/auth=login_success/, { timeout: 15000 });
+    await page.waitForURL(/\/en(\/?|\?.*)$/, { timeout: 15000 });
 
     const logoutButton = page.locator('button:has-text("Logout")');
     if (await logoutButton.isVisible()) {
