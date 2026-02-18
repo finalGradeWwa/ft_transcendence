@@ -29,10 +29,14 @@ test.describe('Homepage & Navigation', () => {
   });
 
   test('search modal opens', async ({ page }) => {
+    await page.addInitScript(() => {
+      window.localStorage.setItem('username', 'testuser');
+    });
     await page.goto('/en/');
     await page.getByRole('link', { name: 'Search' }).waitFor();
     await page.getByRole('link', { name: 'Search' }).click();
     await page.waitForURL(/showSearch/);
+    await expect(page).toHaveURL(/showSearch/);
   });
 
   test('footer links work', async ({ page }) => {

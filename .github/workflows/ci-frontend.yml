@@ -69,7 +69,7 @@ jobs:
           DJANGO_SETTINGS_MODULE: mysite.settings
           PYTHONPATH: backend/plantapp
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
-          DEBUG_VALUE: 'false'
+          DEBUG_VALUE: 'true'
           ALLOWED_HOSTS: 'localhost'
           GITHUB_OAUTH_KEY: ${{ secrets.OAUTH_KEY }}
           GITHUB_OAUTH_SECRET: ${{ secrets.OAUTH_SECRET }}
@@ -88,7 +88,7 @@ jobs:
           DJANGO_SETTINGS_MODULE: mysite.settings
           PYTHONPATH: backend/plantapp
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
-          DEBUG_VALUE: 'false'
+          DEBUG_VALUE: 'true'
           ALLOWED_HOSTS: 'localhost'
           GITHUB_OAUTH_KEY: ${{ secrets.OAUTH_KEY }}
           GITHUB_OAUTH_SECRET: ${{ secrets.OAUTH_SECRET }}
@@ -96,14 +96,28 @@ jobs:
 
       - name: Start Django backend
         run: |
-          python manage.py runserver 8000 &
-          sleep 5
+          python manage.py runserver 0.0.0.0:8000 > /tmp/django.log 2>&1 &
+          echo "Waiting for Django to start..."
+          for i in {1..30}; do
+            if curl -s http://localhost:8000 > /dev/null; then
+              echo "Django is up!"
+              break
+            fi
+            if [ $i -eq 30 ]; then
+              echo "Django failed to start"
+              cat /tmp/django.log
+              exit 1
+            fi
+            sleep 1
+          done
         working-directory: backend/plantapp
         env:
           DJANGO_SETTINGS_MODULE: mysite.settings
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
-          DEBUG_VALUE: 'false'
-          ALLOWED_HOSTS: 'localhost'
+          DEBUG_VALUE: 'true'
+          ALLOWED_HOSTS: 'localhost,127.0.0.1'
+          GITHUB_OAUTH_KEY: ${{ secrets.OAUTH_KEY }}
+          GITHUB_OAUTH_SECRET: ${{ secrets.OAUTH_SECRET }}
 
       - uses: actions/setup-node@v4
         with:
