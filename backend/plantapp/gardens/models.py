@@ -3,7 +3,6 @@ from organizations.models import Organization
 from organizations.base import (
     OrganizationUserBase,
     OrganizationOwnerBase,
-    OrganizationInvitationBase,
 )
 from django.conf import settings
 
