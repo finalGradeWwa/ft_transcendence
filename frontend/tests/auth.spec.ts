@@ -273,9 +273,19 @@ test.describe('Combined Authentication Flows', () => {
     await page.fill('input[name="email"]', 'test@example.com');
     await page.fill('input[name="password"]', 'Testpass123!');
     await page.click('button[type="submit"]');
+    
+    // Wait for the redirect and page load
     await page.waitForURL(/\/en(\/?|\?.*)$/, { timeout: 15000 });
+    await page.waitForLoadState('networkidle', { timeout: 10000 });
+    
+    // Wait for localStorage to be populated and header to update
+    await page.waitForFunction(
+      () => localStorage.getItem('username') !== null,
+      { timeout: 10000 }
+    );
 
-    await expect(page.locator('.header-top-wrapper')).toContainText(/test/i);
+    // Wait for the username to appear in the header after localStorage is populated
+    await expect(page.locator('.header-top-wrapper')).toContainText(/test/i, { timeout: 10000 });
   });
 
   test('3.4 - Logged-in user can log out', async ({ page }) => {
@@ -284,7 +294,16 @@ test.describe('Combined Authentication Flows', () => {
     await page.fill('input[name="email"]', 'test@example.com');
     await page.fill('input[name="password"]', 'Testpass123!');
     await page.click('button[type="submit"]');
+    
+    // Wait for the redirect and page load
     await page.waitForURL(/\/en(\/?|\?.*)$/, { timeout: 15000 });
+    await page.waitForLoadState('networkidle', { timeout: 10000 });
+    
+    // Wait for localStorage to be populated
+    await page.waitForFunction(
+      () => localStorage.getItem('username') !== null,
+      { timeout: 10000 }
+    );
 
     const logoutButton = page.locator('button:has-text("Logout")');
     if (await logoutButton.isVisible()) {
