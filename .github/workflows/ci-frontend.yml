@@ -67,6 +67,9 @@ jobs:
         working-directory: backend/plantapp
         env:
           DJANGO_SETTINGS_MODULE: mysite.settings
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          DEBUG_VALUE: 'false'
+          ALLOWED_HOSTS: 'localhost'
 
       - name: Create test user
         run: |
@@ -79,6 +82,9 @@ jobs:
         working-directory: backend/plantapp
         env:
           DJANGO_SETTINGS_MODULE: mysite.settings
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          DEBUG_VALUE: 'false'
+          ALLOWED_HOSTS: 'localhost'
 
       - name: Start Django backend
         run: |
@@ -87,6 +93,9 @@ jobs:
         working-directory: backend/plantapp
         env:
           DJANGO_SETTINGS_MODULE: mysite.settings
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          DEBUG_VALUE: 'false'
+          ALLOWED_HOSTS: 'localhost'
 
       - uses: actions/setup-node@v4
         with:
