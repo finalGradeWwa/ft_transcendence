@@ -25,6 +25,7 @@ class FriendSystemTests(APITestCase):
         )
 
     def test_is_friend_true_and_false(self):
+        self.client.force_authenticate(user=self.alice)
         url = f"/users/{self.alice.id}/is-friend/?target_id={self.bob.id}"
 
         response = self.client.get(url)
