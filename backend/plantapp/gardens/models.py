@@ -3,7 +3,6 @@ from organizations.models import Organization
 from organizations.base import (
     OrganizationUserBase,
     OrganizationOwnerBase,
-    OrganizationInvitationBase,
 )
 from django.conf import settings
 
@@ -51,9 +50,3 @@ class GardenOwner(OrganizationOwnerBase):
         on_delete=models.CASCADE,
     )
 
-class GardenInvitation(OrganizationInvitationBase):
-    organization = models.ForeignKey(
-        Garden,
-        related_name="invitations",
-        on_delete=models.CASCADE,
-    )
