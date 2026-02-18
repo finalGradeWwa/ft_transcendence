@@ -5,6 +5,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework import status, generics, filters
 from .serializers import UserSerializer, UserUpdateSerializer, PublicUserSerializer
 from django.contrib.auth import get_user_model
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 
 
 User = get_user_model()
@@ -15,21 +16,22 @@ User = get_user_model()
 
 class MeView(APIView):
 
-	permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
 
-	def get(self, request):
-		serializer = UserSerializer(request.user)
-		return Response(serializer.data)
+    def get(self, request):
+        serializer = UserSerializer(request.user)
+        return Response(serializer.data)
 
-	def patch(self, request):
-		serializer = UserUpdateSerializer(
-			request.user,
-			data=request.data,
-			partial=True
-		)
-		serializer.is_valid(raise_exception=True)
-		serializer.save()
-		return Response(serializer.data)
+    def patch(self, request):
+        serializer = UserUpdateSerializer(
+            request.user,
+            data=request.data,
+            partial=True
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
 
 class ListFollowersAPIView(APIView):
     permission_classes = [AllowAny]

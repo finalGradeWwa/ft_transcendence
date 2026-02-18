@@ -27,7 +27,11 @@ const LoginModal = ({ isVisible, onClose, t }: any) => {
    * EN: Effect handling autofocus on the first field and listening for the Escape key.
    */
   useEffect(() => {
-    if (!isVisible) return;
+    const isLogged = !!sessionStorage.getItem('accessToken');
+    if (!isVisible || isLogged) {
+      if (isVisible && isLogged) onClose();
+      return;
+    }
 
     // PL: Ustawienie fokusu na loginie dla lepszego UX. EN: Setting focus on login for better UX.
     usernameInputRef.current?.focus();
@@ -43,7 +47,15 @@ const LoginModal = ({ isVisible, onClose, t }: any) => {
     return () => window.removeEventListener('keydown', handleEsc);
   }, [isVisible, onClose]);
 
-  if (!isVisible) return null;
+  /**
+   * PL: Zapobiega wyświetleniu formularza zalogowanemu użytkownikowi.
+   * EN: Prevents showing the form to an authenticated user.
+   */
+  if (
+    !isVisible ||
+    (typeof window !== 'undefined' && !!sessionStorage.getItem('accessToken'))
+  )
+    return null;
 
   return (
     <div

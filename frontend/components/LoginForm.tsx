@@ -91,7 +91,7 @@ const useLoginForm = (
       if (!data?.user) throw new Error('EMPTY_RESPONSE');
 
       localStorage.setItem('username', data.user.username);
-      window.dispatchEvent(new Event('storage')); // PL: Powiadomienie nagłówka o zmianie.
+      window.dispatchEvent(new Event('user-updated')); // PL: Powiadomienie nagłówka o zmianie.
 
       onLoginSuccess();
       window.location.href = `/${locale}/?auth=login_success&provider=password`;

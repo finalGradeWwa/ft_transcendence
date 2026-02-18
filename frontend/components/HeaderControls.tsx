@@ -110,7 +110,11 @@ function useUsername() {
     };
 
     window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
+    window.addEventListener('user-updated', handleStorageChange);
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('user-updated', handleStorageChange);
+    };
   }, []);
 
   const logout = useCallback(async () => {
@@ -127,7 +131,7 @@ function useUsername() {
     localStorage.removeItem('token');
     sessionStorage.removeItem('accessToken'); // PL: Czyścimy też token z sessionStorage
     setUsername(null);
-    window.dispatchEvent(new Event('storage'));
+    window.dispatchEvent(new Event('user-updated'));
 
     window.location.href = '/';
   }, []);
@@ -281,7 +285,7 @@ export function HeaderControls({
           if (userData?.username) {
             localStorage.setItem('username', userData.username);
             setUsername(userData.username);
-            window.dispatchEvent(new Event('storage'));
+            window.dispatchEvent(new Event('user-updated'));
 
             const url = new URL(window.location.href);
             url.searchParams.delete('auth');
@@ -328,8 +332,8 @@ export function HeaderControls({
           />
         )}
         {/**
-         *  PL: Przycisk dodawania - widoczny tylko dla zalogowanych.
-         *  EN: Add button - visible only for logged-in users.
+         * PL: Przycisk dodawania - widoczny tylko dla zalogowanych.
+         * EN: Add button - visible only for logged-in users.
          */}
         {username && (
           <div className="relative" ref={addMenuRef}>

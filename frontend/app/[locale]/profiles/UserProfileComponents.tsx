@@ -320,9 +320,15 @@ export const PinsGallery = ({
  * PL: Przycisk kierujący do edycji profilu (widoczny tylko dla właściciela).
  * EN: Button leading to profile editing (visible only to the owner).
  */
-export const EditProfileButton = ({ t }: { t: any }) => (
+export const EditProfileButton = ({
+  t,
+  username,
+}: {
+  t: any;
+  username?: string;
+}) => (
   <Link
-    href="/profile/edit"
+    href={`/profiles/${username}/edit`}
     className="flex items-center whitespace-nowrap gap-2 px-4 py-2 bg-primary-green/90 text-white rounded-lg font-bold uppercase text-[10px] tracking-widest transition-all hover:bg-green-700 shadow-sm w-fit leading-none"
   >
     <svg
@@ -374,6 +380,7 @@ export const ProfileFooter = ({
   pins,
   itemsPerPage,
   t,
+  username,
 }: {
   isOwnProfile: boolean;
   currentPage: number;
@@ -382,10 +389,11 @@ export const ProfileFooter = ({
   pins: Array<{ id: number; title: string; image: string }>;
   itemsPerPage: number;
   t: any;
+  username?: string;
 }) => (
   <div className="mt-8 pt-8 border-t border-white/20 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
     <div className="lg:col-span-2 flex justify-center lg:justify-start">
-      {isOwnProfile && <EditProfileButton t={t} />}
+      {isOwnProfile && <EditProfileButton t={t} username={username} />}
     </div>
     <div className="lg:col-span-10 bg-white/5 p-5 ml-4 rounded-xl border border-white/5">
       <div className="flex justify-between items-center mb-4">
@@ -446,6 +454,7 @@ export const ProfileContent = ({
           pins={pins}
           itemsPerPage={itemsPerPage}
           t={t}
+          username={user?.username}
         />
       </div>
     </div>
