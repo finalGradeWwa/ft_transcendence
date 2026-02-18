@@ -268,28 +268,35 @@ test.describe('Combined Authentication Flows', () => {
   });
 
   test('3.3 - Logged-in user sees username in header', async ({ page }) => {
-    // test.skip(true, 'Requires backend CORS/cookie configuration');
     await page.goto('/en/?showLogin=true');
     await page.fill('input[name="email"]', 'test@example.com');
     await page.fill('input[name="password"]', 'Testpass123!');
     await page.click('button[type="submit"]');
-    // await page.waitForURL(/auth=login_success/, { timeout: 15000 });
+    
+    // Wait for redirect and page to fully load after login
+    await page.waitForURL(/\/en(\/?|\?.*)$/, { timeout: 15000 });
+    await page.waitForLoadState('domcontentloaded');
 
-    await expect(page.locator('header')).toContainText(/test/i);
+    // Wait for username to appear in the profile area
+    const usernameElement = page.locator('.header-top-wrapper').getByText(/test/i);
+    await expect(usernameElement).toBeVisible({ timeout: 10000 });
   });
 
   test('3.4 - Logged-in user can log out', async ({ page }) => {
-    // test.skip(true, 'Requires backend CORS/cookie configuration');
     await page.goto('/en/?showLogin=true');
     await page.fill('input[name="email"]', 'test@example.com');
     await page.fill('input[name="password"]', 'Testpass123!');
     await page.click('button[type="submit"]');
-    // await page.waitForURL(/auth=login_success/, { timeout: 15000 });
+    
+    // Wait for redirect and page to fully load after login
+    await page.waitForURL(/\/en(\/?|\?.*)$/, { timeout: 15000 });
+    await page.waitForLoadState('domcontentloaded');
 
-    const logoutButton = page.locator('button:has-text("Logout")');
-    if (await logoutButton.isVisible()) {
-      await logoutButton.click();
-      await expect(page).toHaveURL(/\/en\/?/);
-    }
+    // Wait for and click the logout button (icon button with close icon)
+    const logoutButton = page.locator('button[aria-label*="logout" i], button:has(svg):near(:text("test"))').last();
+    await expect(logoutButton).toBeVisible({ timeout: 10000 });
+    await logoutButton.click();
+    
+    await expect(page).toHaveURL(/\/en\/?/);
   });
 });
