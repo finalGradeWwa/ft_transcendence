@@ -49,6 +49,45 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+          cache-dependency-path: backend/requirements.txt
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+        working-directory: backend
+
+      - name: Run Django migrations
+        run: python manage.py migrate
+        working-directory: backend/plantapp
+        env:
+          DJANGO_SETTINGS_MODULE: mysite.settings
+
+      - name: Create test user
+        run: |
+          python manage.py shell << EOF
+          from django.contrib.auth import get_user_model
+          User = get_user_model()
+          if not User.objects.filter(email='test@example.com').exists():
+              User.objects.create_user(username='test', email='test@example.com', password='Testpass123!')
+          EOF
+        working-directory: backend/plantapp
+        env:
+          DJANGO_SETTINGS_MODULE: mysite.settings
+
+      - name: Start Django backend
+        run: |
+          python manage.py runserver 8000 &
+          sleep 5
+        working-directory: backend/plantapp
+        env:
+          DJANGO_SETTINGS_MODULE: mysite.settings
+
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
@@ -67,7 +106,7 @@ jobs:
         run: npx playwright test
         working-directory: frontend
         env:
-          CI: true
+          NEXT_PUBLIC_API_URL: http://localhost:8000
 
   build:
     runs-on: ubuntu-latest

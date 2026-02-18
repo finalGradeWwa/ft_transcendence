@@ -268,7 +268,6 @@ test.describe('Combined Authentication Flows', () => {
   });
 
   test('3.3 - Logged-in user sees username in header', async ({ page }) => {
-    // test.skip(true, 'Requires backend CORS/cookie configuration');
     await page.goto('/en/?showLogin=true');
     await page.fill('input[name="email"]', 'test@example.com');
     await page.fill('input[name="password"]', 'Testpass123!');
@@ -276,20 +275,15 @@ test.describe('Combined Authentication Flows', () => {
     
     // Wait for the redirect and page load
     await page.waitForURL(/\/en(\/?|\?.*)$/, { timeout: 15000 });
-    await page.waitForLoadState('networkidle', { timeout: 10000 });
-    
-    // Wait for localStorage to be populated and header to update
-    await page.waitForFunction(
-      () => localStorage.getItem('username') !== null,
-      { timeout: 10000 }
-    );
+    await page.waitForLoadState('domcontentloaded', { timeout: 10000 });
 
-    // Wait for the username to appear in the header after localStorage is populated
-    await expect(page.locator('.header-top-wrapper')).toContainText(/test/i, { timeout: 10000 });
+    // Wait for the username to appear in the header
+    // Using a more specific selector for the username display
+    const usernameElement = page.locator('.header-top-wrapper').getByText(/test/i);
+    await expect(usernameElement).toBeVisible({ timeout: 15000 });
   });
 
   test('3.4 - Logged-in user can log out', async ({ page }) => {
-    // test.skip(true, 'Requires backend CORS/cookie configuration');
     await page.goto('/en/?showLogin=true');
     await page.fill('input[name="email"]', 'test@example.com');
     await page.fill('input[name="password"]', 'Testpass123!');
@@ -297,18 +291,15 @@ test.describe('Combined Authentication Flows', () => {
     
     // Wait for the redirect and page load
     await page.waitForURL(/\/en(\/?|\?.*)$/, { timeout: 15000 });
-    await page.waitForLoadState('networkidle', { timeout: 10000 });
-    
-    // Wait for localStorage to be populated
-    await page.waitForFunction(
-      () => localStorage.getItem('username') !== null,
-      { timeout: 10000 }
-    );
+    await page.waitForLoadState('domcontentloaded', { timeout: 10000 });
 
-    const logoutButton = page.locator('button:has-text("Logout")');
-    if (await logoutButton.isVisible()) {
-      await logoutButton.click();
-      await expect(page).toHaveURL(/\/en\/?/);
-    }
+    // Wait for username to appear (indicating successful login)
+    const usernameElement = page.locator('.header-top-wrapper').getByText(/test/i);
+    await expect(usernameElement).toBeVisible({ timeout: 15000 });
+
+    // Find and click the logout button
+    const logoutButton = page.getByRole('button', { name: /logout/i });
+    await logoutButton.click();
+    await expect(page).toHaveURL(/\/en\/?/);
   });
 });
