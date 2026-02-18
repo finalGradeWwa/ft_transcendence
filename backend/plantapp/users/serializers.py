@@ -71,15 +71,16 @@ class UserUpdateSerializer(serializers.ModelSerializer):
         return value
 
     def update(self, instance, validated_data):
-        old_password = validated_data.pop('old_password')
+        old_password = validated_data.pop('old_password', None)
         new_password = validated_data.pop('password', None)
         validated_data.pop('password_confirm', None)
 
-        if not instance.check_password(old_password):
-            raise serializers.ValidationError({"old_password": "Wrong password."})
-
-        if new_password:
-            instance.set_password(new_password)
+        if old_password is not None:
+            if not instance.check_password(old_password):
+                raise serializers.ValidationError({"old_password": "Wrong password."})
+            
+            if new_password:
+                instance.set_password(new_password)
 
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
