@@ -33,7 +33,6 @@ test.describe('Homepage & Navigation', () => {
     await page.getByRole('link', { name: 'Search' }).waitFor();
     await page.getByRole('link', { name: 'Search' }).click();
     await page.waitForURL(/showSearch/);
-    await expect(page).toHaveURL(/showSearch/);
   });
 
   test('footer links work', async ({ page }) => {
@@ -70,7 +69,9 @@ test.describe('Sign Up (Registration)', () => {
     await page.click('button[type="submit"]');
 
     const firstNameInput = page.locator('#reg-first-name');
-    const validity = await firstNameInput.evaluate((el: HTMLInputElement) => el.validity.valid);
+    const validity = await firstNameInput.evaluate(
+      (el: HTMLInputElement) => el.validity.valid
+    );
     expect(validity).toBe(false);
   });
 
@@ -86,7 +87,9 @@ test.describe('Sign Up (Registration)', () => {
     await page.click('button[type="submit"]');
 
     const emailInput = page.locator('#reg-email');
-    const validity = await emailInput.evaluate((el: HTMLInputElement) => el.validity.valid);
+    const validity = await emailInput.evaluate(
+      (el: HTMLInputElement) => el.validity.valid
+    );
     expect(validity).toBe(false);
   });
 
@@ -101,7 +104,9 @@ test.describe('Sign Up (Registration)', () => {
 
     await page.click('button[type="submit"]');
 
-    await expect(page.locator('[role="alert"].animate-pulse')).toContainText(/Min. 8 characters/i);
+    await expect(page.locator('[role="alert"].animate-pulse')).toContainText(
+      /Min. 8 characters/i
+    );
   });
 
   test('1.5 - Show error when passwords do not match', async ({ page }) => {
@@ -115,7 +120,9 @@ test.describe('Sign Up (Registration)', () => {
 
     await page.click('button[type="submit"]');
 
-    await expect(page.locator('[role="alert"].animate-pulse')).toContainText(/match/i);
+    await expect(page.locator('[role="alert"].animate-pulse')).toContainText(
+      /match/i
+    );
   });
 
   test('1.6 - Cannot register without accepting terms', async ({ page }) => {
@@ -129,7 +136,9 @@ test.describe('Sign Up (Registration)', () => {
     await page.click('button[type="submit"]');
 
     const termsCheckbox = page.locator('#terms');
-    const validity = await termsCheckbox.evaluate((el: HTMLInputElement) => el.validity.valid);
+    const validity = await termsCheckbox.evaluate(
+      (el: HTMLInputElement) => el.validity.valid
+    );
     expect(validity).toBe(false);
   });
 
@@ -167,7 +176,10 @@ test.describe('Sign Up (Registration)', () => {
     const passwordInput = page.locator('#reg-password');
     await expect(passwordInput).toHaveAttribute('type', 'password');
 
-    const toggleButton = page.locator('button:has(svg)').filter({ has: page.locator('path[d*="M15 12"]') }).first();
+    const toggleButton = page
+      .locator('button:has(svg)')
+      .filter({ has: page.locator('path[d*="M15 12"]') })
+      .first();
     await toggleButton.click();
 
     await expect(passwordInput).toHaveAttribute('type', 'text');
@@ -187,7 +199,6 @@ test.describe('Sign In (Login)', () => {
     await page.click('button[type="submit"]');
 
     await page.waitForURL(/\/en(\/?|\?.*)$/, { timeout: 15000 });
-
   });
 
   test('2.2 - Show error for invalid email', async ({ page }) => {
@@ -212,7 +223,9 @@ test.describe('Sign In (Login)', () => {
     await page.click('button[type="submit"]');
 
     const emailInput = page.locator('input[name="email"]');
-    const validity = await emailInput.evaluate((el: HTMLInputElement) => el.validity.valid);
+    const validity = await emailInput.evaluate(
+      (el: HTMLInputElement) => el.validity.valid
+    );
     expect(validity).toBe(false);
   });
 
