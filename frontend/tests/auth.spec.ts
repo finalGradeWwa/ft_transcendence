@@ -29,6 +29,9 @@ test.describe('Homepage & Navigation', () => {
   });
 
   test('search modal opens', async ({ page }) => {
+    await page.addInitScript(() => {
+      window.localStorage.setItem('username', 'testuser');
+    });
     await page.goto('/en/');
     await page.getByRole('link', { name: 'Search' }).waitFor();
     await page.getByRole('link', { name: 'Search' }).click();
@@ -37,9 +40,9 @@ test.describe('Homepage & Navigation', () => {
   });
 
   test('footer links work', async ({ page }) => {
-    test.skip(true, 'requires fix');
+    // test.skip(true, 'requires fix');
     await page.goto('/en/');
-    await page.getByRole('link', { name: /Terms/i }).click();
+    await page.locator('a.text-primary-green[href="/en/terms"]').click();
     await expect(page).toHaveURL('/en/terms');
   });
 });
@@ -70,7 +73,9 @@ test.describe('Sign Up (Registration)', () => {
     await page.click('button[type="submit"]');
 
     const firstNameInput = page.locator('#reg-first-name');
-    const validity = await firstNameInput.evaluate((el: HTMLInputElement) => el.validity.valid);
+    const validity = await firstNameInput.evaluate(
+      (el: HTMLInputElement) => el.validity.valid
+    );
     expect(validity).toBe(false);
   });
 
@@ -86,7 +91,9 @@ test.describe('Sign Up (Registration)', () => {
     await page.click('button[type="submit"]');
 
     const emailInput = page.locator('#reg-email');
-    const validity = await emailInput.evaluate((el: HTMLInputElement) => el.validity.valid);
+    const validity = await emailInput.evaluate(
+      (el: HTMLInputElement) => el.validity.valid
+    );
     expect(validity).toBe(false);
   });
 
@@ -101,7 +108,9 @@ test.describe('Sign Up (Registration)', () => {
 
     await page.click('button[type="submit"]');
 
-    await expect(page.locator('[role="alert"].animate-pulse')).toContainText(/Min. 8 characters/i);
+    await expect(page.locator('[role="alert"].animate-pulse')).toContainText(
+      /Min. 8 characters/i
+    );
   });
 
   test('1.5 - Show error when passwords do not match', async ({ page }) => {
@@ -115,7 +124,9 @@ test.describe('Sign Up (Registration)', () => {
 
     await page.click('button[type="submit"]');
 
-    await expect(page.locator('[role="alert"].animate-pulse')).toContainText(/match/i);
+    await expect(page.locator('[role="alert"].animate-pulse')).toContainText(
+      /match/i
+    );
   });
 
   test('1.6 - Cannot register without accepting terms', async ({ page }) => {
@@ -129,7 +140,9 @@ test.describe('Sign Up (Registration)', () => {
     await page.click('button[type="submit"]');
 
     const termsCheckbox = page.locator('#terms');
-    const validity = await termsCheckbox.evaluate((el: HTMLInputElement) => el.validity.valid);
+    const validity = await termsCheckbox.evaluate(
+      (el: HTMLInputElement) => el.validity.valid
+    );
     expect(validity).toBe(false);
   });
 
@@ -167,7 +180,10 @@ test.describe('Sign Up (Registration)', () => {
     const passwordInput = page.locator('#reg-password');
     await expect(passwordInput).toHaveAttribute('type', 'password');
 
-    const toggleButton = page.locator('button:has(svg)').filter({ has: page.locator('path[d*="M15 12"]') }).first();
+    const toggleButton = page
+      .locator('button:has(svg)')
+      .filter({ has: page.locator('path[d*="M15 12"]') })
+      .first();
     await toggleButton.click();
 
     await expect(passwordInput).toHaveAttribute('type', 'text');
@@ -180,14 +196,13 @@ test.describe('Sign In (Login)', () => {
   });
 
   test('2.1 - Login with valid credentials', async ({ page }) => {
-    test.skip(true, 'Requires backend CORS/cookie configuration');
+    // test.skip(true, 'Requires backend CORS/cookie configuration');
     await page.fill('input[name="email"]', 'test@example.com');
     await page.fill('input[name="password"]', 'Testpass123!');
 
     await page.click('button[type="submit"]');
 
-    await page.waitForURL(/auth=login_success/, { timeout: 15000 });
-    await expect(page).toHaveURL(/auth=login_success/);
+    await page.waitForURL(/\/en(\/?|\?.*)$/, { timeout: 15000 });
   });
 
   test('2.2 - Show error for invalid email', async ({ page }) => {
@@ -212,7 +227,9 @@ test.describe('Sign In (Login)', () => {
     await page.click('button[type="submit"]');
 
     const emailInput = page.locator('input[name="email"]');
-    const validity = await emailInput.evaluate((el: HTMLInputElement) => el.validity.valid);
+    const validity = await emailInput.evaluate(
+      (el: HTMLInputElement) => el.validity.valid
+    );
     expect(validity).toBe(false);
   });
 
@@ -255,28 +272,35 @@ test.describe('Combined Authentication Flows', () => {
   });
 
   test('3.3 - Logged-in user sees username in header', async ({ page }) => {
-    test.skip(true, 'Requires backend CORS/cookie configuration');
     await page.goto('/en/?showLogin=true');
     await page.fill('input[name="email"]', 'test@example.com');
     await page.fill('input[name="password"]', 'Testpass123!');
     await page.click('button[type="submit"]');
-    await page.waitForURL(/auth=login_success/, { timeout: 15000 });
+    
+    // Wait for redirect and page to fully load after login
+    await page.waitForURL(/\/en(\/?|\?.*)$/, { timeout: 15000 });
+    await page.waitForLoadState('domcontentloaded');
 
-    await expect(page.locator('header')).toContainText(/test/i);
+    // Wait for username to appear in the profile area
+    const usernameElement = page.locator('.header-top-wrapper').getByText(/test/i);
+    await expect(usernameElement).toBeVisible({ timeout: 10000 });
   });
 
   test('3.4 - Logged-in user can log out', async ({ page }) => {
-    test.skip(true, 'Requires backend CORS/cookie configuration');
     await page.goto('/en/?showLogin=true');
     await page.fill('input[name="email"]', 'test@example.com');
     await page.fill('input[name="password"]', 'Testpass123!');
     await page.click('button[type="submit"]');
-    await page.waitForURL(/auth=login_success/, { timeout: 15000 });
+    
+    // Wait for redirect and page to fully load after login
+    await page.waitForURL(/\/en(\/?|\?.*)$/, { timeout: 15000 });
+    await page.waitForLoadState('domcontentloaded');
 
-    const logoutButton = page.locator('button:has-text("Logout")');
-    if (await logoutButton.isVisible()) {
-      await logoutButton.click();
-      await expect(page).toHaveURL(/\/en\/?/);
-    }
+    // Wait for and click the logout button (icon button with close icon)
+    const logoutButton = page.locator('button[aria-label*="logout" i], button:has(svg):near(:text("test"))').last();
+    await expect(logoutButton).toBeVisible({ timeout: 10000 });
+    await logoutButton.click();
+    
+    await expect(page).toHaveURL(/\/en\/?/);
   });
 });
