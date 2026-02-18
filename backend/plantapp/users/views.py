@@ -64,7 +64,7 @@ class UnfriendAPIView(APIView):
 
 class ListFriendsAPIView(APIView):
     """Get all friends (mutual connections) for a user."""
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, user_id):
         user = get_object_or_404(User, pk=user_id)
@@ -76,7 +76,7 @@ class ListFriendsAPIView(APIView):
 
 class IsFriendAPIView(APIView):
     """Check if two users are friends."""
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, user_id):
         user = get_object_or_404(User, pk=user_id)

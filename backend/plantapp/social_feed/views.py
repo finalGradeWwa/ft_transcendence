@@ -57,15 +57,15 @@ class PinViewSet(viewsets.ViewSet):
     @action(detail=False, methods=['get'], url_path='feed')
     def feed(self, request):
         """
-        Get personalized feed: pins from friends and users you've sent requests to + your own pins.
+        Get personalized feed: pins from mutual friends + your own pins.
         GET /api/pins/feed/
         """
-        # Get IDs of users the current user has connections with (friends + outgoing requests)
-        following_ids = request.user.following.values_list('id', flat=True)
+        # Get IDs of mutual friends only (users who accepted your friend request)
+        friends_ids = request.user.get_friends().values_list('id', flat=True)
         
-        # Get pins from connected users OR from the current user
+        # Get pins from mutual friends OR from the current user
         pins = Pin.objects.filter(
-            Q(creator__in=following_ids) | Q(creator=request.user)
+            Q(creator__in=friends_ids) | Q(creator=request.user)
         ).order_by('-created_at')
         
         serializer = PinListReadModeSerializer(pins, many=True)

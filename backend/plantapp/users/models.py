@@ -45,7 +45,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     date_joined = models.DateTimeField(default=timezone.now)
     # Internal field: stores friend connections/requests (mutual = friends, one-way = pending request)
     following = models.ManyToManyField("self", blank=True,symmetrical=False, related_name="followers")
-
     def get_friends(self):
         """Return all mutual friends (users with mutual friend connections)."""
         # Get users we have a connection with who also have a connection back to us
