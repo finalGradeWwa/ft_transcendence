@@ -50,7 +50,7 @@ export default function ChatPage() {
       sender: otherUser,
       recipient: currentUser,
       content: 'Hello! Welcome to the chat.',
-      timestamp: new Date().toISOString(),
+      timestamp: '2026-02-18T12:00:00.000Z',
       is_read: true,
     },
   ]);
