@@ -10,6 +10,12 @@ type User = {
   username: string;
 };
 
+type Friend = {
+  id: number;
+  username: string;
+  isOnline: boolean;
+};
+
 type Message = {
   id: number;
   sender: User;
@@ -27,6 +33,17 @@ export default function ChatPage() {
   const currentUser: User = { id: 1, username: 'currentUser' };
   const otherUser: User = { id: 2, username: 'otherUser' };
 
+  // mock friends list
+  const [friends, setFriends] = useState<Friend[]>([
+    { id: 2, username: 'otherUser', isOnline: true },
+    { id: 3, username: 'Andrzej', isOnline: true },
+    { id: 4, username: 'Marek', isOnline: false },
+    { id: 5, username: 'Epipremniara', isOnline: true },
+    { id: 6, username: 'bazyl', isOnline: false },
+  ]);
+
+  const [selectedFriend, setSelectedFriend] = useState<Friend | null>(friends[0]);
+
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 1,
@@ -41,11 +58,68 @@ export default function ChatPage() {
   // State to track the current input field value
   const [inputValue, setInputValue] = useState('');
 
+  // WebSocket connection
+  const wsRef = useRef<WebSocket | null>(null);
+
+  // WebSocket Setup
+  useEffect(() => {
+    const ws = new WebSocket('ws://localhost:8000/ws/chat/');
+    wsRef.current = ws;
+
+    ws.onopen = () => {
+      console.log('WebSocket connected');
+    };
+
+    ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      console.log('Received:', data);
+
+      // Handle message or status update
+      if (data.type === 'new_message') {
+        // Add new message to the list
+        const newMessage: Message = {
+          id: data.id,
+          sender: data.sender,
+          recipient: data.recipient,
+          content: data.content,
+          timestamp: data.timestamp,
+          is_read: false, // idk if we want it to stay
+        };
+        setMessages((prev) => [...prev, newMessage]);
+      } else if (data.type === 'status_update') {
+        // Update friend's online status
+        setFriends((prev) =>
+          prev.map((f) =>
+            f.id === data.user_id ? { ...f, isOnline: data.is_online } : f
+          )
+        );
+      }
+    };
+
+    ws.onerror = (error) => {
+      console.error('WebSocket error:', error);
+    };
+
+    ws.onclose = () => {
+      console.log('WebSocket disconnected');
+    };
+
+    // Cleanup: close WebSocket when component unmounts
+    return () => {
+      if (ws.readyState === WebSocket.OPEN) {
+        ws.close();
+      }
+    };
+  }, []);
+
   // Scrolls the chat to the bottom to show the latest message
   //-----
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    const container = messagesEndRef.current?.parentElement;
+    if (container) {
+      container.scrollTop = container.scrollHeight;
+    }
   };
 
   useEffect(() => {
@@ -58,13 +132,26 @@ export default function ChatPage() {
     e.preventDefault();
 
     // Ignore empty messages
-    if (!inputValue.trim()) return;
+    if (!inputValue.trim() || !selectedFriend) return;
 
-        // Capture current input value and clear the input field
+    // Capture current input value and clear the input field
     const messageContent = inputValue;
     setInputValue('');
 
-    // Add message to the list using the functional updater to avoid stale state
+    // Send message via WebSocket
+    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+      wsRef.current.send(
+        JSON.stringify({
+          type: 'send_message',
+          recipient_id: selectedFriend.id,
+          content: messageContent,
+        })
+      );
+    } else {
+      console.error('WebSocket is not connected');
+    }
+
+    // Optimistically add message to UI (will be confirmed by server)
     setMessages((prevMessages) => {
       const nextId =
         prevMessages.length > 0
@@ -74,7 +161,7 @@ export default function ChatPage() {
       const newMessage: Message = {
         id: nextId,
         sender: currentUser,
-        recipient: otherUser,
+        recipient: { id: selectedFriend.id, username: selectedFriend.username },
         content: messageContent,
         timestamp: new Date().toISOString(),
         is_read: false,
@@ -82,30 +169,6 @@ export default function ChatPage() {
 
       return [...prevMessages, newMessage];
     });
-
-    // Simulate a response after 1 second (replace with real backend call later)
-    //-------
-    setTimeout(() => {
-      setMessages((prevMessages) => {
-        const nextId =
-          prevMessages.length > 0
-            ? prevMessages[prevMessages.length - 1].id + 1
-            : 1;
-
-        const responseMessage: Message = {
-          id: nextId,
-          sender: otherUser,
-          recipient: currentUser,
-          content: 'This is a demo response.',
-          timestamp: new Date().toISOString(),
-          is_read: false,
-        };
-
-        return [...prevMessages, responseMessage];
-      });
-    }, 1000);
-	//-------
-
   };
 
   // Formats timestamp string into a readable time string (HH:MM)
@@ -118,10 +181,81 @@ export default function ChatPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-beige-900 via-beige-800 to-beige-900 text-white">
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
-        <div className="bg-secondary-beige backdrop-blur-sm rounded-lg shadow-xl border border-secondary-beige flex flex-col h-[600px]">
-          {/* Messages Area */}
-          <div className="flex-1 overflow-y-auto p-6 space-y-4">
+      <div className="container mx-auto px-4 py-8 max-w-7xl">
+        <div className="flex gap-4 h-[600px]">
+
+          {/* Friends List Sidebar */}
+          <div className="w-80 bg-secondary-beige backdrop-blur-sm rounded-lg shadow-xl border border-secondary-beige flex flex-col">
+            <div className="p-4 border-b border-gray-700">
+              <h2 className="text-xl font-bold text-gray-800">Friends</h2>
+            </div>
+            <div className="flex-1 overflow-y-auto">
+              {friends.map((friend) => (
+                <div
+                  key={friend.id}
+                  className={`p-4 border-b border-gray-700 hover:bg-gray-700/50 transition-colors ${
+                    selectedFriend?.id === friend.id ? 'bg-gray-700/70' : ''
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="relative">
+                        <div className="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center font-bold">
+                          {friend.username[0].toUpperCase()}
+						  {/* to be changed to avatar */}
+                        </div>
+                        <div
+                          className={`absolute bottom-0 right-0 w-4 h-4 rounded-full border-2 border-secondary-beige ${
+                            friend.isOnline ? 'bg-green-500' : 'bg-gray-500'
+                          }`}
+                        />
+                      </div>
+                      <div>
+                        <p className="font-medium text-gray-800">{friend.username}</p>
+                        <p className="text-xs text-gray-600">
+                          {friend.isOnline ? 'Online' : 'Offline'}
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => setSelectedFriend(friend)}
+                      className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm transition-colors"
+                    >
+                      Message
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Chat Area */}
+          <div className="flex-1 bg-secondary-beige backdrop-blur-sm rounded-lg shadow-xl border border-secondary-beige flex flex-col">
+            {selectedFriend && (
+              <div className="p-4 border-b border-gray-700">
+                <div className="flex items-center gap-3">
+                  <div className="relative">
+                    <div className="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center font-bold">
+                      {selectedFriend.username[0].toUpperCase()}
+                    </div>
+                    <div
+                      className={`absolute bottom-0 right-0 w-4 h-4 rounded-full border-2 border-secondary-beige ${
+                        selectedFriend.isOnline ? 'bg-green-500' : 'bg-gray-500'
+                      }`}
+                    />
+                  </div>
+                  <div>
+                    <p className="font-bold text-gray-700">{selectedFriend.username}</p>
+                    <p className="text-xs text-gray-500">
+                      {selectedFriend.isOnline ? 'Online' : 'Offline'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Messages Area */}
+            <div className="flex-1 overflow-y-auto p-6 space-y-4">
             {messages.map((message) => (
 
               <div
@@ -170,6 +304,7 @@ export default function ChatPage() {
                 {t('send')}
               </button>
             </form>
+          </div>
           </div>
         </div>
       </div>
