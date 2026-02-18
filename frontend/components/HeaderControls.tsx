@@ -10,10 +10,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import { useRouter, usePathname, Link } from '@/i18n/navigation';
 import { useSearchParams } from 'next/navigation';
 import { Icon } from '@/components/icons/ui/Icon';
-import { apiFetch } from '@/lib/api';
-// PL: Importujemy poprawną funkcję fetchCurrentUser z Twojej biblioteki auth.
-// EN: Importing the correct fetchCurrentUser function from your auth library.
-import { fetchCurrentUser } from '@/lib/auth';
+import { fetchCurrentUser, apiFetch } from '@/lib/auth';
 
 const BTN_S =
   'p-2 rounded-full bg-secondary-beige text-neutral-900 hover:text-primary-green shadow-md transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black dark:focus-visible:outline-white outline-none shrink-0 flex items-center justify-center';
