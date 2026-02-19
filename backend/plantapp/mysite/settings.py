@@ -74,6 +74,8 @@ INSTALLED_APPS = [
     'social_feed',
     'chat_app',
     'django_filters',
+    'channels',
+    'tools',
 ]
 
 MIDDLEWARE = [
@@ -107,6 +109,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'mysite.wsgi.application'
+ASGI_APPLICATION = 'mysite.asgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
@@ -208,6 +211,16 @@ SIMPLE_JWT = {
     "CHECK_REVOKE_TOKEN": False,
     "REVOKE_TOKEN_CLAIM": "hash_password",
     "CHECK_USER_IS_ACTIVE": True,
+}
+
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("redis", 6379)], # Port 6379 is the standard unencrypted Redis port
+        },
+    },
 }
 
 CORS_ALLOWED_ORIGINS = [
