@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, FormEvent } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
-
+//class UserFriendsListAPIView(APIView):
 
 // same as models.py
 type User = {
@@ -42,7 +42,7 @@ export default function ChatPage() {
     { id: 6, username: 'bazyl', isOnline: false },
   ]);
 
-  const [selectedFriend, setSelectedFriend] = useState<Friend | null>(friends[0]);
+  const [selectedFriend, setSelectedFriend] = useState<Friend | null>(friends[0] || null);
 
   const [messages, setMessages] = useState<Message[]>([
     {
