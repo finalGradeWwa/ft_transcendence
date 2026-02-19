@@ -29,7 +29,7 @@ export const GlobalModalProvider = () => {
   const router = useRouter();
   const t = useTranslations('HomePage');
 
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
 
   useEffect(() => {
     const token =
@@ -44,11 +44,11 @@ export const GlobalModalProvider = () => {
    * EN: Reacts to URL parameter changes and opens the modal if showLogin=true.
    */
   const isLoginParamPresent = searchParams.get('showLogin') === 'true';
-  const isLoginModalOpen = isLoginParamPresent && !isLoggedIn;
+  const isLoginModalOpen = isLoginParamPresent && isLoggedIn === false;
   const isSearchModalOpen = searchParams.get('showSearch') === 'true';
 
   useEffect(() => {
-    if (isLoginParamPresent && isLoggedIn) {
+    if (isLoginParamPresent && isLoggedIn === true) {
       router.replace(pathname);
     }
   }, [isLoginParamPresent, isLoggedIn, pathname, router]);

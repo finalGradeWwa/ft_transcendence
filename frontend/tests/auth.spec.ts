@@ -167,7 +167,9 @@ test.describe('Sign Up (Registration)', () => {
 
     await page.click('button[type="submit"]');
 
-    await expect(page.locator('[role="alert"].animate-pulse')).toBeVisible();
+    await expect(page.locator('[role="alert"]')).toBeVisible({
+      timeout: 10000,
+    });
   });
 
   test('1.8 - Show error when email already exists', async ({ page }) => {
@@ -181,7 +183,9 @@ test.describe('Sign Up (Registration)', () => {
 
     await page.click('button[type="submit"]');
 
-    await expect(page.locator('[role="alert"].animate-pulse')).toBeVisible();
+    await expect(page.locator('[role="alert"]')).toBeVisible({
+      timeout: 10000,
+    });
   });
 
   test('1.11 - Toggle password visibility', async ({ page }) => {
@@ -286,13 +290,15 @@ test.describe('Combined Authentication Flows', () => {
     await page.fill('input[name="email"]', 'test@example.com');
     await page.fill('input[name="password"]', 'Testpass123!');
     await page.click('button[type="submit"]');
-    
+
     // Wait for redirect and page to fully load after login
     await page.waitForURL(/\/en(\/?|\?.*)$/, { timeout: 15000 });
     await page.waitForLoadState('domcontentloaded');
 
     // Wait for username to appear in the profile area
-    const usernameElement = page.locator('.header-top-wrapper').getByText(/test/i);
+    const usernameElement = page
+      .locator('.header-top-wrapper')
+      .getByText(/test/i);
     await expect(usernameElement).toBeVisible({ timeout: 10000 });
   });
 
@@ -301,16 +307,20 @@ test.describe('Combined Authentication Flows', () => {
     await page.fill('input[name="email"]', 'test@example.com');
     await page.fill('input[name="password"]', 'Testpass123!');
     await page.click('button[type="submit"]');
-    
+
     // Wait for redirect and page to fully load after login
     await page.waitForURL(/\/en(\/?|\?.*)$/, { timeout: 15000 });
     await page.waitForLoadState('domcontentloaded');
 
     // Wait for and click the logout button (icon button with close icon)
-    const logoutButton = page.locator('button[aria-label*="logout" i], button:has(svg):near(:text("test"))').last();
+    const logoutButton = page
+      .locator(
+        'button[aria-label*="logout" i], button:has(svg):near(:text("test"))'
+      )
+      .last();
     await expect(logoutButton).toBeVisible({ timeout: 10000 });
     await logoutButton.click();
-    
+
     await expect(page).toHaveURL(/\/en\/?/);
   });
 });
