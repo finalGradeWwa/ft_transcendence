@@ -304,6 +304,21 @@ export function HeaderControls({
           label={tAria('searchBtn')}
         />
 
+        <IconButton
+          href={
+            username
+              ? { pathname, query: { showNotifications: 'true' } }
+              : undefined
+          }
+          onClick={
+            !username && !isLoading
+              ? () => router.push({ pathname, query: { showLogin: 'true' } })
+              : undefined
+          }
+          icon="bell"
+          label={tAria('notificationsButton')}
+        />
+
         <div className="relative" ref={addMenuRef}>
           <IconButton
             onClick={

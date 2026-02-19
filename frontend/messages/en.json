@@ -33,6 +33,7 @@
       "footerNavigation": "Footer navigation",
       "selectLanguage": "Select language",
       "searchBtn": "Search",
+      "notificationsButton": "Notifications",
       "add": "Add new plant",
       "profile": "User profile",
       "logout": "Logout",
@@ -194,5 +195,13 @@
       "close": "Close search"
     },
     "loading": "Searching, please wait..."
+  },
+  "NotificationsModal": {
+    "title": "Friend Requests",
+    "close": "Close notifications",
+    "loading": "Loading requests...",
+    "noRequests": "No pending friend requests",
+    "accept": "Accept friend request",
+    "reject": "Reject friend request"
   }
 }

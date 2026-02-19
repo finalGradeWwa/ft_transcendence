@@ -194,5 +194,13 @@
       "close": "Zamknij wyszukiwanie"
     },
     "loading": "Trwa wyszukiwanie, proszę czekać..."
+  },
+  "NotificationsModal": {
+    "title": "Zaproszenia do Znajomych",
+    "close": "Zamknij powiadomienia",
+    "loading": "Ładowanie zaproszeń...",
+    "noRequests": "Brak oczekujących zaproszeń",
+    "accept": "Zaakceptuj zaproszenie",
+    "reject": "Odrzuć zaproszenie"
   }
 }
