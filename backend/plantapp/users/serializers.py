@@ -101,9 +101,3 @@ class PublicUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ("id", "username", "first_name", "last_name", "avatar_photo")
-
-class ListFollowersSerializer(serializers.ModelSerializer):
-     class Meta:
-        model = User
-        fields = ("followers",)
-        read_only_fields = fields

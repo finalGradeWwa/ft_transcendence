@@ -157,7 +157,7 @@ class MeViewTests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-class FollowAPITests(APITestCase):
+class FriendRequestAPITests(APITestCase):
     def setUp(self):
         self.alice = User.objects.create_user(
             email="alice@a.com",
@@ -169,34 +169,34 @@ class FollowAPITests(APITestCase):
             username="bob",
             password="password123",
         )
-    def test_user_can_follow_another_user(self):
+    
+    def test_user_can_send_friend_request(self):
         self.client.force_authenticate(user=self.alice)
 
-        url = f"/users/{self.bob.id}/follow/"
+        url = f"/users/{self.bob.id}/send-request/"
         response = self.client.post(url)
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue(
             self.alice.following.filter(id=self.bob.id).exists()
         )
-        self.assertTrue(
-            self.bob.followers.filter(id=self.alice.id).exists()
-        )
-    def test_user_cannot_follow_self(self):
+    
+    def test_user_cannot_send_request_to_self(self):
         self.client.force_authenticate(user=self.alice)
 
-        url = f"/users/{self.alice.id}/follow/"
+        url = f"/users/{self.alice.id}/send-request/"
         response = self.client.post(url)
 
         self.assertEqual(response.status_code, 400)
         self.assertFalse(
             self.alice.following.filter(id=self.alice.id).exists()
         )
-    def test_user_can_unfollow(self):
+    
+    def test_user_can_cancel_friend_request(self):
         self.alice.following.add(self.bob)
 
         self.client.force_authenticate(user=self.alice)
-        url = f"/users/{self.bob.id}/unfollow/"
+        url = f"/users/{self.bob.id}/cancel-request/"
         response = self.client.post(url)
 
         self.assertEqual(response.status_code, 200)
@@ -204,105 +204,554 @@ class FollowAPITests(APITestCase):
             self.alice.following.filter(id=self.bob.id).exists()
         )
 
-    def test_list_followers(self):
-        self.alice.following.add(self.bob)
+    def test_user_cannot_cancel_nonexistent_request(self):
+        self.client.force_authenticate(user=self.alice)
+        
+        url = f"/users/{self.bob.id}/cancel-request/"
+        response = self.client.post(url)
 
-        url = f"/users/{self.bob.id}/followers/"
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("detail", response.data)
+
+    def test_list_friends(self):
+        # Make them mutual friends
+        self.alice.following.add(self.bob)
+        self.bob.following.add(self.alice)
+
+        self.client.force_authenticate(user=self.alice)
+        url = f"/users/{self.bob.id}/friends/"
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 1)
         self.assertEqual(response.data[0]["username"], "alice")
 
-    def test_list_following(self):
+    def test_list_incoming_requests(self):
+        # Alice sends request to Bob
         self.alice.following.add(self.bob)
 
-        url = f"/users/{self.alice.id}/following/"
+        self.client.force_authenticate(user=self.bob)
+        url = "/api/friend-requests/"
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]["username"], "alice")
+    
+    def test_list_outgoing_requests(self):
+        # Alice sends request to Bob
+        self.alice.following.add(self.bob)
+
+        self.client.force_authenticate(user=self.alice)
+        url = "/api/friend-requests/outgoing/"
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
         self.assertEqual(response.data[0]["username"], "bob")
 
-    def test_user_cannot_follow_non_existent(self):
+    def test_user_cannot_send_request_to_non_existent(self):
         self.client.force_authenticate(user=self.alice)
 
-        url = "/users/99999/follow/"
+        url = "/users/99999/send-request/"
         response = self.client.post(url)
 
         self.assertEqual(response.status_code, 404)
 
-    def test_user_cannot_follow_twice(self):
+    def test_user_cannot_send_request_twice(self):
         self.client.force_authenticate(user=self.alice)
 
-        url = f"/users/{self.bob.id}/follow/"
+        url = f"/users/{self.bob.id}/send-request/"
         response = self.client.post(url)
         response = self.client.post(url)
 
         self.assertEqual(response.status_code, 400)
+    
+    def test_user_can_accept_friend_request(self):
+        # Alice sends request to Bob
+        self.alice.following.add(self.bob)
+        
+        self.client.force_authenticate(user=self.bob)
+        url = f"/users/{self.alice.id}/accept/"
+        response = self.client.post(url)
 
-class UserSearchAPIViewTests(APITestCase):
+        self.assertEqual(response.status_code, 200)
+        # Now they should be mutual friends
+        self.assertTrue(self.bob.following.filter(id=self.alice.id).exists())
+        self.assertTrue(self.alice.following.filter(id=self.bob.id).exists())
+    
+    def test_user_can_reject_friend_request(self):
+        # Alice sends request to Bob
+        self.alice.following.add(self.bob)
+        
+        self.client.force_authenticate(user=self.bob)
+        url = f"/users/{self.alice.id}/reject/"
+        response = self.client.post(url)
+
+        self.assertEqual(response.status_code, 200)
+        # Alice should no longer be following Bob
+        self.assertFalse(self.alice.following.filter(id=self.bob.id).exists())
+
+
+class UnfriendAPITests(APITestCase):
+    """Tests for POST /users/<id>/unfriend/ endpoint"""
+
     def setUp(self):
-        self.url = reverse('user-search')
-        self.user = User.objects.create_user(
-            username='searcher',
-            email='searcher@example.com',
-            password='password123'
+        self.alice = User.objects.create_user(
+            email="alice@example.com",
+            username="alice",
+            password="password123",
         )
-        self.target_user = User.objects.create_user(
-            username='target',
-            email='target@example.com',
-            password='password123',
-            first_name='John',
-            last_name='Doe'
+        self.bob = User.objects.create_user(
+            email="bob@example.com",
+            username="bob",
+            password="password123",
         )
-        self.other_user = User.objects.create_user(
-            username='other',
-            email='other@example.com',
-            password='password123',
-            first_name='Jane',
-            last_name='Smith'
+        self.charlie = User.objects.create_user(
+            email="charlie@example.com",
+            username="charlie",
+            password="password123",
         )
 
-    def test_search_unauthenticated(self):
-        self.client.force_authenticate(user=None)
-        response = self.client.get(self.url)
+    def test_unfriend_removes_both_follow_directions(self):
+        """Unfriend should remove both users' follow relationships."""
+        # Alice and Bob are mutual friends
+        self.alice.following.add(self.bob)
+        self.bob.following.add(self.alice)
+
+        self.client.force_authenticate(user=self.alice)
+        url = f"/users/{self.bob.id}/unfriend/"
+        response = self.client.post(url)
+
+        self.assertEqual(response.status_code, 200)
+        # Both directions should be removed
+        self.assertFalse(self.alice.following.filter(pk=self.bob.pk).exists())
+        self.assertFalse(self.bob.following.filter(pk=self.alice.pk).exists())
+        # They should no longer be friends
+        self.assertFalse(self.alice.is_friend_with(self.bob))
+        self.assertFalse(self.bob.is_friend_with(self.alice))
+
+    def test_unfriend_when_not_friends_returns_400(self):
+        """Unfriend should fail if users are not mutual friends."""
+        # Alice follows Bob but Bob doesn't follow back (not friends)
+        self.alice.following.add(self.bob)
+
+        self.client.force_authenticate(user=self.alice)
+        url = f"/users/{self.bob.id}/unfriend/"
+        response = self.client.post(url)
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("not friends", response.data["detail"].lower())
+
+    def test_unfriend_when_no_relationship_returns_400(self):
+        """Unfriend should fail if there's no relationship at all."""
+        self.client.force_authenticate(user=self.alice)
+        url = f"/users/{self.bob.id}/unfriend/"
+        response = self.client.post(url)
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("not friends", response.data["detail"].lower())
+
+    def test_unfriend_self_returns_400(self):
+        """Cannot unfriend yourself."""
+        self.client.force_authenticate(user=self.alice)
+        url = f"/users/{self.alice.id}/unfriend/"
+        response = self.client.post(url)
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("cannot unfriend yourself", response.data["detail"].lower())
+
+    def test_unfriend_nonexistent_user_returns_404(self):
+        """Unfriend should return 404 for nonexistent user."""
+        self.client.force_authenticate(user=self.alice)
+        url = "/users/99999/unfriend/"
+        response = self.client.post(url)
+
+        self.assertEqual(response.status_code, 404)
+
+    def test_unfriend_unauthenticated_returns_401(self):
+        """Unfriend requires authentication."""
+        url = f"/users/{self.bob.id}/unfriend/"
+        response = self.client.post(url)
+
+        self.assertEqual(response.status_code, 401)
+
+    def test_unfriend_does_not_affect_other_friendships(self):
+        """Unfriending one user should not affect other friendships."""
+        # Alice is friends with both Bob and Charlie
+        self.alice.following.add(self.bob, self.charlie)
+        self.bob.following.add(self.alice)
+        self.charlie.following.add(self.alice)
+
+        # Alice unfriends Bob
+        self.client.force_authenticate(user=self.alice)
+        url = f"/users/{self.bob.id}/unfriend/"
+        response = self.client.post(url)
+
+        self.assertEqual(response.status_code, 200)
+        # Alice and Bob are no longer friends
+        self.assertFalse(self.alice.is_friend_with(self.bob))
+        # Alice and Charlie are still friends
+        self.assertTrue(self.alice.is_friend_with(self.charlie))
+
+
+class IsFriendAPITests(APITestCase):
+    def setUp(self):
+        self.alice = User.objects.create_user(
+            email="alice@example.com",
+            username="alice",
+            password="password123",
+        )
+        self.bob = User.objects.create_user(
+            email="bob@example.com",
+            username="bob",
+            password="password123",
+        )
+        self.charlie = User.objects.create_user(
+            email="charlie@example.com",
+            username="charlie",
+            password="password123",
+        )
+
+    def test_is_friend_returns_true_for_mutual_follows(self):
+        # Alice and Bob follow each other (mutual friends)
+        self.alice.following.add(self.bob)
+        self.bob.following.add(self.alice)
+
+        self.client.force_authenticate(user=self.alice)
+        url = f"/users/{self.alice.id}/is-friend/?target_id={self.bob.id}"
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.data["is_friend"])
+
+    def test_is_friend_returns_false_for_one_way_follow(self):
+        # Alice follows Bob but Bob doesn't follow Alice
+        self.alice.following.add(self.bob)
+
+        self.client.force_authenticate(user=self.alice)
+        url = f"/users/{self.alice.id}/is-friend/?target_id={self.bob.id}"
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(response.data["is_friend"])
+
+    def test_is_friend_returns_false_for_no_relationship(self):
+        # No relationship between Alice and Bob
+        self.client.force_authenticate(user=self.alice)
+        url = f"/users/{self.alice.id}/is-friend/?target_id={self.bob.id}"
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(response.data["is_friend"])
+
+    def test_is_friend_missing_target_id_parameter(self):
+        # Test the error contract when target_id is missing
+        self.client.force_authenticate(user=self.alice)
+        url = f"/users/{self.alice.id}/is-friend/"
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("detail", response.data)
+        self.assertEqual(response.data["detail"], "target_id query parameter required")
+
+    def test_is_friend_with_invalid_user_id(self):
+        self.client.force_authenticate(user=self.alice)
+        url = f"/users/99999/is-friend/?target_id={self.bob.id}"
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 404)
+
+    def test_is_friend_with_invalid_target_id(self):
+        self.client.force_authenticate(user=self.alice)
+        url = f"/users/{self.alice.id}/is-friend/?target_id=99999"
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 404)
+
+
+class UserFriendsListAPIViewTests(APITestCase):
+    """Tests for GET /api/friends/ endpoint"""
+
+    def setUp(self):
+        self.alice = User.objects.create_user(
+            email="alice@example.com",
+            username="alice",
+            password="password123",
+        )
+        self.bob = User.objects.create_user(
+            email="bob@example.com",
+            username="bob",
+            password="password123",
+        )
+        self.charlie = User.objects.create_user(
+            email="charlie@example.com",
+            username="charlie",
+            password="password123",
+        )
+        self.diana = User.objects.create_user(
+            email="diana@example.com",
+            username="diana",
+            password="password123",
+        )
+
+    def test_get_friends_returns_mutual_follows_only(self):
+        # Alice follows Bob, Bob follows Alice back (mutual)
+        self.alice.following.add(self.bob)
+        self.bob.following.add(self.alice)
+
+        # Alice follows Charlie but Charlie doesn't follow back (one-way)
+        self.alice.following.add(self.charlie)
+
+        # Diana follows Alice but Alice doesn't follow back (one-way)
+        self.diana.following.add(self.alice)
+
+        self.client.force_authenticate(user=self.alice)
+        response = self.client.get("/api/friends/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]["username"], "bob")
+
+    def test_get_friends_returns_empty_list_when_no_mutual_follows(self):
+        # Alice follows Bob but Bob doesn't follow back
+        self.alice.following.add(self.bob)
+
+        self.client.force_authenticate(user=self.alice)
+        response = self.client.get("/api/friends/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 0)
+
+    def test_get_friends_with_multiple_mutual_follows(self):
+        # Alice and Bob are mutual friends
+        self.alice.following.add(self.bob)
+        self.bob.following.add(self.alice)
+
+        # Alice and Charlie are mutual friends
+        self.alice.following.add(self.charlie)
+        self.charlie.following.add(self.alice)
+
+        # Alice and Diana are mutual friends
+        self.alice.following.add(self.diana)
+        self.diana.following.add(self.alice)
+
+        self.client.force_authenticate(user=self.alice)
+        response = self.client.get("/api/friends/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 3)
+
+        usernames = {friend["username"] for friend in response.data}
+        self.assertEqual(usernames, {"bob", "charlie", "diana"})
+
+    def test_get_friends_includes_correct_user_fields(self):
+        # Alice and Bob are mutual friends
+        self.alice.following.add(self.bob)
+        self.bob.following.add(self.alice)
+
+        self.client.force_authenticate(user=self.alice)
+        response = self.client.get("/api/friends/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+
+        friend = response.data[0]
+        self.assertIn("id", friend)
+        self.assertIn("username", friend)
+        self.assertIn("first_name", friend)
+        self.assertIn("last_name", friend)
+        self.assertEqual(friend["username"], "bob")
+
+    def test_get_friends_unauthenticated_returns_401(self):
+        response = self.client.get("/api/friends/")
+
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-    def test_search_by_username(self):
-        self.client.force_authenticate(user=self.user)
-        response = self.client.get(self.url, {'search': 'target'})
+    def test_get_friends_respects_mutual_follow_not_one_way(self):
+        # Bob follows Alice but Alice doesn't follow Bob
+        self.bob.following.add(self.alice)
 
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.client.force_authenticate(user=self.alice)
+        response = self.client.get("/api/friends/")
+
+        # Alice should not see Bob as a friend
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 0)
+
+    def test_get_friends_does_not_include_self(self):
+        # Alice follows herself (shouldn't happen in practice but let's be safe)
+        self.alice.following.add(self.alice)
+
+        self.client.force_authenticate(user=self.alice)
+        response = self.client.get("/api/friends/")
+
+        # Self-follow should not appear in friends list
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 0)
+
+
+class ListFriendsAPIViewTests(APITestCase):
+    """Tests for GET /users/<id>/friends/ endpoint (public friends list)"""
+
+    def setUp(self):
+        self.alice = User.objects.create_user(
+            email="alice@example.com",
+            username="alice",
+            password="password123",
+        )
+        self.bob = User.objects.create_user(
+            email="bob@example.com",
+            username="bob",
+            password="password123",
+        )
+        self.charlie = User.objects.create_user(
+            email="charlie@example.com",
+            username="charlie",
+            password="password123",
+        )
+        self.diana = User.objects.create_user(
+            email="diana@example.com",
+            username="diana",
+            password="password123",
+        )
+
+    def test_list_friends_returns_mutual_follows_only(self):
+        """Endpoint should only return mutual follows (both users follow each other)."""
+        # Alice and Bob are mutual friends
+        self.alice.following.add(self.bob)
+        self.bob.following.add(self.alice)
+
+        # Alice follows Charlie but Charlie doesn't follow back
+        self.alice.following.add(self.charlie)
+
+        # Diana follows Alice but Alice doesn't follow back
+        self.diana.following.add(self.alice)
+
+        self.client.force_authenticate(user=self.alice)
+        url = f"/users/{self.alice.id}/friends/"
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 1)
-        self.assertEqual(response.data[0]['username'], 'target')
+        self.assertEqual(response.data[0]["username"], "bob")
 
-    def test_search_by_first_name(self):
-        self.client.force_authenticate(user=self.user)
-        response = self.client.get(self.url, {'search': 'John'})
+    def test_list_friends_returns_empty_when_no_mutual_follows(self):
+        """Endpoint should return empty list when user has no mutual follows."""
+        # Alice follows Bob but Bob doesn't follow back
+        self.alice.following.add(self.bob)
 
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.client.force_authenticate(user=self.alice)
+        url = f"/users/{self.alice.id}/friends/"
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 0)
+
+    def test_list_friends_with_multiple_mutual_follows(self):
+        """Endpoint should return all mutual friends correctly."""
+        # Set up multiple mutual friendships with Alice
+        self.alice.following.add(self.bob)
+        self.bob.following.add(self.alice)
+
+        self.alice.following.add(self.charlie)
+        self.charlie.following.add(self.alice)
+
+        self.alice.following.add(self.diana)
+        self.diana.following.add(self.alice)
+
+        self.client.force_authenticate(user=self.alice)
+        url = f"/users/{self.alice.id}/friends/"
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 3)
+
+        usernames = {friend["username"] for friend in response.data}
+        self.assertEqual(usernames, {"bob", "charlie", "diana"})
+
+    def test_list_friends_includes_correct_user_fields(self):
+        """Endpoint should return serialized user data with essential fields."""
+        self.alice.following.add(self.bob)
+        self.bob.following.add(self.alice)
+
+        self.client.force_authenticate(user=self.alice)
+        url = f"/users/{self.alice.id}/friends/"
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 1)
-        self.assertEqual(response.data[0]['username'], 'target')
 
-    def test_search_by_last_name(self):
-        self.client.force_authenticate(user=self.user)
-        response = self.client.get(self.url, {'search': 'Doe'})
+        friend = response.data[0]
+        self.assertIn("id", friend)
+        self.assertIn("username", friend)
+        self.assertIn("first_name", friend)
+        self.assertIn("last_name", friend)
+        self.assertEqual(friend["username"], "bob")
 
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 1)
-        self.assertEqual(response.data[0]['username'], 'target')
+    # def test_list_friends_is_public(self):
+    #     """Endpoint should be publicly accessible (AllowAny permission)."""
+    #     self.alice.following.add(self.bob)
+    #     self.bob.following.add(self.alice)
 
-    def test_search_response_shape(self):
-        self.client.force_authenticate(user=self.user)
-        response = self.client.get(self.url, {'search': 'target'})
+    #     url = f"/users/{self.alice.id}/friends/"
+    #     # No authentication needed
+    #     response = self.client.get(url)
 
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        result = response.data[0]
+    #     self.assertEqual(response.status_code, 200)
+    #     self.assertEqual(len(response.data), 1)
 
-        self.assertIn('id', result)
-        self.assertIn('username', result)
-        self.assertIn('first_name', result)
-        self.assertIn('last_name', result)
+    def test_list_friends_respects_mutual_follow_not_one_way(self):
+        """Endpoint should not return one-way follows (only mutual)."""
+        # Bob follows Alice but Alice doesn't follow Bob
+        self.bob.following.add(self.alice)
 
-        self.assertNotIn('email', result)
-        self.assertNotIn('password', result)
+        self.client.force_authenticate(user=self.alice)
+        url = f"/users/{self.alice.id}/friends/"
+        response = self.client.get(url)
+
+        # Alice should not see Bob as a friend since she doesn't follow back
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 0)
+
+    def test_list_friends_excludes_self(self):
+        """Endpoint should exclude self-follows from friends list (defensive)."""
+        # Alice follows herself (shouldn't happen but we defend against it)
+        self.alice.following.add(self.alice)
+
+        self.client.force_authenticate(user=self.alice)
+        url = f"/users/{self.alice.id}/friends/"
+        response = self.client.get(url)
+
+        # Self-follow should not appear in friends list
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 0)
+
+    def test_list_friends_nonexistent_user_returns_404(self):
+        """Endpoint should return 404 when user doesn't exist."""
+        self.client.force_authenticate(user=self.alice)
+        url = "/users/99999/friends/"
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 404)
+
+    def test_list_friends_contract_consistency(self):
+        """Friends list should be consistent with is_friend API."""
+        # Set up: Alice and Bob are mutual friends, Alice and Charlie are one-way
+        self.alice.following.add(self.bob, self.charlie)
+        self.bob.following.add(self.alice)
+
+        self.client.force_authenticate(user=self.alice)
+        url = f"/users/{self.alice.id}/friends/"
+        response = self.client.get(url)
+
+        # Verify consistency: everyone in the endpoint response should also satisfy is_friend_with
+        for friend in response.data:
+            friend_obj = User.objects.get(pk=friend["id"])
+            self.assertTrue(self.alice.is_friend_with(friend_obj),
+                          f"{friend['username']} returned by endpoint but is_friend_with returned False")
+
+        # Verify exclusions: if someone is not in the endpoint response, is_friend_with should be False
+        if self.charlie in [User.objects.get(pk=f["id"]) for f in response.data]:
+            self.fail("Charlie (one-way follow) should not be in friends list")
+        self.assertFalse(self.alice.is_friend_with(self.charlie))

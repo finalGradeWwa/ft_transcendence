@@ -11,6 +11,7 @@
  */
 
 import UserProfileClient from '../UserProfileClient';
+import { cookies } from 'next/headers';
 
 const API_URL = (
   process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000'
@@ -18,8 +19,12 @@ const API_URL = (
 
 async function getUserProfile(username: string) {
   try {
+    const cookieStore = await cookies();
+    const refreshToken = cookieStore.get('refresh_token')?.value;
+
     const response = await fetch(`${API_URL}/users/profile/${username}/`, {
       cache: 'no-store',
+      headers: refreshToken ? { Cookie: `refresh_token=${refreshToken}` } : {},
     });
 
     if (!response.ok) return null;
