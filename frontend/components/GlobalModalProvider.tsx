@@ -9,6 +9,7 @@ import { useSearchParams } from 'next/navigation';
 import { useRouter, usePathname } from '@/i18n/navigation';
 import dynamic from 'next/dynamic';
 import { useTranslations } from 'next-intl';
+import { useState, useEffect } from 'react';
 
 const LoginModal = dynamic(() => import('@/components/LoginModal'), {
   ssr: false,
@@ -28,12 +29,29 @@ export const GlobalModalProvider = () => {
   const router = useRouter();
   const t = useTranslations('HomePage');
 
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const token =
+      typeof window !== 'undefined'
+        ? sessionStorage.getItem('accessToken')
+        : null;
+    setIsLoggedIn(!!token);
+  }, [searchParams]);
+
   /**
    * PL: Reaguje na zmianę parametrów w URL i otwiera modal, jeśli showLogin=true.
    * EN: Reacts to URL parameter changes and opens the modal if showLogin=true.
    */
-  const isLoginModalOpen = searchParams.get('showLogin') === 'true';
+  const isLoginParamPresent = searchParams.get('showLogin') === 'true';
+  const isLoginModalOpen = isLoginParamPresent && !isLoggedIn;
   const isSearchModalOpen = searchParams.get('showSearch') === 'true';
+
+  useEffect(() => {
+    if (isLoginParamPresent && isLoggedIn) {
+      router.replace(pathname);
+    }
+  }, [isLoginParamPresent, isLoggedIn, pathname, router]);
 
   /**
    * PL: Zamyka modal i czyści parametry URL przy użyciu routera Next.js.
