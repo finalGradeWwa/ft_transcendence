@@ -29,6 +29,14 @@ test.describe('Homepage & Navigation', () => {
   });
 
   test('search modal opens', async ({ page }) => {
+    await page.route('**/api/auth/token/refresh/**', route => {
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ access: 'fake-token' }),
+      });
+    });
+
     await page.route('**/api/auth/me/**', route => {
       route.fulfill({
         status: 200,
@@ -167,7 +175,7 @@ test.describe('Sign Up (Registration)', () => {
 
     await page.click('button[type="submit"]');
 
-    await expect(page.locator('[role="alert"]')).toBeVisible({
+    await expect(page.locator('[role="alert"].animate-pulse')).toBeVisible({
       timeout: 10000,
     });
   });
@@ -183,7 +191,7 @@ test.describe('Sign Up (Registration)', () => {
 
     await page.click('button[type="submit"]');
 
-    await expect(page.locator('[role="alert"]')).toBeVisible({
+    await expect(page.locator('[role="alert"].animate-pulse')).toBeVisible({
       timeout: 10000,
     });
   });
