@@ -70,15 +70,24 @@ class UserUpdateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("This username is already taken.")
         return value
 
+    def validate(self, data):
+        password = data.get('password')
+        password_confirm = data.get('password_confirm')
+
+        if password and password != password_confirm:
+            raise serializers.ValidationError({"password_confirm": "Passwords do not match."})
+
+        return data
+
     def update(self, instance, validated_data):
         old_password = validated_data.pop('old_password', None)
         new_password = validated_data.pop('password', None)
         validated_data.pop('password_confirm', None)
 
-        if old_password is not None:
+        if old_password:
             if not instance.check_password(old_password):
                 raise serializers.ValidationError({"old_password": "Wrong password."})
-            
+
             if new_password:
                 instance.set_password(new_password)
 
@@ -87,7 +96,6 @@ class UserUpdateSerializer(serializers.ModelSerializer):
 
         instance.save()
         return instance
-
 
 class PublicUserSerializer(serializers.ModelSerializer):
     class Meta:

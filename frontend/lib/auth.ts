@@ -1,6 +1,10 @@
 const DEFAULT_API_URL = 'http://localhost:8000';
 const ACCESS_TOKEN_KEY = 'accessToken';
 
+/**
+ * PL: Pobiera bazowy URL API z zmiennej środowiskowej lub wartości domyślnej.
+ * EN: Gets the base API URL from environment variable or default value.
+ */
 export function getApiUrl(): string {
   return (process.env.NEXT_PUBLIC_API_URL ?? DEFAULT_API_URL).replace(
     /\/$/,
@@ -8,6 +12,10 @@ export function getApiUrl(): string {
   );
 }
 
+/**
+ * PL: Zarządzanie tokenem dostępu w sessionStorage.
+ * EN: Access token management in sessionStorage.
+ */
 export function setAccessToken(token: string) {
   if (typeof window === 'undefined') return;
   sessionStorage.setItem(ACCESS_TOKEN_KEY, token);
@@ -23,10 +31,33 @@ export function clearAccessToken() {
   sessionStorage.removeItem(ACCESS_TOKEN_KEY);
 }
 
+/**
+ * PL: Wylogowanie użytkownika — czyści lokalne dane sesji i wywołuje endpoint backendu.
+ * EN: User logout — clears local session data and calls backend endpoint.
+ */
+export async function logout(): Promise<void> {
+  clearAccessToken();
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem('username');
+  }
+
+  await fetch(`${getApiUrl()}/api/auth/logout/`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+  }).catch(() => {});
+}
+
 let refreshPromise: Promise<string> | null = null;
 
 type RefreshResponse = { access?: string };
 
+/**
+ * PL: Odświeża token dostępu używając refresh_token z cookie.
+ * W przypadku błędu wylogowuje użytkownika i przekierowuje na stronę logowania.
+ * EN: Refreshes the access token using refresh_token from cookie.
+ * On failure, logs out the user and redirects to the login page.
+ */
 export async function refreshAccessToken(): Promise<string> {
   const apiUrl = getApiUrl();
 
@@ -37,8 +68,12 @@ export async function refreshAccessToken(): Promise<string> {
   });
 
   if (!res.ok) {
-    const body = await safeReadText(res);
-    throw new Error(`REFRESH_FAILED:${res.status}:${body}`);
+    await logout();
+    if (typeof window !== 'undefined') {
+      const locale = window.location.pathname.split('/')[1] || 'pl';
+      window.location.href = `/${locale}?showLogin=true`;
+    }
+    return new Promise(() => {});
   }
 
   const data = (await res.json()) as RefreshResponse;
@@ -49,6 +84,12 @@ export async function refreshAccessToken(): Promise<string> {
   return data.access;
 }
 
+/**
+ * PL: Zwraca ważny token dostępu — z sessionStorage lub przez odświeżenie.
+ * Deduplicuje równoległe wywołania refresh za pomocą współdzielonego Promise.
+ * EN: Returns a valid access token — from sessionStorage or by refreshing.
+ * Deduplicates parallel refresh calls using a shared Promise.
+ */
 export async function getValidAccessToken(): Promise<string> {
   const existing = getAccessToken();
   if (existing) return existing;
@@ -62,6 +103,12 @@ export async function getValidAccessToken(): Promise<string> {
   return refreshPromise;
 }
 
+/**
+ * PL: Uniwersalna funkcja do wywołań API — automatycznie dołącza token Bearer
+ * i obsługuje jego odświeżenie przy błędzie 401.
+ * EN: Universal API fetch function — automatically attaches Bearer token
+ * and handles its refresh on 401 error.
+ */
 export async function apiFetch(
   path: string,
   init: RequestInit = {}
@@ -74,10 +121,8 @@ export async function apiFetch(
   const doRequest = (access: string) => {
     const headers = new Headers(init.headers);
 
-    // Always attach the access token
     headers.set('Authorization', `Bearer ${access}`);
 
-    // If body is present and it's not FormData, default to JSON content type
     const body = (init as RequestInit).body;
     if (body && !(body instanceof FormData) && !headers.has('Content-Type')) {
       headers.set('Content-Type', 'application/json');
@@ -89,11 +134,12 @@ export async function apiFetch(
       headers,
     });
   };
+
   let res = await doRequest(token);
 
+  /** PL: Przy błędzie 401 próbujemy odświeżyć token i ponowić żądanie. EN: On 401 error, try to refresh the token and retry the request. */
   if (res.status === 401) {
     clearAccessToken();
-
     const fresh = await getValidAccessToken();
     res = await doRequest(fresh);
   }
@@ -106,6 +152,10 @@ type CurrentUser = {
   email?: string;
 };
 
+/**
+ * PL: Pobiera dane aktualnie zalogowanego użytkownika z API.
+ * EN: Fetches currently logged-in user data from the API.
+ */
 export async function fetchCurrentUser(): Promise<CurrentUser> {
   const res = await apiFetch('/api/auth/me/', { method: 'GET' });
 
@@ -120,6 +170,7 @@ export async function fetchCurrentUser(): Promise<CurrentUser> {
   return data as CurrentUser;
 }
 
+/** PL: Bezpiecznie odczytuje treść odpowiedzi bez rzucania błędów. EN: Safely reads response body without throwing errors. */
 async function safeReadText(res: Response): Promise<string> {
   try {
     return (await res.text()).slice(0, 300);

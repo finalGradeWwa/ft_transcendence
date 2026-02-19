@@ -10,7 +10,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import { useRouter, usePathname, Link } from '@/i18n/navigation';
 import { useSearchParams } from 'next/navigation';
 import { Icon } from '@/components/icons/ui/Icon';
-import { fetchCurrentUser, apiFetch } from '@/lib/auth';
+import { fetchCurrentUser, apiFetch, logout as authLogout } from '@/lib/auth';
 
 const BTN_S =
   'p-2 rounded-full bg-secondary-beige text-neutral-900 hover:text-primary-green shadow-md transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black dark:focus-visible:outline-white outline-none shrink-0 flex items-center justify-center';
@@ -99,8 +99,27 @@ function useUsername() {
 
   useEffect(() => {
     const storedUsername = localStorage.getItem('username');
-    setUsername(storedUsername);
-    setIsLoading(false);
+
+    if (!storedUsername) {
+      setIsLoading(false);
+      return;
+    }
+
+    fetchCurrentUser()
+      .then(userData => {
+        if (userData?.username) {
+          setUsername(userData.username);
+        } else {
+          localStorage.removeItem('username');
+          setUsername(null);
+        }
+      })
+      .catch(() => {
+        setUsername(null);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
 
     const handleStorageChange = () => {
       setUsername(localStorage.getItem('username'));
@@ -114,22 +133,11 @@ function useUsername() {
     };
   }, []);
 
+  /** PL: Użyj hooka do wylogowania użytkownika z auth.ts EN: Use hook to logout user from auth.ts */
   const logout = useCallback(async () => {
-    try {
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/logout/`, {
-        method: 'POST',
-        credentials: 'include',
-      });
-    } catch (e) {
-      console.error('Logout request failed', e);
-    }
-
-    localStorage.removeItem('username');
-    localStorage.removeItem('token');
-    sessionStorage.removeItem('accessToken'); // PL: Czyścimy też token z sessionStorage
+    await authLogout();
     setUsername(null);
     window.dispatchEvent(new Event('user-updated'));
-
     window.location.href = '/';
   }, []);
 
@@ -191,13 +199,7 @@ const UserSection = ({
   );
 };
 
-export function HeaderControls({
-  onSearchClick,
-  showSearch,
-}: {
-  onSearchClick?: () => void;
-  showSearch?: boolean;
-}) {
+export function HeaderControls() {
   const {
     username,
     setUsername,
@@ -230,7 +232,7 @@ export function HeaderControls({
       try {
         // PL: Używamy apiFetch, który automatycznie doda token Bearer i bazowy URL.
         // EN: Using apiFetch, which automatically adds the Bearer token and base URL.
-        const response = await apiFetch('/api/chat/unread-count/');
+        const response = await apiFetch('/chat/unread-count/');
 
         const contentType = response.headers.get('content-type');
         const isJson = contentType && contentType.includes('application/json');

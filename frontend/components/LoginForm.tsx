@@ -158,9 +158,11 @@ export const LoginForm = ({
         label={t('email')}
         name="email"
         type="email"
+        id="login-email"
         required
         onChange={update} // PL: Użycie funkcji 'update' z hooka
         disabled={isLoading}
+        autoComplete="email"
       />
 
       <div className="relative">
@@ -168,6 +170,7 @@ export const LoginForm = ({
           label={t('password')}
           type={showPassword ? 'text' : 'password'}
           name="password"
+          id="login-password"
           required
           onChange={update} // PL: Użycie funkcji 'update' z hooka
           disabled={isLoading}

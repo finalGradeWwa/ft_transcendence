@@ -27,35 +27,19 @@ const LoginModal = ({ isVisible, onClose, t }: any) => {
    * EN: Effect handling autofocus on the first field and listening for the Escape key.
    */
   useEffect(() => {
-    const isLogged = !!sessionStorage.getItem('accessToken');
-    if (!isVisible || isLogged) {
-      if (isVisible && isLogged) onClose();
-      return;
-    }
+    if (!isVisible) return;
 
-    // PL: Ustawienie fokusu na loginie dla lepszego UX. EN: Setting focus on login for better UX.
     usernameInputRef.current?.focus();
 
-    /** PL: Funkcja zamykająca modal po naciśnięciu ESC. EN: Function closing the modal on ESC press. */
     const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        onClose();
-      }
+      if (e.key === 'Escape') onClose();
     };
 
     window.addEventListener('keydown', handleEsc);
     return () => window.removeEventListener('keydown', handleEsc);
   }, [isVisible, onClose]);
 
-  /**
-   * PL: Zapobiega wyświetleniu formularza zalogowanemu użytkownikowi.
-   * EN: Prevents showing the form to an authenticated user.
-   */
-  if (
-    !isVisible ||
-    (typeof window !== 'undefined' && !!sessionStorage.getItem('accessToken'))
-  )
-    return null;
+  if (!isVisible) return null;
 
   return (
     <div

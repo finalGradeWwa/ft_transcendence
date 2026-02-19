@@ -9,8 +9,9 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/i18n/navigation';
 import { Icon } from '@/components/icons/ui/Icon';
+import { apiFetch } from '@/lib/auth';
 
 // PL: Definicja typu użytkownika zgodna z PublicUserSerializer z backendu.
 // EN: User type definition matching PublicUserSerializer from the backend.
@@ -51,17 +52,8 @@ const SearchModal = ({ isVisible, onClose }: SearchModalProps) => {
       }
 
       try {
-        const token = sessionStorage.getItem('accessToken');
-
-        const response = await fetch(
-          `http://localhost:8000/users/search/?search=${searchQuery}`,
-          {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${token}`,
-            },
-          }
+        const response = await apiFetch(
+          `/users/search/?search=${encodeURIComponent(searchQuery)}`
         );
 
         if (response.ok) {

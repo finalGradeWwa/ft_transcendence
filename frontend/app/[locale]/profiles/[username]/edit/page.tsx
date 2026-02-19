@@ -14,7 +14,7 @@ import { Text } from '@/components/typography/Text';
 import { Button } from '@/components/Button';
 import { Heading } from '@/components/Heading';
 import { useTranslations } from 'next-intl';
-import { getApiUrl } from '@/lib/auth';
+import { getApiUrl, apiFetch } from '@/lib/auth';
 
 export default function EditProfilePage({
   params,
@@ -54,7 +54,7 @@ export default function EditProfilePage({
   const getFullAvatarUrl = (path?: string) => {
     if (!path) return null;
     if (path.startsWith('http') || path.startsWith('blob:')) return path;
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/+$/, '') || '';
+    const apiUrl = getApiUrl();
     const cleanPath = path.startsWith('/') ? path : `/${path}`;
     return cleanPath.startsWith('/media/')
       ? `${apiUrl}${cleanPath}`
@@ -68,12 +68,7 @@ export default function EditProfilePage({
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const token = sessionStorage.getItem('accessToken');
-        const response = await fetch(`${getApiUrl()}/api/auth/me/`, {
-          headers: {
-            Authorization: token ? `Bearer ${token}` : '',
-          },
-        });
+        const response = await apiFetch('/api/auth/me/');
 
         if (response.ok) {
           const data = await response.json();
@@ -139,7 +134,7 @@ export default function EditProfilePage({
     const avatarFile = formData.get('avatar_photo') as File;
 
     const passwordRegex =
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&./\\()|{}[\]#^_-]).{8,}$/;
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&./()|{}\[\]#^_-]).{8,}$/;
 
     /** PL: Podstawowa walidacja haseł przed wysyłką. EN: Basic password validation before submission. */
     if (!oldPassword) {
@@ -181,12 +176,8 @@ export default function EditProfilePage({
     }
 
     try {
-      const token = sessionStorage.getItem('accessToken');
-      const response = await fetch(`${getApiUrl()}/api/auth/me/`, {
+      const response = await apiFetch('/api/auth/me/', {
         method: 'PATCH',
-        headers: {
-          Authorization: token ? `Bearer ${token}` : '',
-        },
         body: formData,
       });
 
@@ -207,11 +198,11 @@ export default function EditProfilePage({
 
       window.location.href = `/${locale}/profiles/${data?.username || userData.username}`;
     } catch (err: any) {
-      setError(
-        err.message.includes('Unexpected token')
+      const message =
+        !err.message || err.message.trim() === ''
           ? te('serverError500')
-          : err.message
-      );
+          : err.message;
+      setError(message);
     } finally {
       setIsLoading(false);
     }

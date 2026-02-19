@@ -11,40 +11,19 @@
  */
 
 import UserProfileClient from '../UserProfileClient';
-import { cookies } from 'next/headers';
+
+const API_URL = (
+  process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000'
+).replace(/\/$/, '');
 
 async function getUserProfile(username: string) {
   try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/users/profile/${username}/`,
-      { cache: 'no-store' }
-    );
+    const response = await fetch(`${API_URL}/users/profile/${username}/`, {
+      cache: 'no-store',
+    });
 
     if (!response.ok) return null;
     return await response.json();
-  } catch (error) {
-    return null;
-  }
-}
-
-async function getCurrentUser() {
-  const cookieStore = await cookies();
-  const accessToken = cookieStore.get('access_token')?.value;
-
-  if (!accessToken) return null;
-
-  try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/auth/me/`,
-      {
-        headers: { Authorization: `Bearer ${accessToken}` },
-        cache: 'no-store',
-      }
-    );
-
-    if (!response.ok) return null;
-    const data = await response.json();
-    return data.username;
   } catch (error) {
     return null;
   }
@@ -56,13 +35,7 @@ export default async function ProfilePage({
   params: Promise<{ username: string }>;
 }) {
   const { username } = await params;
+  const user = await getUserProfile(username);
 
-  const [user, currentLoggedUser] = await Promise.all([
-    getUserProfile(username),
-    getCurrentUser(),
-  ]);
-
-  return (
-    <UserProfileClient user={user} currentLoggedUser={currentLoggedUser} />
-  );
+  return <UserProfileClient user={user} currentLoggedUser={null} />;
 }
