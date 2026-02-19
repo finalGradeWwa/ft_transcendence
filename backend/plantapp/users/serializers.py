@@ -4,18 +4,18 @@ from rest_framework import serializers
 User = get_user_model()
 
 class UserSerializer(serializers.ModelSerializer):
-	class Meta:
-		model = User
-		fields = (
-			"id", # Do we need 'id' in users model?
-			"first_name",
+    class Meta:
+        model = User
+        fields = (
+            "id",  # Do we need 'id' in users model?
+            "first_name",
             "last_name",
             "username",
-			"email",
-			"date_joined",
-			"is_active",
-		)
-		read_only_fields = fields
+            "email",
+            "date_joined",
+            "is_active",
+        )
+        read_only_fields = fields
 
 
 class UserUpdateSerializer(serializers.ModelSerializer):
@@ -46,9 +46,3 @@ class PublicUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ("id", "username", "first_name", "last_name")
-
-class ListFollowersSerializer(serializers.ModelSerializer):
-     class Meta:
-        model = User
-        fields = ("followers",)
-        read_only_fields = fields

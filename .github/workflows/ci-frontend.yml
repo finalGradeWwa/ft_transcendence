@@ -1,0 +1,159 @@
+name: Frontend CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: frontend
+
+      - name: Run linter
+        run: npm run lint
+        working-directory: frontend
+
+  test-unit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: frontend
+
+      - name: Run unit tests
+        run: npm run test
+        working-directory: frontend
+
+  test-e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+          cache-dependency-path: backend/requirements.txt
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+        working-directory: backend
+
+      - name: Run Django migrations
+        run: python manage.py migrate
+        working-directory: backend/plantapp
+        env:
+          DJANGO_SETTINGS_MODULE: mysite.settings
+          PYTHONPATH: backend/plantapp
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          DEBUG_VALUE: 'true'
+          ALLOWED_HOSTS: 'localhost'
+          GITHUB_OAUTH_KEY: ${{ secrets.OAUTH_KEY }}
+          GITHUB_OAUTH_SECRET: ${{ secrets.OAUTH_SECRET }}
+
+
+      - name: Create test user
+        run: |
+          python manage.py shell << EOF
+          from django.contrib.auth import get_user_model
+          User = get_user_model()
+          if not User.objects.filter(email='test@example.com').exists():
+              User.objects.create_user(username='test', email='test@example.com', password='Testpass123!')
+          EOF
+        working-directory: backend/plantapp
+        env:
+          DJANGO_SETTINGS_MODULE: mysite.settings
+          PYTHONPATH: backend/plantapp
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          DEBUG_VALUE: 'true'
+          ALLOWED_HOSTS: 'localhost'
+          GITHUB_OAUTH_KEY: ${{ secrets.OAUTH_KEY }}
+          GITHUB_OAUTH_SECRET: ${{ secrets.OAUTH_SECRET }}
+
+
+      - name: Start Django backend
+        run: |
+          python manage.py runserver 0.0.0.0:8000 > /tmp/django.log 2>&1 &
+          echo "Waiting for Django to start..."
+          for i in {1..30}; do
+            if curl -s http://localhost:8000 > /dev/null; then
+              echo "Django is up!"
+              break
+            fi
+            if [ $i -eq 30 ]; then
+              echo "Django failed to start"
+              cat /tmp/django.log
+              exit 1
+            fi
+            sleep 1
+          done
+        working-directory: backend/plantapp
+        env:
+          DJANGO_SETTINGS_MODULE: mysite.settings
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          DEBUG_VALUE: 'true'
+          ALLOWED_HOSTS: 'localhost,127.0.0.1'
+          GITHUB_OAUTH_KEY: ${{ secrets.OAUTH_KEY }}
+          GITHUB_OAUTH_SECRET: ${{ secrets.OAUTH_SECRET }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: frontend
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+        working-directory: frontend
+
+      - name: Run E2E tests
+        run: npx playwright test
+        working-directory: frontend
+        env:
+          NEXT_PUBLIC_API_URL: http://localhost:8000
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: frontend
+
+      - name: Build application
+        run: npm run build
+        working-directory: frontend

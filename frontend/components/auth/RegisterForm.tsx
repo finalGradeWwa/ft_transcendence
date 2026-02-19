@@ -116,16 +116,13 @@ export const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
     }
 
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/register/`,
-        {
-          method: 'POST',
-          body: formData,
-          headers: {
-            Accept: 'application/json',
-          },
-        }
-      );
+      const response = await fetch(`${getApiUrl()}/api/auth/register/`, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          Accept: 'application/json',
+        },
+      });
 
       const text = await response.text();
       const data = text ? JSON.parse(text) : null;

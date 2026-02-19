@@ -4,7 +4,6 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
-from rest_framework.parsers import FormParser, MultiPartParser
 from .serializers import PinWriteModeSerializer, PinDetailReadModeSerializer, PinListReadModeSerializer
 from .services import create_pin
 from .models import Pin
@@ -26,7 +25,7 @@ class PinViewSet(viewsets.ViewSet):
         serializer = PinDetailReadModeSerializer(pin)
         return Response(
             {
-            "detail": f"added new pin!",
+            "detail": "added new pin!",
             "pin": serializer.data
             },
             status=status.HTTP_201_CREATED,
@@ -58,15 +57,15 @@ class PinViewSet(viewsets.ViewSet):
     @action(detail=False, methods=['get'], url_path='feed')
     def feed(self, request):
         """
-        Get personalized feed: pins from users you follow + your own pins.
+        Get personalized feed: pins from mutual friends + your own pins.
         GET /api/pins/feed/
         """
-        # Get IDs of users the current user follows
-        following_ids = request.user.following.values_list('id', flat=True)
+        # Get IDs of mutual friends only (users who accepted your friend request)
+        friends_ids = request.user.get_friends().values_list('id', flat=True)
         
-        # Get pins from followed users OR from the current user
+        # Get pins from mutual friends OR from the current user
         pins = Pin.objects.filter(
-            Q(creator__in=following_ids) | Q(creator=request.user)
+            Q(creator__in=friends_ids) | Q(creator=request.user)
         ).order_by('-created_at')
         
         serializer = PinListReadModeSerializer(pins, many=True)

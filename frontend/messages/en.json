@@ -17,13 +17,7 @@
     "showMore": "Show more plants",
     "oauthLoginSuccess": "GitHub login completed successfully. You are signed in.",
     "loginSuccess": "Successfully signed in.",
-    "nav": [
-      "Home",
-      "Gardens",
-      "About Us",
-      "Terms",
-      "Contact"
-    ],
+    "nav": ["Home", "Gardens", "About Us", "Terms", "Contact"],
     "searchPlaceholder": "Search is active",
     "searchInfo": "Full search logic will be here.",
     "rights": "All rights reserved.",
@@ -42,7 +36,8 @@
       "add": "Add new plant",
       "profile": "User profile",
       "logout": "Logout",
-      "userTools": "User tools"
+      "userTools": "User tools",
+      "chat": "Open chat"
     },
     "contact": {
       "name": "John Weeder",

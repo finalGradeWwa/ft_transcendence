@@ -17,13 +17,7 @@
     "showMore": "Pokaż więcej roślin",
     "oauthLoginSuccess": "Logowanie przez GitHub zakończone sukcesem. Jesteś zalogowany.",
     "loginSuccess": "Zalogowano pomyślnie.",
-    "nav": [
-      "Strona Główna",
-      "Ogrody",
-      "O nas",
-      "Regulamin",
-      "Kontakt"
-    ],
+    "nav": ["Strona Główna", "Ogrody", "O nas", "Regulamin", "Kontakt"],
     "searchPlaceholder": "Wyszukiwanie jest aktywne",
     "searchInfo": "Tutaj będzie pełna logika wyszukiwania.",
     "rights": "Wszelkie prawa zastrzeżone.",
@@ -42,7 +36,8 @@
       "add": "Dodaj nową roślinę",
       "profile": "Profil użytkownika",
       "logout": "Wyloguj się",
-      "userTools": "Narzędzia użytkownika"
+      "userTools": "Narzędzia użytkownika",
+      "chat": "Otwórz czat"
     },
     "contact": {
       "name": "John Weeder",

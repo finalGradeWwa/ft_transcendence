@@ -29,10 +29,16 @@ def api_root(request):
 				"current_user": "/api/auth/me/"
 			},
 			"users": {
-				"follow": "/users/<user_id>/follow/",
-				"unfollow": "/users/<user_id>/unfollow/",
-				"followers": "/users/<user_id>/followers/",
-				"following": "/users/<user_id>/following/"
+				"friends": "/users/<user_id>/friends/",
+				"my_friends": "/api/friends/",
+				"send_friend_request": "/users/<user_id>/send-request/",
+				"accept_friend_request": "/users/<user_id>/accept/",
+				"reject_friend_request": "/users/<user_id>/reject/",
+				"cancel_friend_request": "/users/<user_id>/cancel-request/",
+				"unfriend": "/users/<user_id>/unfriend/",
+				"incoming_requests": "/api/friend-requests/",
+				"outgoing_requests": "/api/friend-requests/outgoing/",
+				"search": "/users/search/"
 			},
 			"gardens": "/api/garden/",
 			"plants": "/api/plant/",

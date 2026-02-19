@@ -1,4 +1,3 @@
-from django.test import TestCase
 from django.contrib.auth import get_user_model
 from rest_framework.test import APITestCase
 from rest_framework import status
@@ -290,9 +289,9 @@ class PinViewSetTestCase(APITestCase):
 
     def test_pin_ordering(self):
         """Test that pins are ordered by created_at (newest first)"""
-        pin1 = Pin.objects.create(content='First pin', creator=self.user1)
-        pin2 = Pin.objects.create(content='Second pin', creator=self.user1)
-        pin3 = Pin.objects.create(content='Third pin', creator=self.user1)
+        Pin.objects.create(content='First pin', creator=self.user1)
+        Pin.objects.create(content='Second pin', creator=self.user1)
+        Pin.objects.create(content='Third pin', creator=self.user1)
         
         self.client.force_authenticate(user=self.user1)
         response = self.client.get('/api/pins/')
@@ -323,9 +322,9 @@ class PinViewSetTestCase(APITestCase):
 
     def test_profile_feed_ordered_by_newest(self):
         """Test that profile_feed returns pins ordered by newest first"""
-        pin1 = Pin.objects.create(content='First', creator=self.user1)
-        pin2 = Pin.objects.create(content='Second', creator=self.user1)
-        pin3 = Pin.objects.create(content='Third', creator=self.user1)
+        Pin.objects.create(content='First', creator=self.user1)
+        Pin.objects.create(content='Second', creator=self.user1)
+        Pin.objects.create(content='Third', creator=self.user1)
         
         self.client.force_authenticate(user=self.user1)
         response = self.client.get('/api/pins/profile_feed/')
@@ -353,8 +352,8 @@ class PinViewSetTestCase(APITestCase):
         
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-    def test_feed_includes_followed_users_and_own_pins(self):
-        """Test that feed returns pins from followed users + own pins"""
+    def test_feed_includes_mutual_friends_and_own_pins(self):
+        """Test that feed returns pins from mutual friends + own pins"""
         # Create a third user
         user3 = User.objects.create_user(
             username='charlie',
@@ -362,8 +361,9 @@ class PinViewSetTestCase(APITestCase):
             password='testpass123'
         )
         
-        # user1 follows user2
+        # user1 and user2 are mutual friends (both follow each other)
         self.user1.following.add(self.user2)
+        self.user2.following.add(self.user1)
         
         # Create pins from all three users
         Pin.objects.create(content='Alice pin', creator=self.user1)
@@ -375,7 +375,7 @@ class PinViewSetTestCase(APITestCase):
         response = self.client.get('/api/pins/feed/')
         
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        # Should see own pin + Bob's pins (followed), but not Charlie's
+        # Should see own pin + Bob's pins (mutual friend), but not Charlie's
         self.assertEqual(len(response.data), 3)
         
         creators = [pin['creator'] for pin in response.data]
@@ -412,12 +412,14 @@ class PinViewSetTestCase(APITestCase):
 
     def test_feed_ordered_by_newest(self):
         """Test that feed returns pins ordered by newest first"""
+        # Establish mutual friendship
         self.user1.following.add(self.user2)
+        self.user2.following.add(self.user1)
         
-        pin1 = Pin.objects.create(content='Alice first', creator=self.user1)
-        pin2 = Pin.objects.create(content='Bob second', creator=self.user2)
-        pin3 = Pin.objects.create(content='Alice third', creator=self.user1)
-        pin4 = Pin.objects.create(content='Bob fourth', creator=self.user2)
+        Pin.objects.create(content='Alice first', creator=self.user1)
+        Pin.objects.create(content='Bob second', creator=self.user2)
+        Pin.objects.create(content='Alice third', creator=self.user1)
+        Pin.objects.create(content='Bob fourth', creator=self.user2)
         
         self.client.force_authenticate(user=self.user1)
         response = self.client.get('/api/pins/feed/')

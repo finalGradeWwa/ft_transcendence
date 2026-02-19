@@ -199,6 +199,51 @@ export function HeaderControls({
   const tP = useTranslations('AddPlantPage');
   const tG = useTranslations('GardensPage');
 
+  // PL: Stan informujący o nowych wiadomościach EN: State indicating new messages
+  const [hasNewMessages, setHasNewMessages] = useState(false);
+
+  // PL: Sprawdzanie nieprzeczytanych wiadomości co 30 sekund EN: Checking for unread messages every 30 seconds
+  useEffect(() => {
+    if (!username) return;
+
+    const checkMessages = async () => {
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/chat/unread-count/`,
+          {
+            credentials: 'include',
+          }
+        );
+
+        const contentType = response.headers.get('content-type');
+        const isJson = contentType && contentType.includes('application/json');
+
+        if (isJson) {
+          const data = await response.json();
+          if (response.ok) {
+            setHasNewMessages(data.unread_count > 0);
+          } else {
+            // Obsługa błędów API zwróconych w JSONie (np. 401, 403)
+            console.error('Chat count error details:', data);
+            setHasNewMessages(false);
+          }
+        } else {
+          // PL: Jeśli to nie JSON, nie robimy nic (zapobiega SyntaxError)
+          console.warn('Chat count endpoint returned non-JSON response');
+          setHasNewMessages(false);
+        }
+      } catch (error) {
+        console.error('Failed to fetch unread messages', error);
+        setHasNewMessages(false);
+      }
+    };
+
+    checkMessages();
+    const interval = setInterval(checkMessages, 30000);
+
+    return () => clearInterval(interval);
+  }, [username]);
+
   /**
    * PL: Obsługa parametru auth=login_success w URL (logowanie OAuth).
    * EN: Handling auth=login_success URL parameter (OAuth login).
@@ -274,6 +319,22 @@ export function HeaderControls({
             <AddMenu user={username} tP={tP} tG={tG} close={closeMenu} />
           )}
         </div>
+
+        {/**
+         * PL: Przycisk przejścia do czatu - widoczny tylko dla zalogowanych.
+         * EN: Chat button - visible only for logged-in users.
+         */}
+        {username && (
+          <div className="relative">
+            <IconButton href="/chat" icon="chat" label={tAria('chat')} />
+            {hasNewMessages && (
+              <span
+                aria-hidden="true"
+                className="absolute top-0 right-0 block h-3 w-3 rounded-full bg-red-500 border-2 border-secondary-beige animate-pulse"
+              />
+            )}
+          </div>
+        )}
 
         <UserSection
           username={username}
