@@ -18,6 +18,7 @@ interface User {
   username: string;
   first_name: string;
   last_name: string;
+  avatar?: string;
 }
 
 interface NotificationsModalProps {
@@ -198,8 +199,16 @@ const NotificationsModal = ({ isVisible, onClose }: NotificationsModalProps) => 
                           onClick={() => handleUserClick(user.username)}
                           className="flex items-center gap-3 flex-1 text-left focus:outline-none focus:ring-2 focus:ring-primary-green rounded"
                         >
-                          <div className="w-10 h-10 bg-primary-green rounded-full flex items-center justify-center text-white font-bold shrink-0">
-                            {user.username[0].toUpperCase()}
+                          <div className="w-10 h-10 bg-primary-green rounded-full flex items-center justify-center text-white font-bold shrink-0 overflow-hidden">
+                            {user.avatar ? (
+                              <img
+                                src={user.avatar}
+                                alt={`${user.username}'s avatar`}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              user.username[0].toUpperCase() // probablly not needed when everything will be correct
+                            )}
                           </div>
                           <div className="flex flex-col min-w-0">
                             <span className="font-semibold text-gray-900 truncate">
