@@ -25,6 +25,19 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'Content-Security-Policy',
+            value: "connect-src 'self' http: https: ws: wss:",
+          },
+        ],
+      },
+    ];
+  },
 };
 
 /**

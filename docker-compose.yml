@@ -12,7 +12,6 @@ services:
 
     volumes:
       - ./backend:/app
-      - backend_db:/app/plantapp
     
     command: daphne -b 0.0.0.0 -p 8000 mysite.asgi:application
     
@@ -29,7 +28,6 @@ services:
     
     volumes:
       - ./backend:/app
-      - backend_db:/app/plantapp
     command: python manage.py migrate
     
     restart: "no"
@@ -55,6 +53,13 @@ services:
     depends_on:
       - backend
     restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    command: redis-server --save "" --appendonly no
 
 volumes:
   backend_db:

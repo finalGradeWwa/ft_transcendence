@@ -10,3 +10,4 @@ django-organizations~=2.5.0
 social-auth-app-django~=5.4.3
 django_filter~=25.2
 coverage~=7.6
+channels-redis~=4.3.0
