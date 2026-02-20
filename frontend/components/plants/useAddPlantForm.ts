@@ -7,6 +7,7 @@
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
+import { apiFetch } from '@/lib/auth';
 
 interface UseAddPlantFormProps {
   username: string;
@@ -17,7 +18,7 @@ export const useAddPlantForm = ({
   username,
   onSuccess,
 }: UseAddPlantFormProps) => {
-  const t = useTranslations('Plants');
+  const t = useTranslations('AddPlantPage');
 
   const [species, setSpecies] = useState('');
   const [nickname, setNickname] = useState('');
@@ -80,9 +81,7 @@ export const useAddPlantForm = ({
        * PL: Pobranie adresu z zmiennych środowiskowych
        * EN: Fetching address from environment variables
        */
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-
-      const response = await fetch(`${apiUrl}/api/plants/`, {
+      const response = await apiFetch('/api/plant/', {
         method: 'POST',
         body: formData,
       });

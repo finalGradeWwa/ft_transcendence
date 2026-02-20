@@ -104,12 +104,17 @@
     "chooseFile": "اختر ملفًا",
     "noFileSelected": "لم يتم اختيار ملف",
     "removeFile": "حذف الملف",
+    "currentPassword": "كلمة المرور الحالية",
     "password": "كلمة المرور",
     "passwordRequirements": "٨ أحرف على الأقل (حرف كبير، حرف صغير، رقم، رمز خاص).",
     "confirmPassword": "تأكيد كلمة المرور",
+    "changePasswordLabel": "تغيير كلمة المرور:",
     "acceptTerms": "أوافق على",
     "termsLink": "الشروط والأحكام",
     "registerBtn": "تسجيل",
+    "editTitle": "تعديل الملف الشخصي",
+    "backToProfile": "العودة إلى الملف الشخصي",
+    "saveBtn": "حفظ",
     "alreadyHaveAccount": "هل لديك حساب بالفعل؟",
     "errorPasswordMatch": "كلمات المرور غير متطابقة",
     "errorRegistrationFailed": "فشل التسجيل. يرجى المحاولة مرة أخرى.",
@@ -128,13 +133,19 @@
   "errors": {
     "connectionError": "خطأ في الاتصال. حاول مرة أخرى لاحقًا.",
     "invalidCredentials": "اسم المستخدم أو كلمة المرور غير صالحة.",
+    "oauthFailed": "فشل تسجيل الدخول عبر GitHub. يرجى المحاولة مرة أخرى.",
+    "oauthAccessDenied": "تم إلغاء تسجيل الدخول عبر GitHub.",
     "genericError": "حدث خطأ ما.",
     "invalidImage": "يرجى تحميل صورة صالحة. الملف الذي قمت بتحميله إما أنه ليس صورة أو أنه ملف تالف.",
     "tooManyRequests": "لقد قمت بمحاولات تسجيل دخول كثيرة جداً. يرجى الانتظار قليلاً.",
     "accountDisabled": "حسابك غير نشط.",
     "sessionExpired": "لقد انتهت صلاحية جلستك. يرجى تحديث الصفحة.",
-    "oauthFailed": "فشل تسجيل الدخول عبر GitHub. يرجى المحاولة مرة أخرى.",
-    "oauthAccessDenied": "تم إلغاء تسجيل الدخول عبر GitHub."
+    "currentPasswordRequired": "يرجى إدخال كلمة المرور الحالية لحفظ التغييرات.",
+    "invalidCurrentPassword": "كلمة المرور الحالية غير صحيحة.",
+    "usernameTaken": "اسم المستخدم هذا مأخوذ بالفعل.",
+    "invalidEmail": "تنسيق البريد الإلكتروني غير صالح.",
+    "updateFailed": "فشل تحديث الملف الشخصي. يرجى المحاولة مرة أخرى.",
+    "serverError500": "خطأ في الخادم (500). يرجى التحقق من سجلات النظام."
   },
   "ChatPage": {
     "title": "الدردشة",
@@ -144,7 +155,8 @@
   "AboutUs": {
     "title": "من نحن",
     "description": "لإضفاء لمسة من ألوان الطبيعة على مغامرتنا البرمجية في 42Warsaw، قررنا إضافة بعض الحيوية إليها. هذا هو مشروعنا الأخير ضمن ما يسمى بـ Common Core، لذا نترك هذا الموقع كذكرى لمغامرة رائعة. الصور من أجل التفاعل. 😏",
-    "footerText": "كن مزارعاً أنت أيضاً"
+    "footerText": "كن مزارعاً أنت أيضاً",
+    "about_image_alt": "صورة زخرفية تظهر النباتات في قسم معلومات عنا"
   },
   "AddPlantPage": {
     "title": "إضافة نبات جديد",
@@ -180,7 +192,23 @@
     "plantsCountLabel": "عدد النباتات",
     "gardenNameLabel": "اسم الحديقة",
     "gardenNamePlaceholder": "مثلاً: شرفتي أو غرفة المعيشة",
-    "noPins": "لا توجد مدخلات"
+    "noPins": "لا توجد مدخلات",
+    "defaultGardenName": "الحديقة الرئيسية",
+    "environmentLabel": "البيئة",
+    "environments": {
+      "indoor": "داخلي",
+      "outdoor": "خارجي",
+      "greenhouse": "دفيئة"
+    },
+    "errors": {
+      "fillName": "يرجى إدخال اسم الحديقة",
+      "addFailed": "خطأ في إنشاء الحديقة",
+      "unexpected": "حدث خطأ غير متوقع"
+    },
+    "success": {
+      "title": "تم إنشاء الحديقة!",
+      "message": "تمت إضافة حديقتك الجديدة."
+    }
   },
   "AuthCallbackPage": {
     "loading": "جارٍ معالجة تسجيل الدخول… يُرجى الانتظار"
