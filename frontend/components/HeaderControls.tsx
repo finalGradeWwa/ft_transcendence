@@ -319,28 +319,6 @@ export function HeaderControls() {
       </select>
 
       <nav className="flex flex-wrap md:flex-nowrap items-center justify-center gap-3">
-        <IconButton
-          href={{ pathname, query: { showSearch: 'true' } }}
-          icon="search"
-          label={tAria('searchBtn')}
-        />
-
-        <IconButton
-          href={
-            username
-              ? { pathname, query: { showNotifications: 'true' } }
-              : undefined
-          }
-          onClick={
-            !username && !isLoading
-              ? () => router.push({ pathname, query: { showLogin: 'true' } })
-              : undefined
-          }
-          icon="bell"
-          label={tAria('notificationsButton')}
-        />
-
-        <div className="relative" ref={addMenuRef}>
         {/**
          * PL: Przycisk wyszukiwania - widoczny tylko dla zalogowanych.
          * EN: Search button - visible only for logged-in users.
@@ -352,6 +330,19 @@ export function HeaderControls() {
             label={tAria('searchBtn')}
           />
         )}
+
+        {/**
+         * PL: Przycisk powiadomień - widoczny tylko dla zalogowanych.
+         * EN: Notifications button - visible only for logged-in users.
+         */}
+        {username && (
+          <IconButton
+            href={{ pathname, query: { showNotifications: 'true' } }}
+            icon="bell"
+            label={tAria('notificationsButton')}
+          />
+        )}
+
         {/**
          * PL: Przycisk dodawania - widoczny tylko dla zalogowanych.
          * EN: Add button - visible only for logged-in users.
