@@ -5,12 +5,13 @@ from .views import (
     FriendRequestsListAPIView, RejectFriendRequestAPIView,
     SendFriendRequestAPIView, AcceptFriendRequestAPIView,
     CancelFriendRequestAPIView, OutgoingFriendRequestsListAPIView,
-    UserSearchAPIView
+    UserProfileView, UserSearchAPIView
 )
 
 
 urlpatterns = [
 	path('api/auth/me/', MeView.as_view(), name='me'),
+	path('users/profile/<str:username>/', UserProfileView.as_view(), name='user-profile'),
     path('users/<int:user_id>/unfriend/', UnfriendAPIView.as_view(), name='unfriend'),
     path('users/<int:user_id>/friends/', ListFriendsAPIView.as_view(), name='list-friends'),
     path('users/<int:user_id>/is-friend/', IsFriendAPIView.as_view(), name='is-friend'),

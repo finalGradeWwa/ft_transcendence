@@ -9,8 +9,36 @@
 
 import createMiddleware from 'next-intl/middleware';
 import { routing } from './i18n/navigation';
+import { NextRequest, NextResponse } from 'next/server';
 
-export default createMiddleware(routing);
+/**
+ * PL: Inicjalizacja bazowego middleware dla next-intl.
+ * EN: Initialization of the base next-intl middleware.
+ */
+const handleI18nRouting = createMiddleware(routing);
+
+/**
+ * PL: Rozszerzona logika middleware o blokadę dostępu do stron logowania/rejestracji dla zalogowanych.
+ * EN: Extended middleware logic blocking access to login/register pages for authenticated users.
+ */
+export default function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  // PL: Sprawdzamy 'refresh_token' (zgodnie z Twoimi ciasteczkami w przeglądarce)
+  const hasSession = request.cookies.has('refresh_token');
+
+  const authPages = ['/login', '/register'];
+  const isAuthPage = authPages.some(page =>
+    pathname.match(new RegExp(`^/(pl|en|de|ar)${page}$`))
+  );
+
+  if (hasSession && isAuthPage) {
+    const locale = pathname.split('/')[1] || 'pl';
+    return NextResponse.redirect(new URL(`/${locale}`, request.url));
+  }
+
+  return handleI18nRouting(request);
+}
 
 /**
  * PL: Konfiguracja matchera definiująca, które ścieżki powinny być procesowane przez Middleware.

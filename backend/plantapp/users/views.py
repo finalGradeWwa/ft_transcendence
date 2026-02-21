@@ -1,10 +1,11 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.shortcuts import get_object_or_404
 from rest_framework import status, generics, filters
 from .serializers import UserSerializer, UserUpdateSerializer, PublicUserSerializer
 from django.contrib.auth import get_user_model
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 
 
 User = get_user_model()
@@ -15,21 +16,22 @@ User = get_user_model()
 
 class MeView(APIView):
 
-	permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
 
-	def get(self, request):
-		serializer = UserSerializer(request.user)
-		return Response(serializer.data)
+    def get(self, request):
+        serializer = UserSerializer(request.user)
+        return Response(serializer.data)
 
-	def patch(self, request):
-		serializer = UserUpdateSerializer(
-			request.user,
-			data=request.data,
-			partial=True
-		)
-		serializer.is_valid(raise_exception=True)
-		serializer.save()
-		return Response(serializer.data)
+    def patch(self, request):
+        serializer = UserUpdateSerializer(
+            request.user,
+            data=request.data,
+            partial=True
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
 
 
 class UnfriendAPIView(APIView):
@@ -253,6 +255,18 @@ class CancelFriendRequestAPIView(APIView):
             status=status.HTTP_200_OK,
         )
 
+
+"""
+PL: Endpoint do pobierania profilu użytkownika po nazwie użytkownika, blokowany w middleware.ts.
+EN: Endpoint for fetching a user's profile by username, blocked in middleware.ts.
+"""
+class UserProfileView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request, username):
+        user = get_object_or_404(User, username=username)
+        serializer = UserSerializer(user, context={'request': request})
+        return Response(serializer.data)
 
 class OutgoingFriendRequestsListAPIView(APIView):
     """Get all outgoing friend requests (requests you've sent that haven't been accepted)."""

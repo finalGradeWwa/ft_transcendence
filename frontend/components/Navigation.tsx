@@ -5,7 +5,7 @@
  * EN: Main navigation component. Manages logo, mobile menu, links, and login integration.
  */
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from '@/i18n/navigation';
 import { useTranslations } from 'next-intl';
 import { Icon } from '@/components/icons/ui/Icon';

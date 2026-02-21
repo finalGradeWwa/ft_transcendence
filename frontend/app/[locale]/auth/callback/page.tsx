@@ -33,13 +33,15 @@ export default function AuthCallbackPage() {
   }, [locale, router]);
 
   return (
-    <div style={{
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      height: '100vh',
-      fontFamily: 'sans-serif'
-    }}>
+    <div
+      style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
+        fontFamily: 'sans-serif',
+      }}
+    >
       <p>{t('loading')}</p>
     </div>
   );

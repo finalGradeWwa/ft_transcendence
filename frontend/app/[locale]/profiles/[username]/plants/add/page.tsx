@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, use } from 'react';
+import { useState, use, useEffect } from 'react';
 import { Heading } from '@/components/Heading';
 import { useTranslations } from 'next-intl';
 import { AddPlantForm } from '@/components/plants/AddPlantForm';
 import { AddPlantSuccess } from '@/components/plants/AddPlantSuccess';
 import NextImage from 'next/image';
+import { apiFetch } from '@/lib/auth';
 
 /**
  * PL: Strona dodawania nowej rośliny.
@@ -21,6 +22,21 @@ export default function AddPlantPage({
   const tr = useTranslations('AddPlantPage');
   const [isSuccess, setIsSuccess] = useState(false);
   const [gardens, setGardens] = useState([]);
+
+  useEffect(() => {
+    const fetchGardens = async () => {
+      try {
+        const response = await apiFetch('/api/garden/?owner=me');
+        if (response.ok) {
+          const data = await response.json();
+          setGardens(data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch gardens:', error);
+      }
+    };
+    fetchGardens();
+  }, []);
 
   return (
     <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 overflow-hidden">
