@@ -352,8 +352,8 @@ class PinViewSetTestCase(APITestCase):
         
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-    def test_feed_includes_followed_users_and_own_pins(self):
-        """Test that feed returns pins from followed users + own pins"""
+    def test_feed_includes_mutual_friends_and_own_pins(self):
+        """Test that feed returns pins from mutual friends + own pins"""
         # Create a third user
         user3 = User.objects.create_user(
             username='charlie',
@@ -361,8 +361,9 @@ class PinViewSetTestCase(APITestCase):
             password='testpass123'
         )
         
-        # user1 follows user2
+        # user1 and user2 are mutual friends (both follow each other)
         self.user1.following.add(self.user2)
+        self.user2.following.add(self.user1)
         
         # Create pins from all three users
         Pin.objects.create(content='Alice pin', creator=self.user1)
@@ -374,7 +375,7 @@ class PinViewSetTestCase(APITestCase):
         response = self.client.get('/api/pins/feed/')
         
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        # Should see own pin + Bob's pins (followed), but not Charlie's
+        # Should see own pin + Bob's pins (mutual friend), but not Charlie's
         self.assertEqual(len(response.data), 3)
         
         creators = [pin['creator'] for pin in response.data]
@@ -411,7 +412,9 @@ class PinViewSetTestCase(APITestCase):
 
     def test_feed_ordered_by_newest(self):
         """Test that feed returns pins ordered by newest first"""
+        # Establish mutual friendship
         self.user1.following.add(self.user2)
+        self.user2.following.add(self.user1)
         
         Pin.objects.create(content='Alice first', creator=self.user1)
         Pin.objects.create(content='Bob second', creator=self.user2)

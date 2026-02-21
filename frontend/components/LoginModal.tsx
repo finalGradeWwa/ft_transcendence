@@ -29,14 +29,10 @@ const LoginModal = ({ isVisible, onClose, t }: any) => {
   useEffect(() => {
     if (!isVisible) return;
 
-    // PL: Ustawienie fokusu na loginie dla lepszego UX. EN: Setting focus on login for better UX.
     usernameInputRef.current?.focus();
 
-    /** PL: Funkcja zamykająca modal po naciśnięciu ESC. EN: Function closing the modal on ESC press. */
     const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        onClose();
-      }
+      if (e.key === 'Escape') onClose();
     };
 
     window.addEventListener('keydown', handleEsc);

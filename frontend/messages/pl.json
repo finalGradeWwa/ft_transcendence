@@ -104,12 +104,17 @@
     "chooseFile": "Wybierz plik",
     "noFileSelected": "Nie wybrano pliku",
     "removeFile": "Usuń plik",
+    "currentPassword": "Aktualne hasło",
     "password": "Hasło",
     "passwordRequirements": "Min. 8 znaków (duża litera, mała litera, cyfra, znak specjalny).",
     "confirmPassword": "Powtórz hasło",
+    "changePasswordLabel": "Zmień hasło:",
     "acceptTerms": "Oświadczam, że akceptuję",
     "termsLink": "regulamin serwisu",
     "registerBtn": "Zarejestruj",
+    "editTitle": "Edytuj profil",
+    "backToProfile": "Wróć do profilu",
+    "saveBtn": "Zapisz",
     "alreadyHaveAccount": "Masz już konto?",
     "errorPasswordMatch": "Hasła nie są identyczne",
     "errorRegistrationFailed": "Rejestracja nie powiodła się. Spróbuj ponownie.",
@@ -134,7 +139,13 @@
     "invalidImage": "Przesłany plik jest nieprawidłowy. Wybrany plik nie jest obrazem lub jest uszkodzony.",
     "tooManyRequests": "Zbyt wiele prób logowania. Odczekaj chwilę.",
     "accountDisabled": "Twoje konto jest nieaktywne.",
-    "sessionExpired": "Twoja sesja wygasła. Proszę odświeżyć stronę."
+    "sessionExpired": "Twoja sesja wygasła. Proszę odświeżyć stronę.",
+    "currentPasswordRequired": "Podaj aktualne hasło, aby zapisać zmiany.",
+    "invalidCurrentPassword": "Aktualne hasło jest niepoprawne.",
+    "usernameTaken": "Ten nick jest już zajęty.",
+    "invalidEmail": "Niepoprawny format adresu email.",
+    "updateFailed": "Edycja danych nie powiodła się. Spróbuj ponownie.",
+    "serverError500": "Błąd serwera (500). Sprawdź logi backendu."
   },
   "ChatPage": {
     "title": "Czat",
@@ -153,7 +164,8 @@
   "AboutUs": {
     "title": "O nas",
     "description": "Aby ożywić naszą zero-jedynkową przygodę z programowaniem w 42Warsaw postanowiliśmy dodać do niej lekkiego kolorytu w barwach natury. To nasz ostatni projekt w ramach tzw. Common Core, zostawiamy zatem ten portal na pamiątkę wspaniałej przygody. Zdjęcia dla zasięgu. 😏",
-    "footerText": "I Ty zostań ogrodnikiem!"
+    "footerText": "I Ty zostań ogrodnikiem!",
+    "about_image_alt": "Dekoracyjne zdjęcie przedstawiające rośliny w sekcji O nas"
   },
   "AddPlantPage": {
     "title": "Dodaj nową roślinę",
@@ -189,7 +201,23 @@
     "plantsCountLabel": "Liczba roślin",
     "gardenNameLabel": "Nazwa ogrodu",
     "gardenNamePlaceholder": "np. Mój Balkon lub Salon",
-    "noPins": "Brak wpisów"
+    "noPins": "Brak wpisów",
+    "defaultGardenName": "Ogród Główny",
+    "environmentLabel": "Środowisko",
+    "environments": {
+      "indoor": "Wewnątrz (Indoor)",
+      "outdoor": "Na zewnątrz (Outdoor)",
+      "greenhouse": "Szklarnia (Greenhouse)"
+    },
+    "errors": {
+      "fillName": "Proszę podać nazwę ogrodu",
+      "addFailed": "Błąd podczas tworzenia ogrodu",
+      "unexpected": "Wystąpił nieoczekiwany błąd"
+    },
+    "success": {
+      "title": "Ogród utworzony!",
+      "message": "Twój nowy ogród został dodany."
+    }
   },
   "AuthCallbackPage": {
     "loading": "Przetwarzanie logowania, proszę czekać..."

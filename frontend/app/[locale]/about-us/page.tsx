@@ -49,19 +49,25 @@ const MemberCard = ({ img }: { img: string }) => (
  * PL: Sekcja dolna: hasło końcowe oraz zdjęcie dekoracyjne.
  * EN: Footer section: final slogan and decorative image.
  */
-const FooterSection = ({ text }: { text: string }) => (
-  <div className="w-full max-w-[600px] mx-auto flex flex-col items-center">
-    <p className="mb-6 text-white font-bold text-xl text-center">{text}</p>
-    <div className="relative w-full aspect-video overflow-hidden rounded-2xl shadow-2xl border-2 border-secondary-beige">
-      <Image
-        src="/images/about/about-img.webp"
-        alt="table with flowers"
-        fill
-        className="object-cover"
-      />
+const FooterSection = ({ text }: { text: string }) => {
+  // PL: Dodano hook tutaj, aby funkcja 't' była dostępna w tym komponencie.
+  const t = useTranslations('AboutUs');
+
+  return (
+    <div className="w-full max-w-[600px] mx-auto flex flex-col items-center">
+      <p className="mb-6 text-white font-bold text-xl text-center">{text}</p>
+      <div className="relative w-full aspect-video overflow-hidden rounded-2xl shadow-2xl border-2 border-secondary-beige">
+        <Image
+          src="/images/about/about-img.webp"
+          fill
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 600px"
+          alt={t('about_image_alt')}
+          className="object-cover"
+        />
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 /**
  * PL: Główny komponent strony "O nas". Zarządza układem siatki i treścią dynamiczną.

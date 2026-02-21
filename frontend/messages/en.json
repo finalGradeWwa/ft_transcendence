@@ -104,12 +104,17 @@
     "chooseFile": "Choose file",
     "noFileSelected": "No file selected",
     "removeFile": "Remove file",
+    "currentPassword": "Current password",
     "password": "Password",
     "passwordRequirements": "Min. 8 characters (uppercase, lowercase, number, special character).",
     "confirmPassword": "Confirm Password",
+    "changePasswordLabel": "Change password:",
     "acceptTerms": "I agree to the",
     "termsLink": "terms and conditions",
     "registerBtn": "Register",
+    "editTitle": "Edit profile",
+    "backToProfile": "Back to profile",
+    "saveBtn": "Save",
     "alreadyHaveAccount": "Already have an account?",
     "errorPasswordMatch": "Passwords do not match",
     "errorRegistrationFailed": "Registration failed. Please try again.",
@@ -134,7 +139,13 @@
     "invalidImage": "Upload a valid image. The file you uploaded was either not an image or a corrupted image.",
     "tooManyRequests": "Too many login attempts. Please wait a moment.",
     "accountDisabled": "Your account is inactive.",
-    "sessionExpired": "Your session has expired. Please refresh the page."
+    "sessionExpired": "Your session has expired. Please refresh the page.",
+    "currentPasswordRequired": "Please enter your current password to save changes.",
+    "invalidCurrentPassword": "Current password is incorrect.",
+    "usernameTaken": "This username is already taken.",
+    "invalidEmail": "Invalid email address format.",
+    "updateFailed": "Profile update failed. Please try again.",
+    "serverError500": "Server error (500). Please check backend logs."
   },
   "ChatPage": {
     "title": "Chat",
@@ -153,7 +164,8 @@
   "AboutUs": {
     "title": "About Us",
     "description": "To spice up our binary programming adventure at 42Warsaw, we decided to add a splash of nature's colors. This is our final project within the so-called Common Core, so we are leaving this portal as a souvenir of a wonderful journey. Photos included for reach. 😏",
-    "footerText": "You can be a gardener too!"
+    "footerText": "You can be a gardener too!",
+    "about_image_alt": "Decorative photo showing plants in the About Us section"
   },
   "AddPlantPage": {
     "title": "Add a new plant",
@@ -189,7 +201,23 @@
     "plantsCountLabel": "Number of plants",
     "gardenNameLabel": "Garden name",
     "gardenNamePlaceholder": "e.g., My Balcony or Living Room",
-    "noPins": "No entries"
+    "noPins": "No entries",
+    "defaultGardenName": "Main Garden",
+    "environmentLabel": "Environment",
+    "environments": {
+      "indoor": "Indoor",
+      "outdoor": "Outdoor",
+      "greenhouse": "Greenhouse"
+    },
+    "errors": {
+      "fillName": "Please provide a garden name",
+      "addFailed": "Error creating garden",
+      "unexpected": "An unexpected error occurred"
+    },
+    "success": {
+      "title": "Garden created!",
+      "message": "Your new garden has been added."
+    }
   },
   "AuthCallbackPage": {
     "loading": "Processing login, please wait..."

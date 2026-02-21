@@ -26,11 +26,21 @@
     "isolatedModules": true,
     "jsx": "react-jsx",
     "incremental": true,
-    "plugins": [
+   "plugins": [
       {
         "name": "next"
       }
     ],
+    /**
+     * PL: Bazowy katalog do rozwiązywania nazw modułów non-relative.
+     * EN: Base directory to resolve non-relative module names.
+     */
+    "baseUrl": ".",
+    /**
+     * PL: Ograniczenie automatycznego ładowania typów z @types.
+     * EN: Restrict automatic loading of types from @types.
+     */
+    "types": ["node", "react", "react-dom"],
     /**
      * PL: Aliasy ścieżek - pozwala na używanie zapisu '@/' zamiast ścieżek względnych.
      * EN: Path aliases - allows using the '@/' notation instead of relative paths.
