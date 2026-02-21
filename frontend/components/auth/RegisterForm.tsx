@@ -101,7 +101,7 @@ export const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
 
     /** PL: Walidacja hasła. EN: Password validation. */
     const passwordRegex =
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&./\\()|{}[\]#^_-]).{8,}$/;
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&./()|{}\[\]#^_-]).{8,}$/;
 
     if (!passwordRegex.test(password)) {
       setError(tr('passwordRequirements'));

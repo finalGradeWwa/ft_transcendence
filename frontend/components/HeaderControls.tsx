@@ -10,9 +10,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import { useRouter, usePathname, Link } from '@/i18n/navigation';
 import { useSearchParams } from 'next/navigation';
 import { Icon } from '@/components/icons/ui/Icon';
-// PL: Importujemy poprawną funkcję fetchCurrentUser z Twojej biblioteki auth.
-// EN: Importing the correct fetchCurrentUser function from your auth library.
-import { apiFetch, fetchCurrentUser } from '@/lib/auth';
+import { fetchCurrentUser, apiFetch, logout as authLogout } from '@/lib/auth';
 
 const BTN_S =
   'p-2 rounded-full bg-secondary-beige text-neutral-900 hover:text-primary-green shadow-md transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black dark:focus-visible:outline-white outline-none shrink-0 flex items-center justify-center';
@@ -20,6 +18,7 @@ const LANGS = ['pl', 'en', 'de', 'ar'];
 
 /**
  * PL: Uniwersalny przycisk z ikoną (Link lub Button).
+ * EN: Universal icon button (Link or Button).
  */
 const IconButton = ({ onClick, icon, label, href }: any) => {
   const content = <Icon name={icon} size={18} aria-hidden="true" />;
@@ -41,6 +40,7 @@ const IconButton = ({ onClick, icon, label, href }: any) => {
 
 /**
  * PL: Menu szybkiego dodawania rośliny lub ogrodu.
+ * EN: Quick add menu for plant or garden.
  */
 const AddMenu = ({ user, tP, tG, close }: any) => (
   <div className="absolute right-0 md:right-[-48px] mt-4 w-64 bg-primary-green rounded-xl shadow-2xl overflow-hidden z-[100] py-1 flex flex-col">
@@ -64,6 +64,7 @@ const AddMenu = ({ user, tP, tG, close }: any) => (
 
 /**
  * PL: Widok zalogowanego użytkownika (Avatar + Nick + Wyloguj).
+ * EN: Logged-in user view (Avatar + Username + Logout).
  */
 const ProfileArea = ({ user, logout, t }: any) => (
   <div className="flex items-center gap-2 bg-primary-green p-1 pr-4 rounded-full shadow-md border border-primary-green/20 w-fit">
@@ -90,6 +91,7 @@ const ProfileArea = ({ user, logout, t }: any) => (
 
 /**
  * PL: Hook zarządzający danymi użytkownika z localStorage.
+ * EN: Hook managing user data from localStorage.
  */
 function useUsername() {
   const [username, setUsername] = useState<string | null>(null);
@@ -97,33 +99,45 @@ function useUsername() {
 
   useEffect(() => {
     const storedUsername = localStorage.getItem('username');
-    setUsername(storedUsername);
-    setIsLoading(false);
+
+    if (!storedUsername) {
+      setIsLoading(false);
+      return;
+    }
+
+    fetchCurrentUser()
+      .then(userData => {
+        if (userData?.username) {
+          setUsername(userData.username);
+        } else {
+          localStorage.removeItem('username');
+          setUsername(null);
+        }
+      })
+      .catch(() => {
+        setUsername(null);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
 
     const handleStorageChange = () => {
       setUsername(localStorage.getItem('username'));
     };
 
     window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
+    window.addEventListener('user-updated', handleStorageChange);
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('user-updated', handleStorageChange);
+    };
   }, []);
 
+  /** PL: Użyj hooka do wylogowania użytkownika z auth.ts EN: Use hook to logout user from auth.ts */
   const logout = useCallback(async () => {
-    try {
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/logout/`, {
-        method: 'POST',
-        credentials: 'include',
-      });
-    } catch (e) {
-      console.error('Logout request failed', e);
-    }
-
-    localStorage.removeItem('username');
-    localStorage.removeItem('token');
-    sessionStorage.removeItem('accessToken'); // PL: Czyścimy też token z sessionStorage
+    await authLogout();
     setUsername(null);
-    window.dispatchEvent(new Event('storage'));
-
+    window.dispatchEvent(new Event('user-updated'));
     window.location.href = '/';
   }, []);
 
@@ -131,22 +145,34 @@ function useUsername() {
 }
 
 /**
- * PL: Hook zamykający menu po kliknięciu poza element.
+ * PL: Hook zamykający menu po kliknięciu poza element lub naciśnięciu ESC.
+ * EN: Hook to close menu when clicking outside or pressing ESC.
  */
 function useOutsideClose<T extends HTMLElement>(onClose: () => void) {
   const ref = useRef<T>(null);
   useEffect(() => {
-    const handle = (e: MouseEvent) => {
+    const handleClickOutside = (e: MouseEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node)) onClose();
     };
-    document.addEventListener('mousedown', handle);
-    return () => document.removeEventListener('mousedown', handle);
+
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleEscape);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleEscape);
+    };
   }, [onClose]);
   return ref;
 }
 
 /**
  * PL: Warunkowe renderowanie logowania lub obszaru profilu.
+ * EN: Conditional rendering of login button or profile area.
  */
 const UserSection = ({
   username,
@@ -173,11 +199,7 @@ const UserSection = ({
   );
 };
 
-export function HeaderControls({
-  onSearchClick,
-}: {
-  onSearchClick?: () => void;
-}) {
+export function HeaderControls() {
   const {
     username,
     setUsername,
@@ -218,6 +240,8 @@ export function HeaderControls({
         if (isJson) {
           const data = await response.json();
           if (response.ok) {
+            // PL: Ustawiamy stan na podstawie liczby wiadomości z API
+            // EN: Setting state based on message count from API
             setHasNewMessages(data.unread_count > 0);
           } else {
             // Obsługa błędów API zwróconych w JSONie (np. 401, 403)
@@ -260,7 +284,7 @@ export function HeaderControls({
           if (userData?.username) {
             localStorage.setItem('username', userData.username);
             setUsername(userData.username);
-            window.dispatchEvent(new Event('storage'));
+            window.dispatchEvent(new Event('user-updated'));
 
             const url = new URL(window.location.href);
             url.searchParams.delete('auth');
@@ -295,28 +319,33 @@ export function HeaderControls({
       </select>
 
       <nav className="flex flex-wrap md:flex-nowrap items-center justify-center gap-3">
-        <IconButton
-          href={{ pathname, query: { showSearch: 'true' } }}
-          icon="search"
-          label={tAria('searchBtn')}
-        />
-
-        <div className="relative" ref={addMenuRef}>
+        {/**
+         * PL: Przycisk wyszukiwania - widoczny tylko dla zalogowanych.
+         * EN: Search button - visible only for logged-in users.
+         */}
+        {username && (
           <IconButton
-            onClick={
-              username ? () => setIsAddMenuOpen(!isAddMenuOpen) : undefined
-            }
-            href={
-              !username && !isLoading ? `${pathname}?showLogin=true` : undefined
-            }
-            icon="plus"
-            label={tAria('add')}
+            href={{ pathname, query: { showSearch: 'true' } }}
+            icon="search"
+            label={tAria('searchBtn')}
           />
-          {username && isAddMenuOpen && (
-            <AddMenu user={username} tP={tP} tG={tG} close={closeMenu} />
-          )}
-        </div>
-
+        )}
+        {/**
+         * PL: Przycisk dodawania - widoczny tylko dla zalogowanych.
+         * EN: Add button - visible only for logged-in users.
+         */}
+        {username && (
+          <div className="relative" ref={addMenuRef}>
+            <IconButton
+              onClick={() => setIsAddMenuOpen(!isAddMenuOpen)}
+              icon="plus"
+              label={tAria('add')}
+            />
+            {isAddMenuOpen && (
+              <AddMenu user={username} tP={tP} tG={tG} close={closeMenu} />
+            )}
+          </div>
+        )}
         {/**
          * PL: Przycisk przejścia do czatu - widoczny tylko dla zalogowanych.
          * EN: Chat button - visible only for logged-in users.
@@ -332,7 +361,6 @@ export function HeaderControls({
             )}
           </div>
         )}
-
         <UserSection
           username={username}
           logout={logout}

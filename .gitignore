@@ -4,6 +4,9 @@ plantapp/.env
 __pycache__/
 .DS_Store
 .env
+certs/
+*.crt
+*.key
 venv
 
 # user avatar images

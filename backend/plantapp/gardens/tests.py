@@ -330,7 +330,7 @@ class AutomaticGardenCreationTests(APITestCase):
         # Check that a garden was created
         garden = Garden.objects.filter(gardenuser__user=user).first()
         self.assertIsNotNone(garden)
-        self.assertEqual(garden.name, f"{user.username}'s Garden")
+        self.assertEqual(garden.name, "Home Garden")
 
     def test_user_is_member_of_default_garden(self):
         """Test that the user is added as a member of the default garden."""
@@ -386,5 +386,5 @@ class AutomaticGardenCreationTests(APITestCase):
         garden2 = Garden.objects.get(gardenuser__user=user2)
 
         self.assertNotEqual(garden1.pk, garden2.pk)
-        self.assertEqual(garden1.name, "user1's Garden")
-        self.assertEqual(garden2.name, "user2's Garden")
+        self.assertEqual(garden1.name, "Home Garden")
+        self.assertEqual(garden2.name, "Home Garden")

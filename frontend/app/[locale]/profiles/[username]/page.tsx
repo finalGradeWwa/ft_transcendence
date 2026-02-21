@@ -11,6 +11,28 @@
  */
 
 import UserProfileClient from '../UserProfileClient';
+import { cookies } from 'next/headers';
+
+const API_URL = (
+  process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000'
+).replace(/\/$/, '');
+
+async function getUserProfile(username: string) {
+  try {
+    const cookieStore = await cookies();
+    const refreshToken = cookieStore.get('refresh_token')?.value;
+
+    const response = await fetch(`${API_URL}/users/profile/${username}/`, {
+      cache: 'no-store',
+      headers: refreshToken ? { Cookie: `refresh_token=${refreshToken}` } : {},
+    });
+
+    if (!response.ok) return null;
+    return await response.json();
+  } catch (error) {
+    return null;
+  }
+}
 
 export default async function ProfilePage({
   params,
@@ -18,23 +40,7 @@ export default async function ProfilePage({
   params: Promise<{ username: string }>;
 }) {
   const { username } = await params;
+  const user = await getUserProfile(username);
 
-  /**
-   * PL: Obiekt danych użytkownika (uchwyty dla backendu).
-   * EN: User data object (backend handles).
-   */
-  const mockUser = {
-    id: 1, // Dodane
-    username: username,
-    date_joined: '2024-05-20',
-    avatar_photo: '',
-    followers: 0,
-    following: 0,
-    gardens: 0,
-    plants: 0,
-    pins: [], // Dodane
-  };
-
-  // Musisz też dodać drugi wymagany prop: currentLoggedUser
-  return <UserProfileClient user={mockUser} currentLoggedUser={null} />;
+  return <UserProfileClient user={user} currentLoggedUser={null} />;
 }

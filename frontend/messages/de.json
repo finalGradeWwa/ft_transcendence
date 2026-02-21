@@ -110,12 +110,17 @@
     "chooseFile": "Datei auswählen",
     "noFileSelected": "Keine Datei ausgewählt",
     "removeFile": "Datei entfernen",
+    "currentPassword": "Aktualisierungs-Passwort",
     "password": "Passwort",
     "passwordRequirements": "Mind. 8 Zeichen (Groß- und Kleinschreibung, Zahl, Sonderzeichen).",
     "confirmPassword": "Passwort bestätigen",
+    "changePasswordLabel": "Passwort ändern:",
     "acceptTerms": "Ich akzeptiere die",
     "termsLink": "Allgemeinen Geschäftsbedingungen",
     "registerBtn": "Registrieren",
+    "editTitle": "Profil bearbeiten",
+    "backToProfile": "Zurück zum Profil",
+    "saveBtn": "Speichern",
     "alreadyHaveAccount": "Hast du schon ein Konto?",
     "errorPasswordMatch": "Die Passwörter stimmen nicht überein",
     "errorRegistrationFailed": "Registrierung fehlgeschlagen. Bitte versuchen Sie es erneut.",
@@ -132,16 +137,21 @@
     "backToList": "Zurück zur Pflanzenliste"
   },
   "errors": {
-    "connectionError": "Verbindungsfehler. Der Server antwortet nicht.",
+    "connectionError": "Verbindungsfehler. Bitte versuchen Sie es später erneut.",
     "invalidCredentials": "Ungültiger Benutzername oder Passwort.",
+    "oauthFailed": "Die GitHub-Anmeldung ist fehlgeschlagen. Bitte versuchen Sie es erneut.",
+    "oauthAccessDenied": "Die GitHub-Anmeldung wurde abgebrochen.",
     "genericError": "Etwas ist schief gelaufen.",
     "invalidImage": "Bitte laden Sie ein gültiges Bild hoch. Die Datei war entweder kein Bild oder sie ist beschädigt.",
     "tooManyRequests": "Zu viele Login-Versuche. Bitte warten Sie einen Moment.",
     "accountDisabled": "Ihr Konto ist inaktiv.",
     "sessionExpired": "Ihre Sitzung ist abgelaufen. Bitte laden Sie die Seite neu.",
-    "oauthFailed": "Die GitHub-Anmeldung ist fehlgeschlagen. Bitte versuche es erneut.",
-    "oauthAccessDenied": "Die GitHub-Anmeldung wurde abgebrochen.",
-    "generic": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es erneut."
+    "currentPasswordRequired": "Bitte geben Sie Ihr aktuelles Passwort ein, um die Änderungen zu speichern.",
+    "invalidCurrentPassword": "Das aktuelle Passwort ist falsch.",
+    "usernameTaken": "Dieser Benutzername ist bereits vergeben.",
+    "invalidEmail": "Ungültiges E-Mail-Format.",
+    "updateFailed": "Profilaktualisierung fehlgeschlagen. Bitte versuchen Sie es erneut.",
+    "serverError500": "Serverfehler (500). Bitte überprüfen Sie die Backend-Protokolle."
   },
   "ChatPage": {
     "title": "Chat",
@@ -160,7 +170,8 @@
   "AboutUs": {
     "title": "Über uns",
     "description": "Um unser binäres Programmierabenteuer bei 42Warsaw etwas lebendiger zu gestalten, haben wir beschlossen, ihm einen Hauch von Naturfarben zu verleihen. Dies ist unser letztes Projekt im Rahmen des sogenannten Common Core – deshalb hinterlassen wir dieses Portal als Erinnerung an ein großartiges Abenteuer. Fotos für die Reichweite. 😏",
-    "footerText": "Werde auch du zum Gärtner!"
+    "footerText": "Werde auch du zum Gärtner!",
+    "about_image_alt": "Dekoratives Bild mit Pflanzen im Bereich Über uns"
   },
   "AddPlantPage": {
     "title": "Neue Pflanze hinzufügen",
@@ -196,7 +207,23 @@
     "plantsCountLabel": "Anzahl der Pflanzen",
     "gardenNameLabel": "Gartenname",
     "gardenNamePlaceholder": "z. B. Mein Balkon oder Wohnzimmer",
-    "noPins": "Keine Einträge"
+    "noPins": "Keine Einträge",
+    "defaultGardenName": "Hauptgarten",
+    "environmentLabel": "Umgebung",
+    "environments": {
+      "indoor": "Drinnen",
+      "outdoor": "Draußen",
+      "greenhouse": "Gewächshaus"
+    },
+    "errors": {
+      "fillName": "Bitte geben Sie einen Gartennamen an",
+      "addFailed": "Fehler beim Erstellen des Gartens",
+      "unexpected": "Ein unerwarteter Fehler ist aufgetreten"
+    },
+    "success": {
+      "title": "Garten erstellt!",
+      "message": "Ihr neuer Garten wurde hinzugefügt."
+    }
   },
   "AuthCallbackPage": {
     "loading": "Anmeldung wird verarbeitet, bitte warten..."

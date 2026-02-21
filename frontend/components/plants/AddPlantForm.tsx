@@ -11,11 +11,14 @@ import { Text } from '@/components/typography/Text';
 import { useAddPlantForm } from './useAddPlantForm';
 
 interface Garden {
-  id: string;
+  garden_id: number;
   name: string;
 }
+
 interface AddPlantFormProps {
   username: string;
+  firstName?: string;
+  lastName?: string;
   gardens: Garden[];
   onSuccess: () => void;
 }
@@ -27,12 +30,22 @@ const labelCls =
 
 export function AddPlantForm({
   username,
+  firstName,
+  lastName,
   gardens,
   onSuccess,
 }: AddPlantFormProps) {
   const t = useTranslations('AddPlantPage');
+  const tGardens = useTranslations('GardensPage');
   const tr = useTranslations('RegisterPage');
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  /**
+   * PL: Wyświetlana nazwa: priorytetowo Imię + Nazwisko, fallback do username.
+   * EN: Displayed name: priority to First Name + Last Name, fallback to username.
+   */
+  const userDisplayName =
+    firstName && lastName ? `${firstName} ${lastName}` : username;
 
   /**
    * PL: Wykorzystanie analogicznego podejścia do RegisterForm poprzez dedykowany hook.
@@ -92,16 +105,23 @@ export function AddPlantForm({
             value={form.garden}
             onChange={e => form.setGarden(e.target.value)}
           >
-            <option value="" className="text-dark-text font-normal">
+            <option
+              value=""
+              className="text-dark-text font-normal"
+              key="placeholder"
+            >
               {t('fields.selectGarden')}
             </option>
-            {gardens?.map(g => (
+            {gardens?.map((g, index) => (
               <option
-                key={g.id}
-                value={g.id}
+                key={g.garden_id}
+                value={g.garden_id}
                 className="text-dark-text font-bold"
               >
-                {g.name}
+                {index === 0 &&
+                (g.name === 'Home Garden' || g.name === `${username}'s Garden`)
+                  ? `${userDisplayName} ${tGardens('defaultGardenName')}`
+                  : g.name}
               </option>
             ))}
           </select>
