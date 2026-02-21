@@ -138,6 +138,15 @@
   },
   "ChatPage": {
     "title": "Chat",
+    "friendsTitle": "Friends",
+    "loadingFriends": "Loading friends...",
+    "noFriends": "You don't have any friends yet.",
+    "selectFriend": "Select a friend to start chatting.",
+    "loadingMessages": "Loading conversation...",
+    "friendsLoadError": "Failed to load your friends list.",
+    "conversationLoadError": "Failed to load this conversation.",
+    "socketConnectionError": "Realtime chat connection failed.",
+    "messageSendError": "Failed to send message.",
     "typeMessage": "Type a message...",
     "send": "Send"
   },

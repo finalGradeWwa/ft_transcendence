@@ -12,7 +12,7 @@ import { useSearchParams } from 'next/navigation';
 import { Icon } from '@/components/icons/ui/Icon';
 // PL: Importujemy poprawną funkcję fetchCurrentUser z Twojej biblioteki auth.
 // EN: Importing the correct fetchCurrentUser function from your auth library.
-import { fetchCurrentUser } from '@/lib/auth';
+import { apiFetch, fetchCurrentUser } from '@/lib/auth';
 
 const BTN_S =
   'p-2 rounded-full bg-secondary-beige text-neutral-900 hover:text-primary-green shadow-md transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black dark:focus-visible:outline-white outline-none shrink-0 flex items-center justify-center';
@@ -208,12 +208,9 @@ export function HeaderControls({
 
     const checkMessages = async () => {
       try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/chat/unread-count/`,
-          {
-            credentials: 'include',
-          }
-        );
+        const response = await apiFetch('/chat/unread-count/', {
+          method: 'GET',
+        });
 
         const contentType = response.headers.get('content-type');
         const isJson = contentType && contentType.includes('application/json');

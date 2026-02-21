@@ -138,6 +138,15 @@
   },
   "ChatPage": {
     "title": "Czat",
+    "friendsTitle": "Znajomi",
+    "loadingFriends": "Ładowanie znajomych...",
+    "noFriends": "Nie masz jeszcze znajomych.",
+    "selectFriend": "Wybierz znajomego, aby rozpocząć czat.",
+    "loadingMessages": "Ładowanie rozmowy...",
+    "friendsLoadError": "Nie udało się załadować listy znajomych.",
+    "conversationLoadError": "Nie udało się załadować tej rozmowy.",
+    "socketConnectionError": "Nie udało się połączyć z czatem na żywo.",
+    "messageSendError": "Nie udało się wysłać wiadomości.",
     "typeMessage": "Wpisz wiadomość...",
     "send": "Wyślij"
   },
