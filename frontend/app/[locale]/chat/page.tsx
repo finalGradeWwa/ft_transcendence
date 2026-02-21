@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, FormEvent } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
+import { getValidAccessToken } from '@/lib/auth';
 //class UserFriendsListAPIView(APIView):
 
 // same as models.py
@@ -14,6 +15,7 @@ type Friend = {
   id: number;
   username: string;
   isOnline: boolean;
+  avatar?: string;
 };
 
 type Message = {
@@ -63,50 +65,80 @@ export default function ChatPage() {
 
   // WebSocket Setup
   useEffect(() => {
-    const ws = new WebSocket('ws://localhost:8000/ws/chat/');
-    wsRef.current = ws;
+    let ws: WebSocket | null = null;
 
-    ws.onopen = () => {
-      console.log('WebSocket connected');
-    };
+    const connectWebSocket = async () => {
+      try {
+        // Check for authentication before connecting
+        const token = await getValidAccessToken();
 
-    ws.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      console.log('Received:', data);
+        if (!token) {
+          console.error('No authentication token available');
+          return;
+        }
 
-      // Handle message or status update
-      if (data.type === 'new_message') {
-        // Add new message to the list
-        const newMessage: Message = {
-          id: data.id,
-          sender: data.sender,
-          recipient: data.recipient,
-          content: data.content,
-          timestamp: data.timestamp,
-          is_read: false, // idk if we want it to stay
+        // Convert http(s) to ws(s) and include token in URL
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+        const wsUrl = `${apiUrl.replace(/^http/, 'ws')}/ws/chat/?token=${token}`;
+
+        ws = new WebSocket(wsUrl);
+        wsRef.current = ws;
+
+        ws.onopen = () => {
+          console.log('WebSocket connected');
         };
-        setMessages((prev) => [...prev, newMessage]);
-      } else if (data.type === 'status_update') {
-        // Update friend's online status
-        setFriends((prev) =>
-          prev.map((f) =>
-            f.id === data.user_id ? { ...f, isOnline: data.is_online } : f
-          )
-        );
+
+        ws.onmessage = (event) => {
+          let data: any;
+          try {
+            data = JSON.parse(event.data);
+          } catch (error) {
+            console.error('Failed to parse WebSocket message as JSON:', error, event.data);
+            return;
+          }
+          console.log('Received:', data);
+
+          // Handle message or status update
+          if (data.type === 'new_message') {
+            // Add new message to the list
+            const newMessage: Message = {
+              id: data.id,
+              sender: data.sender,
+              recipient: data.recipient,
+              content: data.content,
+              timestamp: data.timestamp,
+              is_read: false, // idk if we want it to stay
+            };
+            setMessages((prev) => [...prev, newMessage]);
+          } else if (data.type === 'status_update') {
+            // Update friend's online status
+            setFriends((prev) =>
+              prev.map((f) =>
+                f.id === data.user_id ? { ...f, isOnline: data.is_online } : f
+              )
+            );
+          }
+        };
+
+        ws.onerror = (error) => {
+          console.error('WebSocket error:', error);
+        };
+
+        ws.onclose = () => {
+          console.log('WebSocket disconnected');
+        };
+      } catch (error) {
+        console.error('Failed to setup WebSocket:', error);
       }
     };
 
-    ws.onerror = (error) => {
-      console.error('WebSocket error:', error);
-    };
-
-    ws.onclose = () => {
-      console.log('WebSocket disconnected');
-    };
+    connectWebSocket().catch((error) => {
+      console.error('Failed to establish WebSocket connection:', error);
+    });
 
     // Cleanup: close WebSocket when component unmounts
     return () => {
-      if (ws.readyState === WebSocket.OPEN) {
+      if (ws && ws.readyState === WebSocket.OPEN) {
         ws.close();
       }
     };
@@ -201,8 +233,15 @@ export default function ChatPage() {
                     <div className="flex items-center gap-3">
                       <div className="relative">
                         <div className="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center font-bold">
-                          {friend.username[0].toUpperCase()}
-						  {/* to be changed to avatar */}
+                            {friend.avatar ? (
+                              <img
+                                src={friend.avatar}
+                                alt={`${friend.username}'s avatar`}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              friend.username[0].toUpperCase() // probablly not needed when everything will be correct
+                            )}
                         </div>
                         <div
                           className={`absolute bottom-0 right-0 w-4 h-4 rounded-full border-2 border-secondary-beige ${
@@ -218,7 +257,10 @@ export default function ChatPage() {
                       </div>
                     </div>
                     <button
-                      onClick={() => setSelectedFriend(friend)}
+                      onClick={() => {
+						setSelectedFriend(friend);
+						setMessages([]);
+					  }}
                       className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm transition-colors"
                     >
                       Message
@@ -305,9 +347,9 @@ export default function ChatPage() {
               </button>
             </form>
           </div>
-          </div>
         </div>
       </div>
     </div>
+  </div>
   );
 }
