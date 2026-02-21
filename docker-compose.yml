@@ -26,9 +26,6 @@ services:
     # which provides SSL termination and secure HTTPS communication.
 
     env_file:
-      - ./backend/plantapp/.env
-
-    env_file:
       - ./backend/.env
 
     volumes:
@@ -48,9 +45,6 @@ services:
     
     container_name: ft_transcendence_backend_migrate
     
-    env_file:
-      - ./backend/plantapp/.env
-
     volumes:
       - ./backend:/app
       - backend_db:/app/plantapp
