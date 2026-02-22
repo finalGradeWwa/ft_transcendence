@@ -32,20 +32,31 @@ export function clearAccessToken() {
 }
 
 /**
- * PL: Wylogowanie użytkownika — czyści lokalne dane sesji i wywołuje endpoint backendu.
- * EN: User logout — clears local session data and calls backend endpoint.
+ * PL: Wylogowanie użytkownika — najpierw wywołuje endpoint backendu, potem czyści lokalne dane.
+ * EN: User logout — first calls backend endpoint, then clears local session data.
  */
 export async function logout(): Promise<void> {
+  // PL: Pobierz token PRZED czyszczeniem, aby backend mógł zweryfikować użytkownika
+  // EN: Get token BEFORE clearing, so backend can verify the user
+  const token = getAccessToken();
+
+  // PL: Wywołaj backend z tokenem w headerze Authorization
+  // EN: Call backend with token in Authorization header
+  await fetch(`${getApiUrl()}/api/auth/logout/`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+  }).catch(() => {});
+
+  // PL: Dopiero teraz usuń tokeny lokalnie
+  // EN: Only now clear tokens locally
   clearAccessToken();
   if (typeof window !== 'undefined') {
     localStorage.removeItem('username');
   }
-
-  await fetch(`${getApiUrl()}/api/auth/logout/`, {
-    method: 'POST',
-    credentials: 'include',
-    headers: { 'Content-Type': 'application/json' },
-  }).catch(() => {});
 }
 
 let refreshPromise: Promise<string> | null = null;
