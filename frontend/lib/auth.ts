@@ -42,7 +42,8 @@ export async function logout(): Promise<void> {
 
   // PL: Wywołaj backend z tokenem w headerze Authorization
   // EN: Call backend with token in Authorization header
-  await fetch(`${getApiUrl()}/api/auth/logout/`, {
+
+  await apiFetch(`${getApiUrl()}/api/auth/logout/`, {
     method: 'POST',
     credentials: 'include',
     headers: {
