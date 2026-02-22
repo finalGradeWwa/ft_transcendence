@@ -125,7 +125,30 @@ export const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
       });
 
       const text = await response.text();
-      const data = text ? JSON.parse(text) : null;
+      
+      // PL: Loguj odpowiedź dla debugowania w Docker
+      // EN: Log response for debugging in Docker
+      if (!text || text.trim().length === 0) {
+        console.error('Empty response from backend:', {
+          status: response.status,
+          statusText: response.statusText,
+          headers: Object.fromEntries(response.headers.entries()),
+        });
+      }
+      
+      let data = null;
+      try {
+        data = text ? JSON.parse(text) : null;
+      } catch (parseError) {
+        console.error('Failed to parse JSON response:', {
+          text: text.substring(0, 500),
+          status: response.status,
+          error: parseError,
+        });
+        // PL: Jeśli nie możemy sparsować, rzuć błąd z informacją
+        // EN: If we can't parse, throw error with info
+        throw new Error(`Invalid JSON response: ${text.substring(0, 100)}`);
+      }
 
       if (!response.ok) {
         let serverErrorMessage = tr('errorRegistrationFailed');
