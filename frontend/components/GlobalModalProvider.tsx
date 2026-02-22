@@ -19,6 +19,10 @@ const SearchModal = dynamic(() => import('@/components/SearchModal'), {
   ssr: false,
 });
 
+const NotificationsModal = dynamic(() => import('@/components/NotificationsModal'), {
+  ssr: false,
+});
+
 /**
  * PL: Komponent zarządzający widocznością modali w skali całej aplikacji.
  * EN: Component managing modal visibility application-wide.
@@ -46,6 +50,7 @@ export const GlobalModalProvider = () => {
   const isLoginParamPresent = searchParams.get('showLogin') === 'true';
   const isLoginModalOpen = isLoginParamPresent && isLoggedIn === false;
   const isSearchModalOpen = searchParams.get('showSearch') === 'true';
+  const isNotificationsModalOpen = searchParams.get('showNotifications') === 'true';
 
   useEffect(() => {
     if (isLoginParamPresent && isLoggedIn === true) {
@@ -65,6 +70,7 @@ export const GlobalModalProvider = () => {
     <>
       <LoginModal isVisible={isLoginModalOpen} onClose={handleClose} t={t} />
       <SearchModal isVisible={isSearchModalOpen} onClose={handleClose} />
+      <NotificationsModal isVisible={isNotificationsModalOpen} onClose={handleClose} />
     </>
   );
 };
