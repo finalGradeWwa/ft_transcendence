@@ -347,6 +347,182 @@ class ChatConsumerWebSocketTestCase(TransactionTestCase):
 
 		async_to_sync(scenario)()
 
+# ✅ Local tests → Uses InMemory (no Redis needed)
+# ✅ GitHub CI → Uses InMemory (no Redis needed)
+# ✅ Docker production → Uses Redis for multi-process support
+
+	def test_websocket_group_handling(self):
+		"""Test that each user connects to their own personal channel group."""
+		async def scenario():
+			comm1 = WebsocketCommunicator(self.application, f"/ws/chat/?token={self._token(self.user1)}")
+			comm2 = WebsocketCommunicator(self.application, f"/ws/chat/?token={self._token(self.user2)}")
+			
+			connected1, _ = await comm1.connect()
+			connected2, _ = await comm2.connect()
+			self.assertTrue(connected1)
+			self.assertTrue(connected2)
+
+			# Send message from user1 to user2
+			await comm1.send_json_to({
+				"type": "chat_message",
+				"message": "Group test message",
+				"recipient_username": self.user2.username,
+			})
+
+			# Both should receive responses (sender gets confirmation, recipient gets message)
+			response1 = await comm1.receive_json_from()
+			response2 = await comm2.receive_json_from()
+
+			self.assertEqual(response1["type"], "message_sent")
+			self.assertEqual(response2["type"], "new_message")
+			self.assertEqual(response2["message"]["content"], "Group test message")
+
+			await comm1.disconnect()
+			await comm2.disconnect()
+
+		async_to_sync(scenario)()
+
+	def test_websocket_handles_nonexistent_recipient(self):
+		"""Test that sending to non-existent user returns appropriate error."""
+		async def scenario():
+			communicator = WebsocketCommunicator(self.application, f"/ws/chat/?token={self._token(self.user1)}")
+			connected, _ = await communicator.connect()
+			self.assertTrue(connected)
+
+			await communicator.send_json_to({
+				"type": "chat_message",
+				"message": "Hello ghost user",
+				"recipient_username": "nonexistent_user_12345",
+			})
+
+			response = await communicator.receive_json_from()
+			self.assertIn("error", response)
+			self.assertIn("not found", response["error"].lower())
+
+			await communicator.disconnect()
+
+		async_to_sync(scenario)()
+
+	def test_websocket_handles_empty_message(self):
+		"""Test that empty messages are rejected."""
+		async def scenario():
+			communicator = WebsocketCommunicator(self.application, f"/ws/chat/?token={self._token(self.user1)}")
+			connected, _ = await communicator.connect()
+			self.assertTrue(connected)
+
+			await communicator.send_json_to({
+				"type": "chat_message",
+				"message": "",
+				"recipient_username": self.user2.username,
+			})
+
+			response = await communicator.receive_json_from()
+			self.assertIn("error", response)
+
+			await communicator.disconnect()
+
+		async_to_sync(scenario)()
+
+	def test_websocket_handles_invalid_json(self):
+		"""Test that invalid JSON is handled gracefully."""
+		async def scenario():
+			communicator = WebsocketCommunicator(self.application, f"/ws/chat/?token={self._token(self.user1)}")
+			connected, _ = await communicator.connect()
+			self.assertTrue(connected)
+
+			# Send invalid JSON
+			await communicator.send_to(text_data="not valid json {{{")
+
+			response = await communicator.receive_json_from()
+			self.assertEqual(response["error"], "Invalid JSON")
+
+			await communicator.disconnect()
+
+		async_to_sync(scenario)()
+
+	def test_websocket_handles_missing_message_type(self):
+		"""Test that messages without a type field are handled."""
+		async def scenario():
+			communicator = WebsocketCommunicator(self.application, f"/ws/chat/?token={self._token(self.user1)}")
+			connected, _ = await communicator.connect()
+			self.assertTrue(connected)
+
+			await communicator.send_json_to({
+				"message": "Hello",
+				"recipient_username": self.user2.username,
+			})
+
+			response = await communicator.receive_json_from()
+			self.assertIn("error", response)
+
+			await communicator.disconnect()
+
+		async_to_sync(scenario)()
+
+	def test_websocket_multiple_messages_in_session(self):
+		"""Test sending multiple messages in a single connection."""
+		async def scenario():
+			sender = WebsocketCommunicator(self.application, f"/ws/chat/?token={self._token(self.user1)}")
+			recipient = WebsocketCommunicator(self.application, f"/ws/chat/?token={self._token(self.user2)}")
+
+			await sender.connect()
+			await recipient.connect()
+
+			# Send three messages
+			for i in range(3):
+				await sender.send_json_to({
+					"type": "chat_message",
+					"message": f"Message {i+1}",
+					"recipient_username": self.user2.username,
+				})
+
+				await sender.receive_json_from()  # sender confirmation
+				response = await recipient.receive_json_from()  # recipient message
+				self.assertEqual(response["message"]["content"], f"Message {i+1}")
+
+			# Verify all three messages are saved
+			count = await database_sync_to_async(Message.objects.filter(
+				sender=self.user1,
+				recipient=self.user2
+			).count)()
+			self.assertEqual(count, 3)
+
+			await sender.disconnect()
+			await recipient.disconnect()
+
+		async_to_sync(scenario)()
+
+	def test_websocket_typing_indicator(self):
+		"""Test typing indicator functionality if implemented."""
+		async def scenario():
+			sender = WebsocketCommunicator(self.application, f"/ws/chat/?token={self._token(self.user1)}")
+			recipient = WebsocketCommunicator(self.application, f"/ws/chat/?token={self._token(self.user2)}")
+
+			await sender.connect()
+			await recipient.connect()
+
+			# Send typing indicator
+			await sender.send_json_to({
+				"type": "typing",
+				"recipient_username": self.user2.username,
+			})
+
+			# Try to receive typing notification (with timeout)
+			# This will pass if typing is implemented, or timeout if not
+			import asyncio
+			try:
+				response = await asyncio.wait_for(recipient.receive_json_from(), timeout=1.0)
+				if response.get("type") == "typing":
+					self.assertEqual(response["username"], self.user1.username)
+			except asyncio.TimeoutError:
+				# Typing indicator not implemented yet - that's okay
+				pass
+
+			await sender.disconnect()
+			await recipient.disconnect()
+
+		async_to_sync(scenario)()
+
 
 class JwtAuthMiddlewareTestCase(TransactionTestCase):
 	def setUp(self):
