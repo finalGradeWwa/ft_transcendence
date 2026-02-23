@@ -121,19 +121,30 @@ if DEBUG:
         }
     }
 else:
-    if not _redis_url:
-        raise RuntimeError(
-            "REDIS_URL is not set while DEBUG is False. "
-            "Set REDIS_URL before deploying to production."
-        )
-    CHANNEL_LAYERS = {
-        'default': {
-            'BACKEND': 'channels_redis.core.RedisChannelLayer',
-            'CONFIG': {
-                'hosts': [_redis_url],
-            },
+    if _redis_url:
+        CHANNEL_LAYERS = {
+            'default': {
+                'BACKEND': 'channels_redis.core.RedisChannelLayer',
+                'CONFIG': {
+                    'hosts': [_redis_url],
+                },
+            }
         }
-    }
+    else:
+        # Fallback to in-memory for testing/CI environments without Redis.
+        # WARNING: This should NOT be used in production with multiple workers.
+        import warnings
+        warnings.warn(
+            "REDIS_URL is not set while DEBUG is False. "
+            "Using InMemoryChannelLayer as fallback, which does not support multiple worker processes. "
+            "Configure REDIS_URL for production deployments.",
+            RuntimeWarning
+        )
+        CHANNEL_LAYERS = {
+            'default': {
+                'BACKEND': 'channels.layers.InMemoryChannelLayer'
+            }
+        }
 
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
