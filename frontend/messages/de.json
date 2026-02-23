@@ -39,6 +39,7 @@
       "footerNavigation": "Fußzeilen-Navigation",
       "selectLanguage": "Sprache wählen",
       "searchBtn": "Suche",
+      "notificationsButton": "Benachrichtigungen",
       "add": "Neue Pflanze hinzufügen",
       "profile": "Benutzerprofil",
       "logout": "Abmelden",
@@ -237,5 +238,13 @@
       "close": "Suche schließen"
     },
     "loading": "Suche wird ausgeführt, bitte warten..."
+  },
+  "NotificationsModal": {
+    "title": "Freundschaftsanfragen",
+    "close": "Benachrichtigungen schließen",
+    "loading": "Anfragen werden geladen...",
+    "noRequests": "Keine ausstehenden Freundschaftsanfragen",
+    "accept": "Freundschaftsanfrage annehmen",
+    "reject": "Freundschaftsanfrage ablehnen"
   }
 }

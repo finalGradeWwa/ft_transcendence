@@ -330,6 +330,19 @@ export function HeaderControls() {
             label={tAria('searchBtn')}
           />
         )}
+
+        {/**
+         * PL: Przycisk powiadomień - widoczny tylko dla zalogowanych.
+         * EN: Notifications button - visible only for logged-in users.
+         */}
+        {username && (
+          <IconButton
+            href={{ pathname, query: { showNotifications: 'true' } }}
+            icon="bell"
+            label={tAria('notificationsButton')}
+          />
+        )}
+
         {/**
          * PL: Przycisk dodawania - widoczny tylko dla zalogowanych.
          * EN: Add button - visible only for logged-in users.

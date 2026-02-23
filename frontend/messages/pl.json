@@ -33,6 +33,7 @@
       "footerNavigation": "Nawigacja w stopce",
       "selectLanguage": "Wybierz język strony",
       "searchBtn": "Szukaj",
+      "notificationsButton": "Powiadomienia",
       "add": "Dodaj nową roślinę",
       "profile": "Profil użytkownika",
       "logout": "Wyloguj się",
@@ -231,5 +232,13 @@
       "close": "Zamknij wyszukiwanie"
     },
     "loading": "Trwa wyszukiwanie, proszę czekać..."
+  },
+  "NotificationsModal": {
+    "title": "Zaproszenia do Znajomych",
+    "close": "Zamknij powiadomienia",
+    "loading": "Ładowanie zaproszeń...",
+    "noRequests": "Brak oczekujących zaproszeń",
+    "accept": "Zaakceptuj zaproszenie",
+    "reject": "Odrzuć zaproszenie"
   }
 }
