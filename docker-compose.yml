@@ -26,13 +26,13 @@ services:
     # which provides SSL termination and secure HTTPS communication.
 
     env_file:
-      - ./backend/plantapp/.env
+      - ./backend/.env
 
     volumes:
       - ./backend:/app
       - backend_db:/app/plantapp
     
-    command: daphne -b 0.0.0.0 -p 8000 mysite.asgi:application
+    command: daphne -b 0.0.0.0 -p 8000  mysite.asgi:application
     
     restart: unless-stopped
     depends_on:
@@ -45,12 +45,11 @@ services:
     
     container_name: ft_transcendence_backend_migrate
     
-    env_file:
-      - ./backend/plantapp/.env
-
     volumes:
       - ./backend:/app
       - backend_db:/app/plantapp
+    env_file:
+      - ./backend/.env
     command: python manage.py migrate
     
     restart: "no"

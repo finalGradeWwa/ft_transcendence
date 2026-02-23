@@ -150,6 +150,15 @@
   },
   "ChatPage": {
     "title": "الدردشة",
+    "friendsTitle": "الأصدقاء",
+    "loadingFriends": "جارٍ تحميل الأصدقاء...",
+    "noFriends": "ليس لديك أصدقاء بعد.",
+    "selectFriend": "اختر صديقًا لبدء الدردشة.",
+    "loadingMessages": "جارٍ تحميل المحادثة...",
+    "friendsLoadError": "تعذر تحميل قائمة أصدقائك.",
+    "conversationLoadError": "تعذر تحميل هذه المحادثة.",
+    "socketConnectionError": "فشل الاتصال بالدردشة الفورية.",
+    "messageSendError": "تعذر إرسال الرسالة.",
     "typeMessage": "اكتب رسالة...",
     "send": "إرسال"
   },

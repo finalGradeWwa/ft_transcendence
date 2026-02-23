@@ -27,5 +27,5 @@ RUN pip install --upgrade pip && \
 # Copy the entire backend directory
 COPY . /app/
 
-# Run Daphne with auto-reload for development
-CMD ["daphne", "-b", "0.0.0.0", "-p", "8000", "--reload", "mysite.asgi:application"]
+# Run Daphne ASGI server
+CMD ["daphne", "-b", "0.0.0.0", "-p", "8000", "mysite.asgi:application"]

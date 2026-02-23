@@ -156,6 +156,15 @@
   },
   "ChatPage": {
     "title": "Chat",
+    "friendsTitle": "Freunde",
+    "loadingFriends": "Freunde werden geladen...",
+    "noFriends": "Du hast noch keine Freunde.",
+    "selectFriend": "Wähle einen Freund aus, um den Chat zu starten.",
+    "loadingMessages": "Unterhaltung wird geladen...",
+    "friendsLoadError": "Deine Freundesliste konnte nicht geladen werden.",
+    "conversationLoadError": "Diese Unterhaltung konnte nicht geladen werden.",
+    "socketConnectionError": "Die Echtzeit-Chatverbindung ist fehlgeschlagen.",
+    "messageSendError": "Nachricht konnte nicht gesendet werden.",
     "typeMessage": "Nachricht eingeben...",
     "send": "Senden"
   },

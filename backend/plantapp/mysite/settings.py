@@ -55,6 +55,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'users.User'
 
 INSTALLED_APPS = [
+    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -107,6 +108,43 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'mysite.wsgi.application'
+ASGI_APPLICATION = 'mysite.asgi.application'
+
+# Channel layers configuration for WebSocket support
+# In-memory is fine for local development and tests (single process).
+# For multi-process / production deployments, REDIS_URL is required to use Redis.
+_redis_url = os.getenv("REDIS_URL")
+if DEBUG:
+    CHANNEL_LAYERS = {
+        'default': {
+            'BACKEND': 'channels.layers.InMemoryChannelLayer'
+        }
+    }
+else:
+    if _redis_url:
+        CHANNEL_LAYERS = {
+            'default': {
+                'BACKEND': 'channels_redis.core.RedisChannelLayer',
+                'CONFIG': {
+                    'hosts': [_redis_url],
+                },
+            }
+        }
+    else:
+        # Fallback to in-memory for testing/CI environments without Redis.
+        # WARNING: This should NOT be used in production with multiple workers.
+        import warnings
+        warnings.warn(
+            "REDIS_URL is not set while DEBUG is False. "
+            "Using InMemoryChannelLayer as fallback, which does not support multiple worker processes. "
+            "Configure REDIS_URL for production deployments.",
+            RuntimeWarning
+        )
+        CHANNEL_LAYERS = {
+            'default': {
+                'BACKEND': 'channels.layers.InMemoryChannelLayer'
+            }
+        }
 
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases

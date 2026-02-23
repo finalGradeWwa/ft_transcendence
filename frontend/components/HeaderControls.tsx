@@ -230,9 +230,9 @@ export function HeaderControls() {
 
     const checkMessages = async () => {
       try {
-        // PL: Używamy apiFetch, który automatycznie doda token Bearer i bazowy URL.
-        // EN: Using apiFetch, which automatically adds the Bearer token and base URL.
-        const response = await apiFetch('/chat/unread-count/');
+        const response = await apiFetch('/chat/unread-count/', {
+          method: 'GET',
+        });
 
         const contentType = response.headers.get('content-type');
         const isJson = contentType && contentType.includes('application/json');

@@ -1,10 +1,20 @@
 
-from django.test import TestCase
+from asgiref.sync import async_to_sync
+from channels.db import database_sync_to_async
+from channels.routing import URLRouter
+from channels.testing import WebsocketCommunicator
+from django.contrib.auth.models import AnonymousUser
+from django.test import TestCase, TransactionTestCase
 from rest_framework.test import APIClient
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 from django.utils import timezone
 from datetime import timedelta
+from rest_framework_simplejwt.tokens import AccessToken
+
+from chat_app.middleware import JwtAuthMiddlewareStack
+from chat_app.models import Message, UserProfile
+from chat_app.routing import websocket_urlpatterns
 
 User = get_user_model()
 
@@ -248,4 +258,148 @@ class UserListAPIViewTestCase(TestCase):
 		self.assertIn(self.user2.id, user_ids)
 		self.assertIn(self.user3.id, user_ids)
 		self.assertEqual(len(users), 2)
+
+
+class ChatConsumerWebSocketTestCase(TransactionTestCase):
+	def setUp(self):
+		self.user1 = User.objects.create_user(username='ws_user1', email='ws_user1@example.com', password='testpass123')
+		self.user2 = User.objects.create_user(username='ws_user2', email='ws_user2@example.com', password='testpass123')
+		self.application = JwtAuthMiddlewareStack(URLRouter(websocket_urlpatterns))
+
+	def _token(self, user):
+		return str(AccessToken.for_user(user))
+
+	def test_websocket_rejects_unauthenticated_connection(self):
+		async def scenario():
+			communicator = WebsocketCommunicator(self.application, '/ws/chat/')
+			connected, _ = await communicator.connect()
+			self.assertFalse(connected)
+
+		async_to_sync(scenario)()
+
+	def test_websocket_connect_updates_online_status(self):
+		async def scenario():
+			communicator = WebsocketCommunicator(self.application, f"/ws/chat/?token={self._token(self.user1)}")
+			connected, _ = await communicator.connect()
+			self.assertTrue(connected)
+
+			profile = await database_sync_to_async(UserProfile.objects.get)(user=self.user1)
+			self.assertTrue(profile.is_online)
+
+			await communicator.disconnect()
+
+			profile = await database_sync_to_async(UserProfile.objects.get)(user=self.user1)
+			self.assertFalse(profile.is_online)
+
+		async_to_sync(scenario)()
+
+	def test_chat_message_delivery_and_persistence(self):
+		async def scenario():
+			sender = WebsocketCommunicator(self.application, f"/ws/chat/?token={self._token(self.user1)}")
+			recipient = WebsocketCommunicator(self.application, f"/ws/chat/?token={self._token(self.user2)}")
+
+			sender_connected, _ = await sender.connect()
+			recipient_connected, _ = await recipient.connect()
+			self.assertTrue(sender_connected)
+			self.assertTrue(recipient_connected)
+
+			await sender.send_json_to({
+				"type": "chat_message",
+				"message": "Hello via websocket",
+				"recipient_username": self.user2.username,
+			})
+
+			sender_response = await sender.receive_json_from()
+			recipient_response = await recipient.receive_json_from()
+
+			self.assertEqual(sender_response["type"], "message_sent")
+			self.assertEqual(recipient_response["type"], "new_message")
+			self.assertEqual(recipient_response["message"]["content"], "Hello via websocket")
+
+			exists = await database_sync_to_async(Message.objects.filter(
+				sender=self.user1,
+				recipient=self.user2,
+				content="Hello via websocket",
+			).exists)()
+			self.assertTrue(exists)
+
+			await sender.disconnect()
+			await recipient.disconnect()
+
+		async_to_sync(scenario)()
+
+	def test_chat_message_rejects_too_long_content(self):
+		async def scenario():
+			communicator = WebsocketCommunicator(self.application, f"/ws/chat/?token={self._token(self.user1)}")
+			connected, _ = await communicator.connect()
+			self.assertTrue(connected)
+
+			await communicator.send_json_to({
+				"type": "chat_message",
+				"message": "x" * 10001,
+				"recipient_username": self.user2.username,
+			})
+
+			response = await communicator.receive_json_from()
+			self.assertEqual(response["error"], "Message is too long (max 10000 characters)")
+
+			await communicator.disconnect()
+
+		async_to_sync(scenario)()
+
+
+class JwtAuthMiddlewareTestCase(TransactionTestCase):
+	def setUp(self):
+		self.user = User.objects.create_user(username='jwt_user', email='jwt_user@example.com', password='testpass123')
+
+	def _run_middleware(self, scope):
+		captured = {}
+
+		async def inner(inner_scope, receive, send):
+			captured["user"] = inner_scope.get("user")
+			await send({"type": "test.complete"})
+
+		middleware = JwtAuthMiddlewareStack(inner)
+
+		async def receive():
+			return {"type": "websocket.disconnect"}
+
+		async def send(_message):
+			return None
+
+		async def scenario():
+			await middleware(scope, receive, send)
+
+		async_to_sync(scenario)()
+		return captured.get("user")
+
+	def test_middleware_sets_authenticated_user_from_valid_token(self):
+		token = str(AccessToken.for_user(self.user))
+		scope = {"type": "websocket", "query_string": f"token={token}".encode(), "user": None}
+
+		user = self._run_middleware(scope)
+
+		self.assertIsNotNone(user)
+		self.assertTrue(user.is_authenticated)
+		self.assertEqual(user.id, self.user.id)
+
+	def test_middleware_sets_anonymous_user_for_invalid_token(self):
+		scope = {"type": "websocket", "query_string": b"token=invalid.token.value", "user": None}
+
+		user = self._run_middleware(scope)
+
+		self.assertIsInstance(user, AnonymousUser)
+		self.assertFalse(user.is_authenticated)
+
+	def test_middleware_preserves_existing_authenticated_scope_user(self):
+		scope = {
+			"type": "websocket",
+			"query_string": b"token=invalid.token.value",
+			"user": self.user,
+		}
+
+		user = self._run_middleware(scope)
+
+		self.assertEqual(user.id, self.user.id)
+		self.assertTrue(user.is_authenticated)
 
