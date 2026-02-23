@@ -32,7 +32,7 @@ services:
       - ./backend:/app
       - backend_db:/app/plantapp
     
-    command: daphne -b 0.0.0.0 -p 8000 --reload mysite.asgi:application
+    command: daphne -b 0.0.0.0 -p 8000  mysite.asgi:application
     
     restart: unless-stopped
     depends_on:

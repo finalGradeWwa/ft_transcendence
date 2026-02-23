@@ -8,6 +8,4 @@ urlpatterns = [
     path('users/', views.UserListAPIView.as_view(), name='user_list'),
     path('unread-count/', views.UnreadCountAPIView.as_view(), name='unread_count'),
     path('chat/<str:username>/', views.ConversationAPIView.as_view(), name='chat'),
-	# PL: Endpoint do pobierania liczby nieprzeczytanych wiadomości. EN: Endpoint for fetching unread messages count.
-	path('unread-count/', views.UnreadCountAPIView.as_view(), name='unread_count'),
 ]

@@ -20,7 +20,6 @@ class InboxAPIView(APIView):
 	permission_classes = [IsAuthenticated]
 
 	def get(self, request):
-		User = get_user_model()
 		users = User.objects.exclude(id=request.user.id)
 
 		payload = []
@@ -61,7 +60,6 @@ class ConversationAPIView(APIView):
 	permission_classes = [IsAuthenticated]
 
 	def get(self, request, username):
-		User = get_user_model()
 		other_user = get_object_or_404(User, username=username)
 
 		Message.objects.filter(
@@ -107,7 +105,6 @@ class ConversationAPIView(APIView):
 		return Response(payload)
 
 	def post(self, request, username):
-		User = get_user_model()
 		other_user = get_object_or_404(User, username=username)
 
 		content = request.data.get("content")
@@ -128,7 +125,6 @@ class UserListAPIView(APIView):
 	permission_classes = [IsAuthenticated]
 
 	def get(self, request):
-		User = get_user_model()
 		users = User.objects.exclude(id=request.user.id)
 		serializer = SimpleUserSerializer(users, many=True)
 		return Response(serializer.data)

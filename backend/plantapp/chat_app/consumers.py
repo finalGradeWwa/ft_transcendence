@@ -1,10 +1,14 @@
 import json
+import logging
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 from django.contrib.auth import get_user_model
+from django.conf import settings
 from .models import Message, UserProfile
 
 User = get_user_model()
+MAX_MESSAGE_LENGTH = 10000
+logger = logging.getLogger(__name__)
 
 
 class ChatConsumer(AsyncWebsocketConsumer):
@@ -50,8 +54,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 self.channel_name
             )
         
-        # Update user's online status
-        if self.user.is_authenticated:
+        # Update user's online status if user exists and is authenticated
+        if hasattr(self, 'user') and self.user and self.user.is_authenticated:
             await self.update_user_status(False)
 
     async def receive(self, text_data):
@@ -78,9 +82,14 @@ class ChatConsumer(AsyncWebsocketConsumer):
             await self.send(text_data=json.dumps({
                 "error": "Invalid JSON"
             }))
-        except Exception as e:
+        except Exception as exc:
+            logger.exception(
+                "Unexpected error in websocket receive for user_id=%s",
+                getattr(self.user, "id", None),
+            )
+            error_message = str(exc) if settings.DEBUG else "Internal server error"
             await self.send(text_data=json.dumps({
-                "error": str(e)
+                "error": error_message
             }))
 
     async def handle_chat_message(self, data):
@@ -90,9 +99,15 @@ class ChatConsumer(AsyncWebsocketConsumer):
         message_content = data.get("message")
         recipient_username = data.get("recipient_username")
         
-        if not message_content or not recipient_username:
+        if not isinstance(message_content, str) or not message_content.strip() or not recipient_username:
             await self.send(text_data=json.dumps({
                 "error": "Message and recipient_username are required"
+            }))
+            return
+
+        if len(message_content) > MAX_MESSAGE_LENGTH:
+            await self.send(text_data=json.dumps({
+                "error": f"Message is too long (max {MAX_MESSAGE_LENGTH} characters)"
             }))
             return
         
@@ -241,8 +256,15 @@ class ChatConsumer(AsyncWebsocketConsumer):
             }
         except User.DoesNotExist:
             return {"error": "Recipient not found"}
-        except Exception as e:
-            return {"error": str(e)}
+        except Exception as exc:
+            logger.exception(
+                "Failed to save chat message from sender_id=%s to recipient_username=%s",
+                getattr(sender, "id", None),
+                recipient_username,
+            )
+            if settings.DEBUG:
+                return {"error": str(exc)}
+            return {"error": "Could not send message"}
 
     @database_sync_to_async
     def get_user_by_username(self, username):

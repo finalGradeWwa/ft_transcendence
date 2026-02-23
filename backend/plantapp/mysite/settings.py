@@ -111,11 +111,29 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 ASGI_APPLICATION = 'mysite.asgi.application'
 
 # Channel layers configuration for WebSocket support
-CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels.layers.InMemoryChannelLayer'
+# In-memory is fine for local development and tests (single process).
+# For multi-process / production deployments, REDIS_URL is required to use Redis.
+_redis_url = os.getenv("REDIS_URL")
+if DEBUG:
+    CHANNEL_LAYERS = {
+        'default': {
+            'BACKEND': 'channels.layers.InMemoryChannelLayer'
+        }
     }
-}
+else:
+    if not _redis_url:
+        raise RuntimeError(
+            "REDIS_URL is not set while DEBUG is False. "
+            "Set REDIS_URL before deploying to production."
+        )
+    CHANNEL_LAYERS = {
+        'default': {
+            'BACKEND': 'channels_redis.core.RedisChannelLayer',
+            'CONFIG': {
+                'hosts': [_redis_url],
+            },
+        }
+    }
 
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases

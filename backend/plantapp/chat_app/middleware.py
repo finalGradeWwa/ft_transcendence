@@ -37,6 +37,9 @@ class JwtAuthMiddleware:
                 except TokenError:
                     scope["user"] = AnonymousUser()
 
+        if scope.get("user") is None:
+            scope["user"] = AnonymousUser()
+
         return await self.inner(scope, receive, send)
 
 
