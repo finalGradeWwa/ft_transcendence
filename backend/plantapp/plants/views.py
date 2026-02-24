@@ -89,29 +89,33 @@ class PlantViewSet(viewsets.ViewSet):
 
     # PUT /api/plant/5/ 
     def update(self, request, pk=None):
-        """
-        Update a plant (PUT). Only garden members can update.
-        """
-        plant = get_object_or_404(Plant, pk=pk)        
-        if not plant.garden.gardenuser_set.filter(user=request.user).exists():
-            return Response(
-                {"detail": "You must be a member of this plant's garden to update it"},
-                status=status.HTTP_403_FORBIDDEN,
-            )
-        serializer = PlantCreateSerializer(
-            plant,
-            data=request.data,
-            context={"request": request},
+    """
+    Update a plant (PUT). Only garden members can update.
+    """
+    if not request.user.is_authenticated:
+        return Response(status=status.HTTP_401_UNAUTHORIZED)
+    plant = get_object_or_404(Plant, pk=pk)        
+    if not plant.garden.gardenuser_set.filter(user=request.user).exists():
+        return Response(
+            {"detail": "You must be a member of this plant's garden to update it"},
+            status=status.HTTP_403_FORBIDDEN,
         )
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
-        return Response(PlantSerializer(serializer.instance).data)
-    
+    serializer = PlantCreateSerializer(
+        plant,
+        data=request.data,
+        context={"request": request},
+    )
+    if serializer.is_valid(raise_exception=True):
+        serializer.save()
+    return Response(PlantSerializer(serializer.instance).data)
+
     # PATCH /api/plant/5/
     def partial_update(self, request, pk=None):
         """
         Update a plant (PATCH). Only garden members can update.
         """
+        if not request.user.is_authenticated:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
         plant = get_object_or_404(Plant, pk=pk)
         if not plant.garden.gardenuser_set.filter(user=request.user).exists():
             return Response(
