@@ -1,5 +1,5 @@
 from rest_framework import viewsets, status
-from rest_framework.permissions import AllowAny  # DODANE AllowAny
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.authentication import SessionAuthentication
 from rest_framework_simplejwt.authentication import JWTAuthentication
@@ -12,7 +12,7 @@ from .services import create_plant
 
 class PlantViewSet(viewsets.ViewSet):
     authentication_classes = [JWTAuthentication, SessionAuthentication]
-    permission_classes = [AllowAny]  # ZMIENIONE z IsAuthenticated na AllowAny
+    permission_classes = [AllowAny]
     queryset = Plant.objects.all()
 
     def list(self, request):
@@ -42,17 +42,14 @@ class PlantViewSet(viewsets.ViewSet):
         serializer = PlantListSerializer(plants, many=True)
         return Response(serializer.data)
 
-    # GET /api/plant/5/
     def retrieve(self, request, pk=None):
         """
         Retrieve a single plant (visible to all authenticated users).
         """
         plant = get_object_or_404(Plant, pk=pk)
-
         serializer = PlantSerializer(plant)
         return Response(serializer.data)
 
-    # POST /api/plant/
     def create(self, request):
         serializer = PlantCreateSerializer(
             data=request.data,
@@ -73,7 +70,6 @@ class PlantViewSet(viewsets.ViewSet):
             status=status.HTTP_201_CREATED,
         )
 
-    # DELETE /api/plant/5/
     def destroy(self, request, pk=None):
         """
         Delete a plant. Only garden members can delete.
@@ -87,29 +83,27 @@ class PlantViewSet(viewsets.ViewSet):
         plant.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    # PUT /api/plant/5/ 
     def update(self, request, pk=None):
-    """
-    Update a plant (PUT). Only garden members can update.
-    """
-    if not request.user.is_authenticated:
-        return Response(status=status.HTTP_401_UNAUTHORIZED)
-    plant = get_object_or_404(Plant, pk=pk)        
-    if not plant.garden.gardenuser_set.filter(user=request.user).exists():
-        return Response(
-            {"detail": "You must be a member of this plant's garden to update it"},
-            status=status.HTTP_403_FORBIDDEN,
+        """
+        Update a plant (PUT). Only garden members can update.
+        """
+        if not request.user.is_authenticated:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        plant = get_object_or_404(Plant, pk=pk)
+        if not plant.garden.gardenuser_set.filter(user=request.user).exists():
+            return Response(
+                {"detail": "You must be a member of this plant's garden to update it"},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        serializer = PlantCreateSerializer(
+            plant,
+            data=request.data,
+            context={"request": request},
         )
-    serializer = PlantCreateSerializer(
-        plant,
-        data=request.data,
-        context={"request": request},
-    )
-    if serializer.is_valid(raise_exception=True):
-        serializer.save()
-    return Response(PlantSerializer(serializer.instance).data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+        return Response(PlantSerializer(serializer.instance).data)
 
-    # PATCH /api/plant/5/
     def partial_update(self, request, pk=None):
         """
         Update a plant (PATCH). Only garden members can update.
