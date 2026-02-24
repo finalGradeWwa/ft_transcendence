@@ -35,7 +35,7 @@ class PlantAPITests(APITestCase):
 
     def test_get_requires_authentication(self):
         url = reverse("plant-detail", args=[self.plant.pk])
-        self.client.logout() 
+        self.client.force_authenticate(user=None)
         response = self.client.get(url)
         self.assertIn(response.status_code, [status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN])
 
@@ -108,18 +108,16 @@ class PlantAPITests(APITestCase):
         self.assertEqual(self.plant.species, "Fern Updated")
 
     def test_patch_requires_authentication(self):
-        """Test that unauthenticated users cannot update"""
         url = reverse("plant-detail", args=[self.plant.pk])
         payload = {"nickname": "Hacked"}
-        self.client.logout()
+        self.client.force_authenticate(user=None)
         response = self.client.patch(url, payload)
         self.assertIn(response.status_code, [status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN])
 
     def test_put_requires_authentication(self):
-        """Test that unauthenticated users cannot update"""
         url = reverse("plant-detail", args=[self.plant.pk])
         payload = {"nickname": "Hacked"}
-        self.client.logout()
+        self.client.force_authenticate(user=None)
         response = self.client.put(url, payload)
         self.assertIn(response.status_code, [status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN])
 
