@@ -1,6 +1,6 @@
 from .models import Garden, GardenUser, GardenOwner
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import AllowAny
 from rest_framework.authentication import SessionAuthentication
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.shortcuts import get_object_or_404
@@ -11,8 +11,7 @@ from .serializers import GardenListSerializer, GardenContentSerializer, GardenCr
 from django.db.models import Count
 from django.contrib.auth import get_user_model
 from plants.services import create_plant
-from plants.models import Plant
-from plants.serializers import PlantSerializer, PlantCreateSerializer, PlantListSerializer
+from plants.serializers import PlantSerializer, PlantCreateSerializer
 
 # Create your views here.
 

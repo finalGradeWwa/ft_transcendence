@@ -50,32 +50,6 @@ class GardenListSerializer(serializers.ModelSerializer):
         read_only_fields = fields
 
 
-class GardenContentSerializer(serializers.ModelSerializer):
-    owner = serializers.SerializerMethodField()
-    user_count = serializers.IntegerField(read_only=True)
-    plant_count = serializers.IntegerField(read_only=True)
-    plants = PlantListSerializer(many=True)
-
-    def get_owner(self, garden):
-        owner = garden.owners.first()
-        # Dodano zabezpieczenie, by nie wywaliło błędu jeśli owner lub user nie istnieją
-        try:
-            return owner.organization_user.user.username if owner else None
-        except AttributeError:
-            return None
-
-    class Meta:
-        model = Garden
-        fields = [
-            "garden_id",
-            "name",
-            "environment",
-            "plants",
-            "owner",
-            "user_count",
-            "plant_count",
-        ]
-
 """
 PL: Zwraca listę członków ogrodu z ich id, nazwą użytkownika i avatarem.
 EN: Returns a list of garden members with their id, username and avatar.
