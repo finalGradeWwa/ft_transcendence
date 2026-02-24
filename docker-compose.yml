@@ -33,7 +33,10 @@ services:
       - backend_db:/app/plantapp
     
     restart: unless-stopped
+
     depends_on:
+      redis:
+        condition: service_started
       backend-migrate:
         condition: service_completed_successfully
   backend-migrate:
@@ -76,7 +79,11 @@ services:
     image: redis:7-alpine
     container_name: redis
     ports:
-      - "6379:6379"
+      - "6379:6379" # needed for testing purposes
+    # Redis is used ONLY for Django Channels (WebSocket routing), NOT for message storage.
+    # Messages are persisted in the database. Redis data is ephemeral and can be safely lost.
+    # --save "" --appendonly no: Disables persistence for better performance.
+    # If Redis restarts, users simply reconnect WebSockets and reload messages from DB.
     command: redis-server --save "" --appendonly no
 
 volumes:

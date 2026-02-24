@@ -111,8 +111,7 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 ASGI_APPLICATION = 'mysite.asgi.application'
 
 # Channel layers configuration for WebSocket support
-# Use Redis if available in docker-compose, otherwise fallback to InMemory for tests.
-
+# REDIS_HOST: defaults to 'redis' for Docker, set to 'localhost' for local development
 if 'test' in sys.argv:
     # Use in-memory channel layer for tests to avoid Redis dependency
     CHANNEL_LAYERS = {
@@ -121,19 +120,11 @@ if 'test' in sys.argv:
         }
     }
 else:
-    # Auto-detect: use 'redis' hostname in Docker, 'localhost' when running locally
-    import socket
-    try:
-        socket.gethostbyname('redis')
-        redis_host = 'redis'
-    except socket.gaierror:
-        redis_host = 'localhost'
-    
     CHANNEL_LAYERS = {
         'default': {
             'BACKEND': 'channels_redis.core.RedisChannelLayer',
             'CONFIG': {
-                'hosts': [(redis_host, 6379)],
+                'hosts': [(os.getenv('REDIS_HOST', 'redis'), 6379)],
             },
         }
     }
