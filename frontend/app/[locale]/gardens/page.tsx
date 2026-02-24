@@ -26,8 +26,14 @@ async function getAllGardens(t: any) {
             `${API_URL}/api/plant/?garden=${garden.garden_id}`,
             { cache: 'no-store' }
           );
+          console.log(
+            'plants status:',
+            plantsRes.status,
+            'garden:',
+            garden.garden_id
+          );
           const plants = plantsRes.ok ? await plantsRes.json() : [];
-
+          console.log('plants:', plants.length, plants[0]);
           // PL: Szukamy najstarszej rośliny, priorytetyzując image_url
           const oldestPlantWithImage = plants
             .filter((p: any) => p.image_url || p.image || p.thumbnail)
