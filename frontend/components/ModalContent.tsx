@@ -31,10 +31,10 @@ export const ModalContent = ({
         className="absolute top-3 end-3 p-2 text-black hover:text-red-800 transition-colors"
         aria-label={t('aria.close')}
       >
-        <Icon name="close" size={20} />
+        <Icon name="close" size={20} aria-hidden="true" />
       </button>
 
-      <Heading as="h2" className="mb-4 text-neutral-900">
+      <Heading as="h2" id="login-title" className="mb-4 text-neutral-900">
         {t('login')}
       </Heading>
 

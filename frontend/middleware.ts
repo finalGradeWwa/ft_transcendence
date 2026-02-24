@@ -37,6 +37,19 @@ export default function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL(`/${locale}`, request.url));
   }
 
+  // PL: Chronione ścieżki - tylko dla zalogowanych. EN: Protected routes - logged in users only.
+  const protectedPages = ['/profiles', '/plants', '/gardens', '/chat'];
+  const isProtectedPage = protectedPages.some(page =>
+    pathname.match(new RegExp(`^/(pl|en|de|ar)${page}`))
+  );
+
+  if (!hasSession && isProtectedPage) {
+    const locale = pathname.split('/')[1] || 'pl';
+    return NextResponse.redirect(
+      new URL(`/${locale}?showLogin=true`, request.url)
+    );
+  }
+
   return handleI18nRouting(request);
 }
 

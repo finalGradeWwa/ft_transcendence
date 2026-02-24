@@ -53,7 +53,7 @@ const MailContent = ({ t }: any) => (
     <p className="text-neutral-900 mb-6">{t('contact.emailDescription')}</p>
     <a
       href={`mailto:${CONTACT_EMAIL}`}
-      className="w-full inline-block bg-primary-green text-white font-bold px-4 py-3 rounded-lg transition-transform hover:scale-[1.02] outline-none break-all"
+      className="w-full inline-block bg-primary-green text-white font-bold px-4 py-3 rounded-lg hover:opacity-90 transition-opacity duration-300 outline-none break-all focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-1 focus-visible:ring-offset-white"
     >
       {CONTACT_EMAIL}
     </a>

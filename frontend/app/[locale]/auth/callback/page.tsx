@@ -23,7 +23,6 @@ export default function AuthCallbackPage() {
         router.replace(`/${locale}?auth=login_success&provider=github`);
       } catch (error) {
         if (cancelled) return;
-        console.error('OAuth callback failed:', error);
         router.replace(`/${locale}?showLogin=true&error=oauth_failed`);
       }
     })();

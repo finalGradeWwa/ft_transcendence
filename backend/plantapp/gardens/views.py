@@ -1,6 +1,8 @@
 from .models import Garden, GardenUser, GardenOwner
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.authentication import SessionAuthentication
+from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
@@ -9,14 +11,16 @@ from .serializers import GardenListSerializer, GardenContentSerializer, GardenCr
 from django.db.models import Count
 from django.contrib.auth import get_user_model
 from plants.services import create_plant
-from plants.serializers import PlantSerializer, PlantCreateSerializer
+from plants.models import Plant
+from plants.serializers import PlantSerializer, PlantCreateSerializer, PlantListSerializer
 
 # Create your views here.
 
 User = get_user_model()
     
 class GardenViewSet(viewsets.ViewSet):
-    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication, SessionAuthentication]
+    permission_classes = [AllowAny]
 
     # GET /api/garden/{id}/
     def retrieve(self, request, pk):
@@ -58,6 +62,8 @@ class GardenViewSet(viewsets.ViewSet):
         List all gardens (visible to all authenticated users).
         """
         owner_param = request.query_params.get("owner")
+        username_param = request.query_params.get("username")
+        member_param = request.query_params.get("member")
         gardens = (
             Garden.objects
                 .distinct()
@@ -69,7 +75,16 @@ class GardenViewSet(viewsets.ViewSet):
                 gardens = gardens.filter(owners__organization_user__user=request.user)
             else:
                 gardens = gardens.filter(owners__organization_user__user_id=owner_param)
-        serializer = GardenListSerializer(gardens, many=True)
+        if username_param:
+            gardens = gardens.filter(owners__organization_user__user__username=username_param)
+        # PL: Filtruje ogrody gdzie użytkownik jest członkiem. Obsługuje "me" (zalogowany user) oraz konkretny username.
+        # EN: Filters gardens where the user is a member. Supports "me" (logged-in user) and a specific username.
+        if member_param:
+            if member_param.lower() == "me":
+                gardens = gardens.filter(gardenuser__user=request.user)
+            else:
+                gardens = gardens.filter(gardenuser__user__username=member_param)
+        serializer = GardenListSerializer(gardens, many=True, context={'request': request})
         return Response(serializer.data)
 
     def destroy(self, request, pk):
@@ -168,16 +183,19 @@ class GardenViewSet(viewsets.ViewSet):
        )
 
     # DELETE /api/garden/{id}/remove_user/{user_id}/
-    @action(detail=True, methods=["delete"], url_path="users/(?P<user_pk>[^/.]+)")
-    def remove_user(self, request, pk=None, user_pk=None):
+    @action(detail=True, methods=["delete"], url_path="remove_user")
+    def remove_user(self, request, pk=None):
         """
         Remove a user from a garden. Only garden owners can remove users.
         """
-        garden_user = get_object_or_404(
-            GardenUser,
-            pk=user_pk,
-            organization_id=pk,
-        )
+        garden = get_object_or_404(Garden, pk=pk)
+        user_id = request.data.get("user_id")
+        if not user_id:
+            return Response(
+                {"detail": "user_id is required"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        garden_user = get_object_or_404(GardenUser, organization=garden, user_id=user_id)
         if not GardenOwner.objects.filter(
             organization=garden_user.organization,
             organization_user__user=request.user,
@@ -186,7 +204,6 @@ class GardenViewSet(viewsets.ViewSet):
                 {"detail": "You are not a garden owner"},
                 status=status.HTTP_403_FORBIDDEN,
             )
-
         garden_user.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 

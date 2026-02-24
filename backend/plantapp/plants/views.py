@@ -1,6 +1,8 @@
 from rest_framework import viewsets, status
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny  # DODANE AllowAny
 from rest_framework.response import Response
+from rest_framework.authentication import SessionAuthentication
+from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.shortcuts import get_object_or_404
 
 from .models import Plant
@@ -9,31 +11,33 @@ from .services import create_plant
 
 
 class PlantViewSet(viewsets.ViewSet):
-    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication, SessionAuthentication]
+    permission_classes = [AllowAny]  # ZMIENIONE z IsAuthenticated na AllowAny
     queryset = Plant.objects.all()
 
-    # GET /api/plant/
-    # GET /api/plant/?garden=3
-    # GET /api/plant/?owner=5
-    # GET /api/plant/?owner=me
     def list(self, request):
         """
-        List all plants. Optionally filter by garden or owner.
-        Use ?owner=me to see your own plants, or ?owner=<user_id> to see a specific user's plants.
+        List all plants. Optionally filter by garden, owner or username.
+        Use ?owner=me to see your own plants, ?owner=<user_id> to see a specific user's plants,
+        or ?username=<username> to filter by username.
         """
         garden_id = request.query_params.get("garden")
         owner_param = request.query_params.get("owner")
+        username_param = request.query_params.get("username")
 
         plants = Plant.objects.all()
 
         if garden_id:
             plants = plants.filter(garden_id=garden_id)
-        
+
         if owner_param:
             if owner_param.lower() == "me":
                 plants = plants.filter(owner=request.user)
             else:
                 plants = plants.filter(owner_id=owner_param)
+
+        if username_param:
+            plants = plants.filter(owner__username=username_param)
 
         serializer = PlantListSerializer(plants, many=True)
         return Response(serializer.data)

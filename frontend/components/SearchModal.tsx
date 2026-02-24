@@ -147,6 +147,7 @@ const SearchModal = ({ isVisible, onClose }: SearchModalProps) => {
           <form onSubmit={handleSubmit} className="p-4" role="search">
             <div className="relative">
               <input
+                maxLength={100}
                 ref={searchInputRef}
                 type="text"
                 value={searchQuery}

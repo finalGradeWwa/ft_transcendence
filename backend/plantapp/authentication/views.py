@@ -85,6 +85,29 @@ class ChangePasswordView(APIView):
 
 # POST /api/auth/logout/
 # logout adds refresh token to blacklist
+# class LogoutView(APIView):
+#     # PL: Zmieniamy na IsAuthenticated, aby wymusić błąd 401 dla niezalogowanych.
+#     # EN: Changed to IsAuthenticated to force 401 error for unauthenticated users.
+#     permission_classes = [IsAuthenticated] 
+
+#     def post(self, request):
+#         refresh_token = request.COOKIES.get(REFRESH_COOKIE_NAME)
+
+#         response = Response(status=status.HTTP_205_RESET_CONTENT)
+
+#         if not refresh_token:
+#             clear_refresh_cookie(response)
+#             return response
+
+#         try:
+#             token = RefreshToken(refresh_token)
+#             token.blacklist()
+#         except TokenError:
+#             pass
+
+#         clear_refresh_cookie(response)
+#         return response
+
 class LogoutView(APIView):
     # PL: Zmieniamy na IsAuthenticated, aby wymusić błąd 401 dla niezalogowanych.
     # EN: Changed to IsAuthenticated to force 401 error for unauthenticated users.

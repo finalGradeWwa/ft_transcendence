@@ -2,11 +2,11 @@
 
 /**
  * PL: Widok formularza dodawania rośliny zintegrowany z hookiem logiki biznesowej.
- * EN: Plant addition form view integrated with the business logic hook.
+ * EN: Integrated add plant form view with business logic hook.
  */
 
 import { useTranslations } from 'next-intl';
-import { useRef } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { Text } from '@/components/typography/Text';
 import { useAddPlantForm } from './useAddPlantForm';
 
@@ -21,6 +21,7 @@ interface AddPlantFormProps {
   lastName?: string;
   gardens: Garden[];
   onSuccess: () => void;
+  initialGardenId?: string | null;
 }
 
 const fieldCls =
@@ -28,34 +29,63 @@ const fieldCls =
 const labelCls =
   'block text-primary-green font-bold mb-2 uppercase text-xs tracking-widest';
 
+const MAX_FILE_SIZE = 5 * 1024 * 1024;
+
 export function AddPlantForm({
   username,
   firstName,
   lastName,
   gardens,
   onSuccess,
+  initialGardenId,
 }: AddPlantFormProps) {
   const t = useTranslations('AddPlantPage');
   const tGardens = useTranslations('GardensPage');
   const tr = useTranslations('RegisterPage');
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [photoError, setPhotoError] = useState(false);
+  const [fileSizeError, setFileSizeError] = useState(false);
 
-  /**
-   * PL: Wyświetlana nazwa: priorytetowo Imię + Nazwisko, fallback do username.
-   * EN: Displayed name: priority to First Name + Last Name, fallback to username.
-   */
   const userDisplayName =
     firstName && lastName ? `${firstName} ${lastName}` : username;
 
-  /**
-   * PL: Wykorzystanie analogicznego podejścia do RegisterForm poprzez dedykowany hook.
-   * EN: Using an approach analogous to RegisterForm via a dedicated hook.
-   */
   const form = useAddPlantForm({ username, onSuccess });
+
+  useEffect(() => {
+    if (initialGardenId) {
+      form.setGarden(initialGardenId);
+    }
+  }, [initialGardenId]);
+
+  const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!form.photo) {
+      setPhotoError(true);
+      return;
+    }
+    if (fileSizeError) return;
+
+    setPhotoError(false);
+    form.handleSubmit(e);
+  };
+
+  const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    setPhotoError(false);
+    setFileSizeError(false);
+
+    if (file && file.size > MAX_FILE_SIZE) {
+      setFileSizeError(true);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      form.handleRemoveFile(fileInputRef);
+      return;
+    }
+
+    form.handleFileChange(e);
+  };
 
   return (
     <>
-      {/** PL: Sekcja wyświetlania błędów API. EN: API error display section. */}
       {form.error && (
         <div
           role="alert"
@@ -65,11 +95,14 @@ export function AddPlantForm({
         </div>
       )}
 
-      <form onSubmit={form.handleSubmit} className="space-y-6 p-1">
-        {/** PL: Pole Gatunek. EN: Species field. */}
+      <form onSubmit={handleFormSubmit} className="space-y-6 p-2">
         <section>
-          <label className={labelCls}>{t('fields.species')}</label>
+          <label htmlFor="species-input" className={labelCls}>
+            {t('fields.species')}
+          </label>
           <input
+            maxLength={25}
+            id="species-input"
             required
             name="species"
             type="text"
@@ -80,10 +113,13 @@ export function AddPlantForm({
           />
         </section>
 
-        {/** PL: Pole Nazwa własna. EN: Nickname field. */}
         <section>
-          <label className={labelCls}>{t('fields.nickname')}</label>
+          <label htmlFor="nickname-input" className={labelCls}>
+            {t('fields.nickname')}
+          </label>
           <input
+            maxLength={25}
+            id="nickname-input"
             required
             name="nickname"
             type="text"
@@ -94,14 +130,16 @@ export function AddPlantForm({
           />
         </section>
 
-        {/** PL: Wybór ogrodu. EN: Garden selection. */}
         <section>
-          <label className={labelCls}>{t('fields.garden')}</label>
+          <label htmlFor="garden-select" className={labelCls}>
+            {t('fields.garden')}
+          </label>
           <select
+            id="garden-select"
             required
             name="garden"
-            disabled={form.isLoading}
-            className="w-full p-3 rounded bg-white border border-primary-green/20 focus:border-primary-green text-gray-green-text font-bold outline-none transition-all cursor-pointer focus:outline-none focus:outline focus:outline-2 focus:outline-gray-600 focus:outline-offset-0"
+            disabled={form.isLoading || !!initialGardenId}
+            className={`w-full p-3 rounded bg-white border border-primary-green/20 focus:border-primary-green text-dark-text/80 font-bold outline-none transition-all cursor-pointer focus:outline-none focus:outline focus:outline-2 focus:outline-gray-600 focus:outline-offset-0 ${!!initialGardenId ? 'opacity-70 bg-neutral-100' : ''}`}
             value={form.garden}
             onChange={e => form.setGarden(e.target.value)}
           >
@@ -127,13 +165,14 @@ export function AddPlantForm({
           </select>
         </section>
 
-        {/** PL: Obowiązkowe zdjęcie rośliny. EN: Mandatory plant photo. */}
         <section className="md:col-span-2">
-          <label className={labelCls}>{t('fields.photo')}</label>
+          <span id="plant-photo-main-label" className={labelCls}>
+            {t('fields.photo')}
+          </span>
           <div className="flex flex-wrap items-center gap-5">
             <div
               aria-hidden="true"
-              className="w-16 h-16 rounded-full border-2 border-secondary-beige overflow-hidden bg-neutral-100 flex items-center justify-center shrink-0 shadow-sm"
+              className={`w-16 h-16 rounded-full border-2 overflow-hidden bg-neutral-100 flex items-center justify-center shrink-0 shadow-sm ${photoError || fileSizeError ? 'border-red-950' : 'border-secondary-beige'}`}
             >
               {form.previewUrl ? (
                 <img
@@ -148,17 +187,20 @@ export function AddPlantForm({
             <PhotoUploadControls
               form={form}
               tr={tr}
+              t={t}
               fileInputRef={fileInputRef}
+              photoError={photoError}
+              fileSizeError={fileSizeError}
+              onFileChange={onFileChange}
             />
           </div>
         </section>
 
-        {/** PL: Przycisk wysyłania ze stanem ładowania. EN: Submit button with loading state. */}
         <div className="pt-2">
           <button
             type="submit"
             disabled={form.isLoading}
-            className="w-full mb-1 bg-primary-green text-white font-black py-4 rounded-xl uppercase tracking-[0.2em] shadow-xl hover:opacity-90 hover:translate-y-[-1px] transition-all disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:outline focus:outline-2 focus:outline-gray-600 focus:outline-offset-[3px]"
+            className="w-full mb-1 bg-primary-green text-white font-black py-4 rounded-xl uppercase tracking-[0.2em] shadow-xl hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:outline focus:outline-2 focus:outline-gray-600 focus:outline-offset-[3px]"
           >
             {form.isLoading ? '...' : t('submit')}
           </button>
@@ -168,47 +210,55 @@ export function AddPlantForm({
   );
 }
 
-/**
- * PL: Wydzielony sub-komponent dla kontrolek uploadu zdjęcia.
- * EN: Separated sub-component for photo upload controls.
- */
-function PhotoUploadControls({ form, tr, fileInputRef }: any) {
+function PhotoUploadControls({
+  form,
+  tr,
+  t,
+  fileInputRef,
+  photoError,
+  fileSizeError,
+  onFileChange,
+}: any) {
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-center gap-4 flex-wrap">
-        {/** PL: Ukryty input typu file. EN: Hidden file input. */}
-        <input
-          required
-          type="file"
-          id="plant-photo-upload"
-          name="image"
-          className="hidden"
-          accept=".jpg,.jpeg,.png,.webp"
-          ref={fileInputRef}
-          onChange={form.handleFileChange}
-          disabled={form.isLoading}
-        />
-        {/** PL: Stylizowana etykieta pełniąca rolę przycisku wyboru. EN: Styled label acting as a select button. */}
         <label
+          id="plant-photo-button-label"
           htmlFor="plant-photo-upload"
-          tabIndex={0}
-          onKeyDown={e => {
-            if (e.key === 'Enter' || e.key === ' ') {
-              e.preventDefault();
-              fileInputRef.current?.click();
-            }
-          }}
-          className="cursor-pointer bg-secondary-beige text-primary-green font-semibold py-2 px-4 rounded-full text-sm hover:bg-amber-100 transition-colors shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-gray-600 focus-visible:outline-offset-2"
+          className={`cursor-pointer font-semibold py-2 px-4 rounded-full text-sm transition-colors shadow-sm focus-within:outline focus-within:outline-2 focus-within:outline-gray-600 focus-within:outline-offset-2 ${photoError || fileSizeError ? 'bg-red-950 text-white' : 'bg-secondary-beige text-primary-green hover:bg-amber-100'}`}
         >
           {tr('chooseFile')}
+          <input
+            type="file"
+            id="plant-photo-upload"
+            name="image"
+            className="sr-only"
+            accept=".jpg,.jpeg,.png,.webp"
+            ref={fileInputRef}
+            onChange={onFileChange}
+            disabled={form.isLoading}
+            aria-labelledby="plant-photo-main-label plant-photo-button-label"
+          />
         </label>
 
-        {/** PL: Przycisk usuwania aktualnie wybranego pliku. EN: Button for removing the currently selected file. */}
+        {photoError && (
+          <span className="text-red-950 text-[10px] font-black uppercase tracking-widest animate-pulse">
+            {t('errors.photoRequired')}
+          </span>
+        )}
+
+        {fileSizeError && (
+          <span className="text-orange-800 text-[12px] font-bold uppercase">
+            {t('errors.fileTooLarge')}
+          </span>
+        )}
+
         {form.photo && (
           <button
             type="button"
             onClick={() => form.handleRemoveFile(fileInputRef)}
             disabled={form.isLoading}
+            aria-label={`${tr('removeFile')}: ${form.photo.name}`}
             className="text-red-600 text-xs font-bold hover:underline flex items-center gap-1 focus:outline-none focus:outline focus:outline-2 focus:outline-gray-600 focus:outline-offset-0 rounded-sm"
           >
             <svg
@@ -218,6 +268,7 @@ function PhotoUploadControls({ form, tr, fileInputRef }: any) {
               strokeWidth={2}
               stroke="currentColor"
               className="w-3 h-3"
+              aria-hidden="true"
             >
               <path
                 strokeLinecap="round"
@@ -229,10 +280,10 @@ function PhotoUploadControls({ form, tr, fileInputRef }: any) {
           </button>
         )}
       </div>
-      {/** PL: Wyświetlanie nazwy pliku lub komunikatu o braku wyboru. EN: Displaying filename or no-selection message. */}
       <Text
         variant="small"
         className="italic max-w-[200px] truncate text-neutral-500"
+        aria-live="polite"
       >
         {form.photo ? form.photo.name : tr('noFileSelected')}
       </Text>

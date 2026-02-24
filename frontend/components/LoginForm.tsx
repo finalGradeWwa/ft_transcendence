@@ -154,6 +154,7 @@ export const LoginForm = ({
       )}
 
       <Input
+        maxLength={200}
         ref={usernameRef}
         label={t('email')}
         name="email"
@@ -167,6 +168,7 @@ export const LoginForm = ({
 
       <div className="relative">
         <Input
+          maxLength={128}
           label={t('password')}
           type={showPassword ? 'text' : 'password'}
           name="password"
@@ -180,9 +182,11 @@ export const LoginForm = ({
           type="button"
           onClick={() => setShowPassword(!showPassword)}
           className="absolute right-3 top-9 text-primary-green"
+          aria-label={showPassword ? t('hidePassword') : t('showPassword')}
         >
           {/* SVG Oka */}
           <svg
+            aria-hidden="true"
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
@@ -209,7 +213,7 @@ export const LoginForm = ({
 
       <div className="relative flex py-5 items-center">
         <div className="flex-grow border-t border-gray-400"></div>
-        <span className="flex-shrink mx-4 text-gray-400">{t('or')}</span>
+        <span className="flex-shrink mx-4 text-gray-700">{t('or')}</span>
         <div className="flex-grow border-t border-gray-400"></div>
       </div>
 

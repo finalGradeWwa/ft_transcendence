@@ -1,22 +1,39 @@
-/**
- * PL: Główny komponent strony (FinalPage) wykorzystujący renderowanie po stronie serwera (SSR).
- * Odpowiada za przygotowanie zestawu danych testowych (dummy data) oraz wyświetlenie
- * głównego widoku z obsługą kierunku tekstu (RTL) wewnątrz dedykowanego tła.
- * * EN: Main page component (FinalPage) utilizing server-side rendering (SSR).
- * Responsible for preparing mock data and rendering the primary view with
- * RTL (Right-to-Left) support inside a dedicated background component.
- */
-
-import { Background } from '@/components/Background';
+import { getTranslations } from 'next-intl/server';
 import { RtlWrapper } from '@/components/RtlWrapper';
 import { PlantType } from '../types/plantTypes';
-
+import { LandingPage } from './LandingPage';
+import { cookies } from 'next/headers';
 import '../globals.css';
 
-/**
- * PL: Dane testowe roślin generowane dynamicznie dla celów demonstracyjnych.
- * EN: Mock plant data generated dynamically for demonstration purposes.
- */
+const API_URL = (
+  process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000'
+).replace(/\/$/, '');
+
+async function getAllPlants(): Promise<PlantType[]> {
+  try {
+    const response = await fetch(`${API_URL}/api/plant/`, {
+      cache: 'no-store',
+    });
+
+    if (!response.ok) return [];
+    const data = await response.json();
+
+    return data.map((p: any) => ({
+      id: p.plant_id,
+      author: p.owner_username,
+      latinName: p.species,
+      commonName: p.nickname,
+      averageRating: '0.0',
+      totalReviews: 0,
+      image: p.image_url,
+      garden: p.garden_name,
+      gardenId: p.garden_id,
+    }));
+  } catch (error) {
+    return [];
+  }
+}
+
 const dummyPlants: Array<PlantType> = Array.from({ length: 20 }, (_, i) => ({
   id: i + 1,
   author: `user_${(i % 5) + 1}`,
@@ -26,12 +43,6 @@ const dummyPlants: Array<PlantType> = Array.from({ length: 20 }, (_, i) => ({
   totalReviews: Math.floor(Math.random() * 50) + 1,
 }));
 
-/**
- * PL: Komponent strony końcowej renderowany po stronie serwera (SSR).
- * Przyjmuje parametry lokalizacji i renderuje opakowanie RTL wraz z tłem i danymi roślin.
- * * EN: Final page component rendered on the server side (SSR).
- * It receives locale parameters and renders the RTL wrapper along with the background and plant data.
- */
 export default async function FinalPage({
   params,
   searchParams,
@@ -39,21 +50,37 @@ export default async function FinalPage({
   params: Promise<{ locale: string }>;
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
-  /**
-   * PL: Oczekiwanie na parametry ścieżki i parametry wyszukiwania (wymagane w Next.js 15+).
-   * EN: Awaiting path parameters and search parameters (required in Next.js 15+).
-   */
   const { locale } = await params;
   const { showLogin, registered } = await searchParams;
 
+  const cookieStore = await cookies();
+  const hasSession = cookieStore.has('refresh_token');
+
+  if (!hasSession) {
+    return (
+      <>
+        <LandingPage locale={locale} showLogin={showLogin === 'true'} />
+      </>
+    );
+  }
+
+  const tGardens = await getTranslations('GardensPage');
+  const plants = await getAllPlants();
+
+  const translatedPlants = plants.map(p => ({
+    ...p,
+    garden:
+      p.garden?.includes("'s Garden") || p.garden === 'Default Garden'
+        ? tGardens('defaultGardenName')
+        : p.garden,
+  }));
+
   return (
-    <Background>
-      <RtlWrapper
-        plants={dummyPlants}
-        locale={locale}
-        showLogin={showLogin === 'true'}
-        isRegistered={registered === 'true'}
-      />
-    </Background>
+    <RtlWrapper
+      plants={translatedPlants.length > 0 ? translatedPlants : dummyPlants}
+      locale={locale}
+      showLogin={showLogin === 'true'}
+      isRegistered={registered === 'true'}
+    />
   );
 }
