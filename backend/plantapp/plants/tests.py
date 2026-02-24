@@ -33,7 +33,7 @@ class PlantAPITests(APITestCase):
             species="Fern",
         )
 
-    ddef test_get_requires_authentication(self):
+    def test_get_requires_authentication(self):
         url = reverse("plant-detail", args=[self.plant.pk])
         self.client.logout()
         response = self.client.get(url)
