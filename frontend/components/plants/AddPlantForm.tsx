@@ -55,7 +55,7 @@ export function AddPlantForm({
     if (initialGardenId) {
       form.setGarden(initialGardenId);
     }
-  }, [initialGardenId]);
+  }, [initialGardenId, form]);
 
   const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

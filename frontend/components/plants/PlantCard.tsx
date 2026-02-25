@@ -17,13 +17,10 @@ interface PlantCardProps {
 export const PlantCard = ({
   plant,
   onClick,
-  gardenUsername,
   currentUser,
   onDeleted,
 }: PlantCardProps) => {
-  const href = gardenUsername
-    ? `/profiles/${gardenUsername}/gardens/${plant.id}`
-    : null;
+  const href = null;
 
   const isOwner = currentUser && plant.author === currentUser;
   const t = useTranslations('PlantCard');

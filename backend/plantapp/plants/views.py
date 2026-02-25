@@ -38,7 +38,7 @@ class PlantViewSet(viewsets.ViewSet):
         if username_param:
             plants = plants.filter(owner__username=username_param)
 
-        serializer = PlantListSerializer(plants, many=True)
+        serializer = PlantListSerializer(plants, many=True, context={"request": request})
         return Response(serializer.data)
 
     def retrieve(self, request, pk=None):

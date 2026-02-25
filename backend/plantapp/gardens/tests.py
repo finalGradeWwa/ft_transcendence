@@ -309,12 +309,12 @@ class GardenAPITests(APITestCase):
         self.client.force_authenticate(user=self.bob)
         url = reverse(
             "garden-remove-user",
-            args=[self.garden.pk, garden_user.pk]
+            args=[self.garden.pk]
         )
 
-        response = self.client.delete(url)
+        response = self.client.delete(url, data={"user_id": garden_user.pk})
 
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN) 
 
 class AutomaticGardenCreationTests(APITestCase):
     """Test that a garden is automatically created when a user is registered."""

@@ -35,7 +35,7 @@ class GardenViewSet(viewsets.ViewSet):
             ),
             pk=pk,
         )
-        serializer = GardenContentSerializer(garden)
+        serializer = GardenContentSerializer(garden, context={"request": request})
         return Response(serializer.data)
 
     # POST /api/garden/
