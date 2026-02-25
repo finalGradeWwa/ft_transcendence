@@ -41,9 +41,7 @@ export const PlantCard = ({
       if (res.ok || res.status === 204) {
         onDeleted?.(plant.id);
       }
-    } catch (error) {
-      console.error('Delete failed', error);
-    }
+    } catch (error) {}
   };
 
   const content = (

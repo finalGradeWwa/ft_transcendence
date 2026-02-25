@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl';
 import { apiFetch } from '@/lib/auth';
 import { Icon } from '@/components/icons/ui/Icon';
 import { Link } from '@/i18n/navigation';
+import { buildImageUrl } from '@/lib/imageUrl';
 
 export default function MembersPage({
   params,
@@ -193,9 +194,7 @@ export default function MembersPage({
           )}
 
           {members.map((member: any) => {
-            const avatarSrc = member.avatar_photo
-              ? `http://localhost:8000${member.avatar_photo}`
-              : null;
+            const avatarSrc = buildImageUrl(member.avatar_photo);
 
             return (
               <div

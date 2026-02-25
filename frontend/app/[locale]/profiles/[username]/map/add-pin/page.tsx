@@ -4,6 +4,7 @@ import { useState, useEffect, use } from 'react';
 import { useTranslations } from 'next-intl';
 import { apiFetch } from '@/lib/auth';
 import { Link, useRouter } from '@/i18n/navigation';
+import { buildImageUrl } from '@/lib/imageUrl';
 
 /**
  * PL: Strona dodawania pinu (notatki) do istniejącej rośliny lub ogrodu.
@@ -203,7 +204,9 @@ export default function AddPinPage({
                         ? selectedItem.image_url
                         : selectedItem.thumbnail
                           ? selectedItem.thumbnail
-                          : `http://localhost:8000${selectedItem.image || selectedItem.photo}`
+                          : buildImageUrl(
+                              selectedItem.image || selectedItem.photo
+                            )
                     }
                     alt="Preview"
                     className="w-full h-full object-cover"

@@ -4,32 +4,32 @@ from gardens.models import Garden
 from plants.models import Plant
 
 class PinWriteModeSerializer(serializers.ModelSerializer):
-	garden = serializers.PrimaryKeyRelatedField(
-		queryset=Garden.objects.none(),
-		required=False,
-		allow_null=True
-	)
-	plant = serializers.PrimaryKeyRelatedField(
-		queryset=Plant.objects.none(),
-		required=False,
-		allow_null=True
-	)
-	class Meta:
-		model = Pin
-		fields = ("image", "content", "garden", "plant")
+    garden = serializers.PrimaryKeyRelatedField(
+        queryset=Garden.objects.none(),
+        required=False,
+        allow_null=True
+    )
+    plant = serializers.PrimaryKeyRelatedField(
+        queryset=Plant.objects.none(),
+        required=False,
+        allow_null=True
+    )
+    class Meta:
+        model = Pin
+        fields = ("image", "content", "garden", "plant")
     
-	def __init__(self, *args, **kwargs):
-		super().__init__(*args, **kwargs)
-		request = self.context.get("request")
-		if request:
-			user = request.user
-			self.fields["garden"].queryset = Garden.objects.filter(
-				gardenuser__user=user
-			)
-			self.fields["plant"].queryset = Plant.objects.filter(
-				garden__in=self.fields["garden"].queryset
-			)
-			
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        request = self.context.get("request")
+        if request:
+            user = request.user
+            self.fields["garden"].queryset = Garden.objects.filter(
+                gardenuser__user=user
+            )
+            self.fields["plant"].queryset = Plant.objects.filter(
+                garden__in=self.fields["garden"].queryset
+            )
+            
 
 # detail on user's wall
 class PinDetailReadModeSerializer(serializers.ModelSerializer):
@@ -56,8 +56,17 @@ class PinListReadModeSerializer(serializers.ModelSerializer):
     plant_owner = serializers.CharField(source='plant.owner.username', read_only=True, allow_null=True)
     garden_id = serializers.IntegerField(source='garden.garden_id', read_only=True, allow_null=True)
     garden_name = serializers.CharField(source='garden.name', read_only=True, allow_null=True)
-    garden_owner = serializers.CharField(source='garden.owners.first.organization_user.user.username', read_only=True, allow_null=True)
+    garden_owner = serializers.SerializerMethodField()
     garden_image = serializers.SerializerMethodField()
+
+    def get_garden_owner(self, obj):
+        if not obj.garden:
+            return None
+        try:
+            owner = obj.garden.owners.first()
+            return owner.organization_user.user.username if owner else None
+        except AttributeError:
+            return None
 
     def get_garden_image(self, obj):
         if not obj.garden:

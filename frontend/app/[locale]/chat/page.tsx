@@ -312,13 +312,22 @@ export default function ChatPage() {
     <div className="min-h-screen bg-gradient-to-br from-beige-900 via-beige-800 to-beige-900 text-white">
       <div className="container mx-auto px-4 py-8 max-w-6xl">
         <div className="bg-secondary-beige backdrop-blur-sm rounded-lg shadow-xl border border-secondary-beige flex h-[600px] overflow-hidden">
-          <aside className="w-72 border-r border-gray-700 p-4 overflow-y-auto">
-            <h2 className="text-lg font-semibold mb-4">{t('friendsTitle')}</h2>
+          <aside
+            aria-label={t('friendsTitle')}
+            className="w-72 border-r border-primary-green/20 p-4 overflow-y-auto bg-black/5"
+          >
+            <h2 className="text-lg text-primary-green font-semibold mb-4">
+              {t('friendsTitle')}
+            </h2>
 
             {isLoadingFriends ? (
-              <p className="text-sm text-gray-300">{t('loadingFriends')}</p>
+              <p className="text-sm text-gray-900 font-semibold">
+                {t('loadingFriends')}
+              </p>
             ) : friends.length === 0 ? (
-              <p className="text-sm text-gray-300">{t('noFriends')}</p>
+              <p className="text-sm text-gray-900 font-semibold">
+                {t('noFriends')}
+              </p>
             ) : (
               <ul className="space-y-2">
                 {friends.map(friend => {
@@ -367,7 +376,9 @@ export default function ChatPage() {
             {/* Messages Area */}
             <div className="flex-1 overflow-y-auto p-6 space-y-4">
               {!selectedFriend ? (
-                <p className="text-gray-300 text-sm">{t('selectFriend')}</p>
+                <p className="text-gray-900 font-semibold text-sm">
+                  {t('selectFriend')}
+                </p>
               ) : isLoadingMessages ? (
                 <p className="text-gray-300 text-sm">{t('loadingMessages')}</p>
               ) : (

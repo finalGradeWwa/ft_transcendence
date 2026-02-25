@@ -1,5 +1,5 @@
 from rest_framework import viewsets, status
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.authentication import SessionAuthentication
 from rest_framework_simplejwt.authentication import JWTAuthentication
@@ -12,15 +12,14 @@ from .services import create_plant
 
 class PlantViewSet(viewsets.ViewSet):
     authentication_classes = [JWTAuthentication, SessionAuthentication]
-    permission_classes = [AllowAny]
     queryset = Plant.objects.all()
 
+    def get_permissions(self):
+        if self.action in ['list', 'retrieve']:
+            return [AllowAny()]
+        return [IsAuthenticated()]
+
     def list(self, request):
-        """
-        List all plants. Optionally filter by garden, owner or username.
-        Use ?owner=me to see your own plants, ?owner=<user_id> to see a specific user's plants,
-        or ?username=<username> to filter by username.
-        """
         garden_id = request.query_params.get("garden")
         owner_param = request.query_params.get("owner")
         username_param = request.query_params.get("username")
@@ -43,9 +42,6 @@ class PlantViewSet(viewsets.ViewSet):
         return Response(serializer.data)
 
     def retrieve(self, request, pk=None):
-        """
-        Retrieve a single plant (visible to all authenticated users).
-        """
         plant = get_object_or_404(Plant, pk=pk)
         serializer = PlantSerializer(plant)
         return Response(serializer.data)
@@ -71,9 +67,6 @@ class PlantViewSet(viewsets.ViewSet):
         )
 
     def destroy(self, request, pk=None):
-        """
-        Delete a plant. Only garden members can delete.
-        """
         plant = get_object_or_404(Plant, pk=pk)
         if not plant.garden.gardenuser_set.filter(user=request.user).exists():
             return Response(
@@ -84,11 +77,6 @@ class PlantViewSet(viewsets.ViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     def update(self, request, pk=None):
-        """
-        Update a plant (PUT). Only garden members can update.
-        """
-        if not request.user.is_authenticated:
-            return Response(status=status.HTTP_401_UNAUTHORIZED)
         plant = get_object_or_404(Plant, pk=pk)
         if not plant.garden.gardenuser_set.filter(user=request.user).exists():
             return Response(
@@ -105,11 +93,6 @@ class PlantViewSet(viewsets.ViewSet):
         return Response(PlantSerializer(serializer.instance).data)
 
     def partial_update(self, request, pk=None):
-        """
-        Update a plant (PATCH). Only garden members can update.
-        """
-        if not request.user.is_authenticated:
-            return Response(status=status.HTTP_401_UNAUTHORIZED)
         plant = get_object_or_404(Plant, pk=pk)
         if not plant.garden.gardenuser_set.filter(user=request.user).exists():
             return Response(

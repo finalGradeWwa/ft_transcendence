@@ -5,6 +5,7 @@ import { AddPlantForm } from './AddPlantForm';
 import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import { apiFetch } from '@/lib/auth';
 
 const API_URL = (
   process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000'
@@ -20,11 +21,16 @@ export default function AddPlantPage({
   const t = useTranslations('AddPlantPage');
   const router = useRouter();
 
-  // Unwrap params using use() hook
   const { gardenId } = use(searchParams);
-  const username = 'csw471';
-
+  const [username, setUsername] = useState<string>('');
   const [gardens, setGardens] = useState([]);
+
+  useEffect(() => {
+    apiFetch('/api/auth/me/')
+      .then(res => res.json())
+      .then(data => setUsername(data.username))
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     async function fetchGardens() {
@@ -61,7 +67,6 @@ export default function AddPlantPage({
           </div>
         </div>
 
-        {/* PL: Formularz En: Form */}
         <div className="w-full overflow-hidden break-words">
           <AddPlantForm
             username={username}

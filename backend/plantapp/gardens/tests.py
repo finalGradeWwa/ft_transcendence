@@ -33,7 +33,7 @@ class GardenAPITests(APITestCase):
         self.create_url = reverse("garden-list")
         self.add_user_url = reverse("garden-add-user", args=[self.garden.pk])
 
-    def test_authentication_required(self):
+    def test_garden_detail_accessible_without_authentication(self):
             response = self.client.get(self.detail_url)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
 

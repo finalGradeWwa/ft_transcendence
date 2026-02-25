@@ -43,7 +43,7 @@ export const GardensPageClient = ({
   return (
     <section className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
       {!hideTitle && (
-        <h1 className="text-2xl md:text-3xl font-bold mb-6 text-white-text overfdisabled:opacitylow-hidden uppercase">
+        <h1 className="text-2xl md:text-3xl font-bold mb-6 text-white-text overflow-hidden uppercase">
           {t('latestGardens')}
         </h1>
       )}
