@@ -79,6 +79,7 @@ cat > .env << EOF
 SECRET_KEY=your-secret-key-change-this-in-production
 DEBUG_VALUE=True
 ALLOWED_HOSTS=localhost,127.0.0.1
+REDIS_HOST=localhost
 SOCIAL_AUTH_GITHUB_KEY=your-github-client-id
 SOCIAL_AUTH_GITHUB_SECRET=your-github-client-secret
 EOF
