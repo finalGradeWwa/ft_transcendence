@@ -180,37 +180,49 @@ cd ..
 rm -rf ft_transcendence
 ```
 ___
+
+to check if Redis is working:
+
+- build (if something is failing use build --no-cache) and start Docker containers (make up)
+- go to /backend/plantapp
+- run ./manage test_redis
+- this should be the output:
+`Using: RedisChannelLayer ✓ Redis working!`
+
 # Individual Contributions
 
 ## prutkows (Paweł Rutkowski) - tech lead & backend developer
 - Major backend apps: authentication (auth, registration, JWT management), users (user profiles)
-- Responsible for the OAuth 2.0 implementation
+- Responsible for setting up OAuth 2.0
 - GitHub CodeOwner, reviewing every pull request on GitHub
 - Making major decisions on the collaboration rules, ensuring the technical quality of the application
 
 ## zogorzeb (Zofia Gorzęba) - project manager & backend developer
-- Major backend apps: gardens (collaborative plant organization), plants (individual plant management), social_feed (pin posting system)
-- All the test suites for frontend and backend
+- Major backend apps: gardens (collaborative plant organization), plants (individual plant management), social_feed (pin posting system), chat_app (redis service)
+- Reviewing backend pull requests
 - GitHub issues management, GitHub Actions configuration
 - Ensuring the communication in the group, distribution of tasks, ensuring coverage of the project's requirements
-- Responsible for the non-technical part of Readme file (description, )
+- Responsible for the technical (redis description) and whole non-technical part of Readme file
 - Responsible for the organizations system backend mechanism (Gardens)
 
 ## phoehne (Przemysław Hoehne) - main frontend developer
 - Major frontend functionalities: main page, profile page, footer, all the forms and user inputs validation, gardens view, plants view
 - Integrating frontend modules together
+- Reviewing frontend pull requests
 - Responsible for SSR, custom design system with reusable components, support for multiple languages, RTL language support, support for additional browsers
 
 ## mlibucha (Mateusz Libucha) - backend developer
 - Major backend apps: users (friends system), chat_app (messaging with WebSocket infrastructure)
-- Infrastructure implementation: Docker Compose, Daphne ASGI server
+- Infrastructure set up: Docker Compose, Daphne ASGI server, Nginx service
 - Setting up website security (SSL certificates)
 - Providing Makefile and technical part of Readme (prerequisites, instructions)
 
 ## mwojtcza (Mateusz Wojtczak) - product owner & frontend developer
 - Ensuring the application's quality, making decisions on the key business features, providing ideas visualization
-- Frontend functionalities: search bar, chat
+- Major frontend functionalities: search bar, chat (WebSockets and visual side), online presence status
+- Supporting the communication between teammembers and easing conflicts
 - Implementation of data fixtures for the testing purposes
+- Reviewing frontend + backend pull requests
 ___
 # Chosen modules
 ## Minor modules
