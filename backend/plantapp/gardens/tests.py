@@ -312,7 +312,7 @@ class GardenAPITests(APITestCase):
             args=[self.garden.pk]
         )
 
-        response = self.client.delete(url, data={"user_id": garden_user.pk})
+        response = self.client.delete(url, data={"user_id": self.bob.pk})
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN) 
 
