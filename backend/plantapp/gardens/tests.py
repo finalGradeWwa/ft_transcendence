@@ -301,7 +301,7 @@ class GardenAPITests(APITestCase):
             )
         
     def test_non_owner_cannot_remove_garden_user(self):
-        garden_user = GardenUser.objects.create(
+        GardenUser.objects.create(
             organization=self.garden,
             user=self.bob,
         )
@@ -314,7 +314,7 @@ class GardenAPITests(APITestCase):
 
         response = self.client.delete(url, data={"user_id": self.bob.pk})
 
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN) 
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
 class AutomaticGardenCreationTests(APITestCase):
     """Test that a garden is automatically created when a user is registered."""
