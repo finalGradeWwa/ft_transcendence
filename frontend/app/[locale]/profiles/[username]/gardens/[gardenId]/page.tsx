@@ -47,15 +47,7 @@ export default async function GardenPage({
   ]);
 
   if (!garden) {
-    return (
-      <div className="min-h-screen bg-main-gradient flex items-center justify-center">
-        <div className="bg-secondary-beige p-8 rounded-xl shadow-xl border-2 border-primary-green outline outline-2 outline-neutral-900 outline-offset-2">
-          <p className="text-primary-green font-black uppercase tracking-widest text-xl">
-            Garden Not Found
-          </p>
-        </div>
-      </div>
-    );
+    return null;
   }
 
   const isDefault =

@@ -28,7 +28,7 @@ export default async function EditGardenPage({
   const garden = await getGardenData(gardenId);
 
   if (!garden) {
-    return <div className="p-10 text-white">Garden not found</div>;
+    return null;
   }
 
   const isDefault =
