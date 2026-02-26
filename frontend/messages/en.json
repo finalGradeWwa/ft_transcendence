@@ -27,6 +27,8 @@
     "terms": "Terms",
     "plantsCountLabel": "Number of plants",
     "addPin": "Add pin",
+    "firstPage": "First",
+    "lastPage": "Last",
     "aria": {
       "close": "Close",
       "homePageLink": "home page",
@@ -42,7 +44,9 @@
       "profile": "User profile",
       "logout": "Logout",
       "userTools": "User tools",
-      "chat": "Open chat"
+      "chat": "Open chat",
+      "previousSlide": "Previous image",
+      "nextSlide": "Next image"
     },
     "contact": {
       "name": "John Weeder",
@@ -236,6 +240,8 @@
     "cannotEditDefault": "The main garden cannot be edited.",
     "accessDenied": "Access denied",
     "back": "Go back",
+    "firstPage": "First",
+    "lastPage": "Last",
     "fields": {
       "name": "Garden name",
       "environment": "Environment"

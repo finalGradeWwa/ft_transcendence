@@ -21,6 +21,8 @@
     "loginSuccess": "Erfolgreich angemeldet.",
     "plantsCountLabel": "Anzahl der Pflanzen",
     "addPin": "Pin hinzufügen",
+    "firstPage": "Erste",
+    "lastPage": "Letzte",
     "nav": [
       "Startseite",
       "Gärten",
@@ -48,7 +50,9 @@
       "profile": "Benutzerprofil",
       "logout": "Abmelden",
       "userTools": "Benutzer-Tools",
-      "chat": "Chat öffnen"
+      "chat": "Chat öffnen",
+      "previousSlide": "Vorheriges Bild",
+      "nextSlide": "Nächstes Bild"
     },
     "contact": {
       "name": "John Weeder",
@@ -242,6 +246,8 @@
     "cannotEditDefault": "Der Hauptgarten kann nicht bearbeitet werden.",
     "accessDenied": "Zugriff verweigert",
     "back": "Zurück",
+    "firstPage": "Erste",
+    "lastPage": "Letzte",
     "fields": {
       "name": "Gartenname",
       "environment": "Umgebung"

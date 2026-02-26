@@ -9,6 +9,7 @@ import { useTranslations } from 'next-intl';
 import { useRef, useEffect, useState } from 'react';
 import { Text } from '@/components/typography/Text';
 import { useAddPlantForm } from './useAddPlantForm';
+import { RefObject } from 'react';
 
 interface Garden {
   garden_id: number;
@@ -22,6 +23,16 @@ interface AddPlantFormProps {
   gardens: Garden[];
   onSuccess: () => void;
   initialGardenId?: string | null;
+}
+
+interface PhotoUploadControlsProps {
+  form: ReturnType<typeof useAddPlantForm>;
+  tr: ReturnType<typeof useTranslations>;
+  t: ReturnType<typeof useTranslations>;
+  fileInputRef: RefObject<HTMLInputElement | null>;
+  photoError: boolean;
+  fileSizeError: boolean;
+  onFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 const fieldCls =
@@ -218,7 +229,7 @@ function PhotoUploadControls({
   photoError,
   fileSizeError,
   onFileChange,
-}: any) {
+}: PhotoUploadControlsProps) {
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-center gap-4 flex-wrap">

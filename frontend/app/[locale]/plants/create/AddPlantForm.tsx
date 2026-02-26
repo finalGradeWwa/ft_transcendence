@@ -252,7 +252,7 @@ export function AddPlantForm({
       <div className="pt-2">
         <button
           type="submit"
-          disabled={loading}
+          disabled={loading || !initialGardenId}
           className="w-full mb-1 bg-primary-green text-white font-black py-4 rounded-xl uppercase tracking-[0.2em] shadow-xl hover:opacity-90  transition-opacity duration-300 disabled:opacity-50 disabled:cursor-not-allowed focus:outline focus:outline-2 focus:outline-gray-600 focus:outline-offset-[3px]"
         >
           {loading ? '...' : t('submit')}

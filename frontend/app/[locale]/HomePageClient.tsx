@@ -143,7 +143,7 @@ export const HomePageClient = ({
               disabled={currentPage === 1}
               className={btnStyle}
             >
-              Początek
+              {t('firstPage')}
             </button>
             <button
               onClick={() => handlePageChange(currentPage - 1)}
@@ -169,7 +169,7 @@ export const HomePageClient = ({
               disabled={currentPage === totalPages}
               className={btnStyle}
             >
-              Koniec
+              {t('lastPage')}
             </button>
           </div>
         )}

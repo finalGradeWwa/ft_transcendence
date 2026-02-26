@@ -27,6 +27,8 @@
     "terms": "Regulamin",
     "plantsCountLabel": "Liczba roślin",
     "addPin": "Dodaj pin",
+    "firstPage": "Początek",
+    "lastPage": "Koniec",
     "aria": {
       "close": "Zamknij",
       "homePageLink": "strona główna",
@@ -238,6 +240,8 @@
     "cannotEditDefault": "Główny ogród nie może być edytowany.",
     "accessDenied": "Brak uprawnień",
     "back": "Powrót",
+    "firstPage": "Początek",
+    "lastPage": "Koniec",
     "fields": {
       "name": "Nazwa ogrodu",
       "environment": "Środowisko"

@@ -61,7 +61,7 @@ export const GardensPageClient = ({
             disabled={currentPage === 1}
             className={btnStyle}
           >
-            Początek
+            {t('firstPage')}
           </button>
           <button
             onClick={() => setCurrentPage(prev => prev - 1)}
@@ -87,7 +87,7 @@ export const GardensPageClient = ({
             disabled={currentPage === totalPages}
             className={btnStyle}
           >
-            Koniec
+            {t('lastPage')}
           </button>
         </div>
       )}

@@ -37,6 +37,7 @@ export const UserPlantsClient = ({
     startIndex,
     startIndex + itemsPerPage
   );
+  const t = useTranslations('GardensPage');
 
   const btnStyle =
     'bg-[#186618] text-[#fff] px-4 py-2 rounded-lg font-bold text-xs uppercase tracking-widest cursor-pointer disabled:opacity-50 focus:outline focus:outline-2 focus:outline-[#fff] focus:outline-offset-2 active:outline-none';
@@ -79,7 +80,7 @@ export const UserPlantsClient = ({
               disabled={currentPage === 1}
               className={btnStyle}
             >
-              Początek
+              {t('firstPage')}
             </button>
             <button
               onClick={() => handlePageChange(currentPage - 1)}
@@ -103,7 +104,7 @@ export const UserPlantsClient = ({
               disabled={currentPage === totalPages}
               className={btnStyle}
             >
-              Koniec
+              {t('lastPage')}
             </button>
           </div>
         )}

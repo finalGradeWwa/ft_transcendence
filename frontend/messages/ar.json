@@ -27,6 +27,8 @@
     "terms": "الشروط",
     "plantsCountLabel": "عدد النباتات",
     "addPin": "إضافة دبوس",
+    "firstPage": "البداية",
+    "lastPage": "النهاية",
     "aria": {
       "close": "إغلاق",
       "homePageLink": "الصفحة الرئيسية",
@@ -42,7 +44,9 @@
       "profile": "ملف المستخدم",
       "logout": "تسجيل الخروج",
       "userTools": "أدوات المستخدم",
-      "chat": "افتح الدردشة"
+      "chat": "افتح الدردشة",
+      "previousSlide": "الصورة السابقة",
+      "nextSlide": "الصورة التالية"
     },
     "contact": {
       "name": "John Weeder",
@@ -236,6 +240,8 @@
     "cannotEditDefault": "لا يمكن تعديل الحديقة الرئيسية.",
     "accessDenied": "تم رفض الوصول",
     "back": "رجوع",
+    "firstPage": "البداية",
+    "lastPage": "النهاية",
     "fields": {
       "name": "اسم الحديقة",
       "environment": "البيئة"
