@@ -200,13 +200,10 @@ export default function AddPinPage({
                 <div className="w-16 h-16 rounded-lg overflow-hidden bg-gray-200 shrink-0 border-2 border-white shadow-sm">
                   <img
                     src={
-                      selectedItem.image_url
-                        ? selectedItem.image_url
-                        : selectedItem.thumbnail
-                          ? selectedItem.thumbnail
-                          : buildImageUrl(
-                              selectedItem.image || selectedItem.photo
-                            )
+                      selectedItem.image_url ||
+                      selectedItem.thumbnail ||
+                      buildImageUrl(selectedItem.image || selectedItem.photo) ||
+                      '/images/favicon/fav_480.webp'
                     }
                     alt="Preview"
                     className="w-full h-full object-cover"
