@@ -14,7 +14,7 @@ from pathlib import Path
 import os
 from dotenv import load_dotenv, find_dotenv
 from datetime import timedelta
-
+import sys
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -111,40 +111,23 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 ASGI_APPLICATION = 'mysite.asgi.application'
 
 # Channel layers configuration for WebSocket support
-# In-memory is fine for local development and tests (single process).
-# For multi-process / production deployments, REDIS_URL is required to use Redis.
-_redis_url = os.getenv("REDIS_URL")
-if DEBUG:
+# REDIS_HOST: defaults to 'redis' for Docker, set to 'localhost' for local development
+if 'test' in sys.argv:
+    # Use in-memory channel layer for tests to avoid Redis dependency
     CHANNEL_LAYERS = {
         'default': {
             'BACKEND': 'channels.layers.InMemoryChannelLayer'
         }
     }
 else:
-    if _redis_url:
-        CHANNEL_LAYERS = {
-            'default': {
-                'BACKEND': 'channels_redis.core.RedisChannelLayer',
-                'CONFIG': {
-                    'hosts': [_redis_url],
-                },
-            }
+    CHANNEL_LAYERS = {
+        'default': {
+            'BACKEND': 'channels_redis.core.RedisChannelLayer',
+            'CONFIG': {
+                'hosts': [(os.getenv('REDIS_HOST', 'redis'), 6379)],
+            },
         }
-    else:
-        # Fallback to in-memory for testing/CI environments without Redis.
-        # WARNING: This should NOT be used in production with multiple workers.
-        import warnings
-        warnings.warn(
-            "REDIS_URL is not set while DEBUG is False. "
-            "Using InMemoryChannelLayer as fallback, which does not support multiple worker processes. "
-            "Configure REDIS_URL for production deployments.",
-            RuntimeWarning
-        )
-        CHANNEL_LAYERS = {
-            'default': {
-                'BACKEND': 'channels.layers.InMemoryChannelLayer'
-            }
-        }
+    }
 
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
