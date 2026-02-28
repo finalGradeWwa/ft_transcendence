@@ -318,6 +318,8 @@
     "submit": "Zapisz pin",
     "back": "Mój profil",
     "searchLabel": "Wyszukaj",
+    "noPlants": "Brak roślin",
+    "noGardens": "Brak ogrodów",
     "errors": {
       "selectItem": "Wybierz roślinę lub ogród",
       "addDescription": "Dodaj treść notatki",

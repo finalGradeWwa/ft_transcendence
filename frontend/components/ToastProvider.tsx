@@ -7,7 +7,7 @@
  * short success, error, or info messages.
  */
 
-import { createContext, useContext, useState, useCallback, useRef } from 'react';
+import { createContext, useContext, useState, useCallback, useRef, useEffect } from 'react';
 
 type ToastType = 'success' | 'error' | 'info';
 
@@ -88,8 +88,24 @@ const ToastItem = ({
 export function ToastProvider({ children }: { children: React.ReactNode }) {
 	const [toasts, setToasts] = useState<Toast[]>([]);
 	const idRef = useRef(0);
+	const timeoutsRef = useRef<Map<number, ReturnType<typeof setTimeout>>>(new Map());
+
+	// PL: Wyczyść wszystkie aktywne timery przy odmontowaniu providera.
+	// EN: Clear all active timers when the provider unmounts.
+	useEffect(() => {
+		const timers = timeoutsRef.current;
+		return () => {
+			timers.forEach(timeoutId => clearTimeout(timeoutId));
+			timers.clear();
+		};
+	}, []);
 
 	const removeToast = useCallback((id: number) => {
+		const timeoutId = timeoutsRef.current.get(id);
+		if (timeoutId !== undefined) {
+			clearTimeout(timeoutId);
+			timeoutsRef.current.delete(id);
+		}
 		setToasts(prev => prev.filter(t => t.id !== id));
 	}, []);
 
@@ -98,9 +114,11 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
 			const id = ++idRef.current;
 			setToasts(prev => [...prev, { id, message, type }]);
 
-			setTimeout(() => {
+			const timeoutId = setTimeout(() => {
+				timeoutsRef.current.delete(id);
 				removeToast(id);
 			}, TOAST_DURATION);
+			timeoutsRef.current.set(id, timeoutId);
 		},
 		[removeToast]
 	);

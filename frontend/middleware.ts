@@ -18,11 +18,45 @@ const API_URL = (
   process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000'
 ).replace(/\/$/, '');
 
+/** PL: Zapas czasu (sekundy) przed wygaśnięciem, po którym wymuszamy odświeżenie.
+ *  EN: Leeway (seconds) before expiry at which we proactively refresh. */
+const REFRESH_LEEWAY_SECONDS = 60;
+
 /**
  * PL: Inicjalizacja bazowego middleware dla next-intl.
  * EN: Initialization of the base next-intl middleware.
  */
 const handleI18nRouting = createMiddleware(routing);
+
+/**
+ * PL: Dekoduje pole `exp` z JWT bez weryfikacji podpisu.
+ *     Zwraca timestamp (sekundy od epoch) lub null przy błędzie.
+ * EN: Decodes the `exp` field from a JWT without signature verification.
+ *     Returns timestamp (seconds since epoch) or null on error.
+ */
+function getJwtExp(token: string): number | null {
+  try {
+    const payload = token.split('.')[1];
+    if (!payload) return null;
+    // base64url → base64
+    const base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
+    const json = atob(base64);
+    const data = JSON.parse(json) as { exp?: unknown };
+    return typeof data.exp === 'number' ? data.exp : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * PL: Sprawdza, czy access token jest wciąż ważny z zadanym zapasem czasu.
+ * EN: Checks whether the access token is still valid with the given leeway.
+ */
+function isAccessTokenFresh(token: string): boolean {
+  const exp = getJwtExp(token);
+  if (exp === null) return false;
+  return exp - Math.floor(Date.now() / 1000) > REFRESH_LEEWAY_SECONDS;
+}
 
 /**
  * PL: Odświeża access token na podstawie refresh_token cookie.
@@ -64,6 +98,20 @@ async function refreshAccessToken(
 }
 
 /**
+ * PL: Dołącza access token do nagłówków odpowiedzi tak, by był dostępny w Server Components.
+ * EN: Attaches the access token to response headers so Server Components can read it.
+ */
+function applyAccessTokenHeader(response: NextResponse, access: string): void {
+  const existingOverrides = response.headers.get('x-middleware-override-headers') || '';
+  const overrideList = existingOverrides ? existingOverrides.split(',') : [];
+  if (!overrideList.includes('x-access-token')) {
+    overrideList.push('x-access-token');
+  }
+  response.headers.set('x-middleware-override-headers', overrideList.join(','));
+  response.headers.set('x-middleware-request-x-access-token', access);
+}
+
+/**
  * PL: Rozszerzona logika middleware o blokadę dostępu do stron logowania/rejestracji dla zalogowanych
  *     oraz odświeżanie tokenów JWT dla Server Components.
  * EN: Extended middleware logic blocking access to login/register pages for authenticated users
@@ -99,27 +147,41 @@ export default async function middleware(request: NextRequest) {
     );
   }
 
-  // PL: Dla zalogowanych użytkowników odśwież token i przekaż access token do Server Components
-  // EN: For authenticated users, refresh the token and pass access token to Server Components
+  // PL: Dla zalogowanych użytkowników przekaż access token do Server Components,
+  //     odświeżając go tylko gdy wygasł lub niedługo wygaśnie.
+  // EN: For authenticated users, forward the access token to Server Components,
+  //     refreshing only when it has expired or is about to expire.
   if (hasSession && refreshToken) {
+    const cachedAccess = request.cookies.get('access_token')?.value;
+
+    // PL: Jeśli mamy świeży access token w cookie — użyj go bez roundtripa do backendu.
+    // EN: If there is a fresh access token in the cookie — use it without a backend roundtrip.
+    if (cachedAccess && isAccessTokenFresh(cachedAccess)) {
+      const response = handleI18nRouting(request);
+      applyAccessTokenHeader(response, cachedAccess);
+      return response;
+    }
+
+    // PL: Access token wygasł lub nie istnieje — odśwież.
+    // EN: Access token expired or missing — refresh.
     const result = await refreshAccessToken(refreshToken);
 
     if (result) {
-      // PL: Uruchom i18n routing na oryginalnym żądaniu
-      // EN: Run i18n routing on the original request
       const response = handleI18nRouting(request);
+      applyAccessTokenHeader(response, result.access);
 
-      // PL: Użyj wewnętrznego mechanizmu Next.js (x-middleware-override-headers)
-      //     do przekazania access tokena jako nagłówka żądania do Server Components.
-      // EN: Use Next.js internal mechanism (x-middleware-override-headers) to pass
-      //     the access token as a request header to Server Components.
-      const existingOverrides = response.headers.get('x-middleware-override-headers') || '';
-      const overrideList = existingOverrides ? existingOverrides.split(',') : [];
-      if (!overrideList.includes('x-access-token')) {
-        overrideList.push('x-access-token');
-      }
-      response.headers.set('x-middleware-override-headers', overrideList.join(','));
-      response.headers.set('x-middleware-request-x-access-token', result.access);
+      // PL: Zapisz nowy access token w krótkotrwałym httpOnly cookie.
+      // EN: Persist the new access token in a short-lived httpOnly cookie.
+      const exp = getJwtExp(result.access);
+      const maxAge = exp
+        ? Math.max(0, exp - Math.floor(Date.now() / 1000))
+        : 300; // fallback: 5 min
+      response.cookies.set('access_token', result.access, {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        maxAge,
+      });
 
       // PL: Jeśli backend zrotował refresh token, ustaw nowe cookie w odpowiedzi
       // EN: If backend rotated the refresh token, set new cookie on the response
@@ -134,6 +196,22 @@ export default async function middleware(request: NextRequest) {
 
       return response;
     }
+
+    // PL: Odświeżenie nie powiodło się (wygasły/nieprawidłowy refresh token, backend niedostępny).
+    //     Usuń oba ciasteczka i przekieruj do strony logowania, by uniknąć:
+    //     - wielokrotnych żądań refresh przy każdym zapytaniu,
+    //     - stanu "zalogowany" z ciągłymi błędami 401 w Server Components.
+    // EN: Refresh failed (expired/invalid refresh token, backend unavailable).
+    //     Clear both cookies and redirect to login to avoid:
+    //     - repeated refresh calls on every request,
+    //     - "logged-in" navigation state with constant 401 errors in Server Components.
+    const locale = request.nextUrl.pathname.split('/')[1] || 'pl';
+    const redirectResponse = NextResponse.redirect(
+      new URL(`/${locale}?showLogin=true`, request.url)
+    );
+    redirectResponse.cookies.delete('refresh_token');
+    redirectResponse.cookies.delete('access_token');
+    return redirectResponse;
   }
 
   return handleI18nRouting(request);

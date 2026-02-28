@@ -1,3 +1,4 @@
+import { notFound } from 'next/navigation';
 import UserProfileClient from '../UserProfileClient';
 import { getTranslations } from 'next-intl/server';
 
@@ -44,7 +45,7 @@ export default async function ProfilePage({
   const { username } = await params;
   const user = await getUserProfile(username);
 
-  if (!user) return null;
+  if (!user) notFound();
 
   const userWithPins = { ...user, pins: [] };
 

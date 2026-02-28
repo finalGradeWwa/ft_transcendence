@@ -318,6 +318,8 @@
     "submit": "حفظ الدبوس",
     "back": "ملفي الشخصي",
     "searchLabel": "بحث",
+    "noPlants": "لا توجد نباتات",
+    "noGardens": "لا توجد حدائق",
     "errors": {
       "selectItem": "اختر نبتة أو حديقة",
       "addDescription": "أضف محتوى الملاحظة",

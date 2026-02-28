@@ -318,6 +318,8 @@
     "submit": "Pin speichern",
     "back": "Mein Profil",
     "searchLabel": "Suchen",
+    "noPlants": "Keine Pflanzen",
+    "noGardens": "Keine Gärten",
     "errors": {
       "selectItem": "Wähle eine Pflanze oder einen Garten aus",
       "addDescription": "Notizinhalt hinzufügen",

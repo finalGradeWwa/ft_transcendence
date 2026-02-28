@@ -318,6 +318,8 @@
     "submit": "Save Pin",
     "back": "My Profile",
     "searchLabel": "Search",
+    "noPlants": "No plants",
+    "noGardens": "No gardens",
     "errors": {
       "selectItem": "Select a plant or garden",
       "addDescription": "Add note content",
