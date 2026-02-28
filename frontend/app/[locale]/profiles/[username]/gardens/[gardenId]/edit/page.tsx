@@ -1,22 +1,7 @@
 import { getTranslations } from 'next-intl/server';
 import { GardenEditForm } from '@/app/[locale]/profiles/[username]/gardens/[gardenId]/edit/GardenEditForm';
-const API_URL = (
-  process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000'
-).replace(/\/$/, '');
-
-async function getGardenData(gardenId: string) {
-  try {
-    const response = await fetch(`${API_URL}/api/garden/${gardenId}/`, {
-      cache: 'no-store',
-    });
-    if (!response.ok) return null;
-    return await response.json();
-  } catch {
-    return null;
-  }
-}
-
-// app/[locale]/profiles/[username]/gardens/[gardenId]/edit/page.tsx
+import { BackButton } from './BackButton';
+import { serverFetch } from '@/lib/serverAuth';
 
 export default async function EditGardenPage({
   params,
@@ -25,11 +10,18 @@ export default async function EditGardenPage({
 }) {
   const { username, gardenId } = await params;
   const t = await getTranslations('GardensPage');
-  const garden = await getGardenData(gardenId);
 
-  if (!garden) {
-    return null;
+  let garden: any = null;
+  try {
+    const response = await serverFetch(`/api/garden/${gardenId}/`);
+    if (response.ok) {
+      garden = await response.json();
+    }
+  } catch (error) {
+    console.error('Failed to fetch garden:', error);
   }
+
+  if (!garden) return null;
 
   const isDefault =
     garden.name?.includes("'s Garden") || garden.name === 'Default Garden';
@@ -44,12 +36,9 @@ export default async function EditGardenPage({
           <p className="text-neutral-600 mb-6 font-semibold">
             {t('cannotEditDefault') || 'Główny ogród nie może być edytowany.'}
           </p>
-          <button
-            onClick={() => history.back()} // lub użyj Link do powrotu
-            className="bg-primary-green text-white px-8 py-3 rounded-xl font-bold uppercase text-xs tracking-widest"
-          >
+          <BackButton className="bg-primary-green text-white px-8 py-3 rounded-xl font-bold uppercase text-xs tracking-widest">
             {t('back') || 'Powrót'}
-          </button>
+          </BackButton>
         </div>
       </div>
     );

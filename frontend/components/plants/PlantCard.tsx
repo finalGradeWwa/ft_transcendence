@@ -20,8 +20,6 @@ export const PlantCard = ({
   currentUser,
   onDeleted,
 }: PlantCardProps) => {
-  const href = null;
-
   const isOwner = currentUser && plant.author === currentUser;
   const t = useTranslations('PlantCard');
 
@@ -38,7 +36,7 @@ export const PlantCard = ({
       if (res.ok || res.status === 204) {
         onDeleted?.(plant.id);
       }
-    } catch (error) {}
+    } catch (error) { }
   };
 
   const content = (
@@ -47,7 +45,7 @@ export const PlantCard = ({
         <button
           onClick={handleDelete}
           className="absolute top-2 right-2 z-10 bg-red-600 text-white rounded-full p-1.5 hover:bg-red-700 transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-900"
-          title="Usuń roślinę"
+          title={t('deleteTitle')}
         >
           <Icon name="trash" size={14} />
         </button>
@@ -57,7 +55,7 @@ export const PlantCard = ({
         {plant.image ? (
           <img
             src={plant.image}
-            alt={plant.commonName || 'Plant'}
+            alt={plant.commonName || t('plantAlt')}
             className={`w-full h-full object-cover${plant.image?.includes('garden-placeholder') ? ' opacity-80' : ''}`}
           />
         ) : (
@@ -79,7 +77,7 @@ export const PlantCard = ({
           <div className="flex items-center gap-1.5 text-dark-text">
             <Icon name="user" size={14} className="text-dark-text" />
             <span className="text-amber-900 leading-none font-bold">
-              {plant.author || 'Anonim'}
+              {plant.author || t('anonymous')}
             </span>
           </div>
           {plant.garden && (
@@ -104,14 +102,6 @@ export const PlantCard = ({
       </div>
     </article>
   );
-
-  if (href) {
-    return (
-      <Link href={href} className="block">
-        {content}
-      </Link>
-    );
-  }
 
   return (
     <div onClick={onClick} className="cursor-pointer">

@@ -66,7 +66,8 @@ export function AddPlantForm({
     if (initialGardenId) {
       form.setGarden(initialGardenId);
     }
-  }, [initialGardenId, form]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialGardenId]);
 
   const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

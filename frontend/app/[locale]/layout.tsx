@@ -15,6 +15,18 @@ import { Background } from '@/components/Background';
 import { Footer } from '@/components/Footer';
 import { Navigation } from '@/components/Navigation';
 import { GlobalModalProvider } from '@/components/GlobalModalProvider';
+import { ToastProvider } from '@/components/ToastProvider';
+import type { Viewport } from 'next';
+
+/**
+ * PL: Konfiguracja viewport — wymagana przez Next.js 16 jako osobny eksport.
+ * EN: Viewport configuration — required by Next.js 16 as a separate export.
+ */
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  themeColor: '#2D6A4F',
+};
 
 /**
  * PL: Konfiguracja fontu Inter z obsługą polskich znaków i zmienną CSS.
@@ -29,8 +41,8 @@ const inter = Inter({
 });
 
 /**
- * PL: Generuje metadane strony (tytuł, opis) na podstawie wybranego języka.
- * EN: Generates page metadata (title, description) based on the selected locale.
+ * PL: Generuje metadane strony (tytuł, opis, Open Graph) na podstawie wybranego języka.
+ * EN: Generates page metadata (title, description, Open Graph) based on the selected locale.
  */
 export async function generateMetadata({
   params,
@@ -40,9 +52,22 @@ export async function generateMetadata({
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'HomePage' });
 
+  const title = t('title');
+  const description = t('description');
+
   return {
-    title: t('title'),
-    description: t('description'),
+    title: {
+      default: title,
+      template: `%s | ${title}`,
+    },
+    description,
+    openGraph: {
+      title,
+      description,
+      type: 'website',
+      locale,
+      siteName: title,
+    },
   };
 }
 
@@ -73,30 +98,32 @@ export default async function LocaleLayout({
       <body className="antialiased font-sans">
         {/** PL: Dostawca treści tłumaczeń dla komponentów klienckich. EN: Translation messages provider for client components. */}
         <NextIntlClientProvider messages={messages} locale={locale}>
-          {/** PL: Komponent tła z własnym kontekstem warstw (z-index). EN: Background component with its own stacking context (z-index). */}
-          <Background>
-            <div className="flex flex-col min-h-screen">
-              <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 flex-grow flex flex-col">
-                <Navigation />
+          <ToastProvider>
+            {/** PL: Komponent tła z własnym kontekstem warstw (z-index). EN: Background component with its own stacking context (z-index). */}
+            <Background>
+              <div className="flex flex-col min-h-screen">
+                <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 flex-grow flex flex-col">
+                  <Navigation />
 
-                {/** PL: Główny obszar treści z obsługą dostępności (skip link target). EN: Main content area with accessibility support (skip link target). */}
-                <main
-                  className="flex-grow outline-none flex flex-col"
-                  id="main-content"
-                  tabIndex={-1}
-                >
-                  {children}
-                </main>
+                  {/** PL: Główny obszar treści z obsługą dostępności (skip link target). EN: Main content area with accessibility support (skip link target). */}
+                  <main
+                    className="flex-grow outline-none flex flex-col"
+                    id="main-content"
+                    tabIndex={-1}
+                  >
+                    {children}
+                  </main>
 
-                <Footer />
+                  <Footer />
+                </div>
               </div>
-            </div>
-          </Background>
+            </Background>
 
-          {/** * PL: Globalny dostawca modali umieszczony poza Background, aby uniknąć problemów z z-index.
+            {/** * PL: Globalny dostawca modali umieszczony poza Background, aby uniknąć problemów z z-index.
            * EN: Global modal provider placed outside Background to avoid z-index issues.
            */}
-          <GlobalModalProvider />
+            <GlobalModalProvider />
+          </ToastProvider>
         </NextIntlClientProvider>
       </body>
     </html>

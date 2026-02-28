@@ -1,5 +1,7 @@
 import { getTranslations } from 'next-intl/server';
 import { UserGardensClient } from './UserGardensClient';
+import { GardenType } from '@/app/[locale]/GardensPageClient';
+import { serverFetch } from '@/lib/serverAuth';
 import NextImage from 'next/image';
 
 interface UserGardensPageProps {
@@ -13,69 +15,61 @@ const API_URL = (
   process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000'
 ).replace(/\/$/, '');
 
-async function getUserGardens(username: string) {
-  try {
-    const response = await fetch(
-      `${API_URL}/api/garden/?username=${encodeURIComponent(username)}`,
-      { cache: 'no-store' }
-    );
-    if (!response.ok) return [];
-    return await response.json();
-  } catch {
-    return [];
-  }
-}
-
 export default async function UserGardensPage({
   params,
 }: UserGardensPageProps) {
   const { username } = await params;
   const tProfile = await getTranslations('ProfilePage');
   const tGardens = await getTranslations('GardensPage');
-  const gardensData = await getUserGardens(username);
 
-  const gardensDataMapped = gardensData.map((g: any) => {
-    const ownerFromTitle = g.name.includes("'s")
-      ? g.name.split("'s")[0]
-      : username;
+  let gardens: GardenType[] = [];
 
-    const isDefault =
-      g.name.includes("'s Garden") || g.name === 'Default Garden';
-    const displayName = isDefault ? tGardens('defaultGardenName') : g.name;
-
-    const envMap: Record<string, string> = {
-      i: 'indoor',
-      o: 'outdoor',
-      g: 'greenhouse',
-    };
-
-    const rawValue = String(g.environment || '')
-      .toLowerCase()
-      .charAt(0);
-    const envKey = envMap[rawValue] || 'indoor';
-    const translatedEnv = tGardens(`environments.${envKey}` as any);
-
-    const rawImage = g.thumbnail || g.image_url || g.image;
-    let finalImage = '/images/garden/garden-placeholder.webp';
-
-    if (rawImage) {
-      finalImage = rawImage.startsWith('http')
-        ? rawImage
-        : `${API_URL}${rawImage.startsWith('/') ? '' : '/'}${rawImage}`;
+  try {
+    const response = await serverFetch(
+      `/api/garden/?username=${encodeURIComponent(username)}`
+    );
+    if (response.ok) {
+      const data = await response.json();
+      const envMap: Record<string, string> = {
+        i: 'indoor',
+        o: 'outdoor',
+        g: 'greenhouse',
+      };
+      gardens = (Array.isArray(data) ? data : [])
+        .map((g: any) => {
+          const ownerFromTitle = g.name?.includes("'s")
+            ? g.name.split("'s")[0]
+            : username;
+          const isDefault =
+            g.name?.includes("'s Garden") || g.name === 'Default Garden';
+          const displayName = isDefault ? tGardens('defaultGardenName') : g.name;
+          const rawValue = String(g.environment || '')
+            .toLowerCase()
+            .charAt(0);
+          const envKey = envMap[rawValue] || 'indoor';
+          const translatedEnv = tGardens(`environments.${envKey}` as any);
+          const rawImage = g.thumbnail || g.image_url || g.image;
+          let finalImage = '/images/garden/garden-placeholder.webp';
+          if (rawImage) {
+            finalImage = rawImage.startsWith('http')
+              ? rawImage
+              : `${API_URL}${rawImage.startsWith('/') ? '' : '/'}${rawImage}`;
+          }
+          return {
+            id: g.garden_id,
+            name: displayName,
+            owner: ownerFromTitle,
+            plantsCount: g.plant_count || 0,
+            styleName: translatedEnv,
+            image: finalImage,
+            isDefault: isDefault,
+          };
+        })
+        .reverse();
     }
-
-    return {
-      id: g.garden_id,
-      name: displayName,
-      owner: ownerFromTitle,
-      plantsCount: g.plant_count || 0,
-      styleName: translatedEnv,
-      image: finalImage,
-      isDefault: isDefault,
-    };
-  });
-
-  const gardens = [...gardensDataMapped].reverse();
+  } catch {
+    // fail silently – gardens will be empty
+  }
 
   return (
     <div className="user-gardens-page min-h-screen bg-main-gradient pb-20 overflow-hidden">

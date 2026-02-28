@@ -69,6 +69,7 @@
     "hidePassword": "Passwort verbergen"
   },
   "LandingPage": {
+    "appName": "Plant Portal",
     "description": "Ihre Pflanzen-Wissensdatenbank, Fotogalerie und eine Gemeinschaft von Botanik-Enthusiasten. Melden Sie sich an, um den Dienst vollumfänglich zu nutzen!",
     "login": "Anmelden",
     "register": "Registrieren"
@@ -94,8 +95,10 @@
       "joinedGardens": "Gemeinsame Gärten"
     },
     "actions": {
-      "follow": "Folgen",
-      "unfollow": "Nicht mehr folgen"
+      "addFriend": "Freund hinzufügen",
+      "removeFriend": "Freund entfernen",
+      "cancelRequest": "Anfrage abbrechen",
+      "acceptRequest": "Anfrage annehmen"
     },
     "settings": {
       "title": "Einstellungen",
@@ -241,6 +244,8 @@
     "addGardener": "Mitglieder / Gärtner hinzufügen",
     "deleteGarden": "Garten löschen",
     "confirmDelete": "Sind Sie sicher, dass Sie diesen Garten löschen möchten? Alle darin enthaltenen Pflanzen werden ebenfalls entfernt.",
+    "communitySpace": "Gemeinschaftsbereich",
+    "gardenPlaceholderAlt": "Garten-Platzhalter",
     "saveChanges": "Änderungen speichern",
     "cancel": "Abbrechen",
     "cannotEditDefault": "Der Hauptgarten kann nicht bearbeitet werden.",
@@ -275,8 +280,13 @@
     "placeholder": "Tippen Sie, um zu suchen...",
     "resultsCount": "{count, plural, one {# Ergebnis gefunden} other {# Ergebnisse gefunden}}",
     "noResults": "Keine Ergebnisse für \"{query}\" gefunden",
+    "sortAZ": "A \u2192 Z",
+    "sortZA": "Z \u2192 A",
+    "showMore": "Mehr anzeigen",
+    "showingOf": "{shown} von {total} angezeigt",
     "aria": {
-      "close": "Suche schließen"
+      "close": "Suche schlie\u00dfen",
+      "sortOrder": "Sortierreihenfolge \u00e4ndern"
     },
     "loading": "Suche wird ausgeführt, bitte warten..."
   },
@@ -320,6 +330,34 @@
     }
   },
   "PlantCard": {
-    "deleteConfirm": "Sind Sie sicher, dass Sie diese Pflanze löschen möchten?"
+    "deleteConfirm": "Sind Sie sicher, dass Sie diese Pflanze l\u00f6schen m\u00f6chten?",
+    "deleteTitle": "Pflanze l\u00f6schen",
+    "anonymous": "Anonym",
+    "plantAlt": "Pflanze"
+  },
+  "Metadata": {
+    "home": "Plant Portal — Ihre Pflanzen-Wissensdatenbank",
+    "homeDescription": "Pflanzen durchstöbern, Gärten entdecken und einer Gemeinschaft von Botanik-Enthusiasten beitreten.",
+    "gardens": "Gärten",
+    "gardensDescription": "Entdecken Sie die neuesten Gärten unserer Community-Mitglieder.",
+    "aboutUs": "Über uns",
+    "aboutUsDescription": "Lernen Sie das Team hinter Plant Portal kennen — ein Projekt aus 42Warsaw.",
+    "contact": "Kontakt",
+    "contactDescription": "Kontaktieren Sie das Plant Portal Team. Bürozeiten und E-Mail-Kontakt.",
+    "terms": "Nutzungsbedingungen",
+    "termsDescription": "Lesen Sie die Nutzungsbedingungen des Plant Portal Dienstes.",
+    "privacyPolicy": "Datenschutz",
+    "privacyPolicyDescription": "Erfahren Sie, wie Plant Portal Ihre persönlichen Daten schützt.",
+    "profile": "{name}",
+    "profileDescription": "Sehen Sie das Profil von {name}, Gärten und Pflanzensammlung.",
+    "chat": "Chat",
+    "chatDescription": "Chatten Sie mit Ihren Freunden auf Plant Portal.",
+    "register": "Registrieren",
+    "registerDescription": "Erstellen Sie ein kostenloses Konto bei Plant Portal und teilen Sie Ihre Pflanzen."
+  },
+  "NotFoundPage": {
+    "title": "Seite nicht gefunden",
+    "description": "Die Seite, die Sie suchen, existiert nicht oder wurde verschoben.",
+    "backHome": "Zurück zur Startseite"
   }
 }

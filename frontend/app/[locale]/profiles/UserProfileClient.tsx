@@ -21,15 +21,16 @@ export default function UserProfileClient({
   );
 
   const [pins, setPins] = useState<any[]>(user?.pins || []);
+  const [userWithGardens, setUserWithGardens] = useState(user);
 
   /** PL: Stan bieżącej strony w galerii pinów | EN: Current page state in the pins gallery */
   const [currentPage, setCurrentPage] = useState(1);
 
   /** PL: Czy zalogowany użytkownik jest właścicielem profilu | EN: Is the logged-in user the profile owner */
-  const [isOwnProfile, setIsOwnProfile] = useState(false);
+  const isOwnProfile = !!(currentLoggedUser && user && currentLoggedUser === user.username);
 
   const totalPages = Math.ceil(pins.length / 4) || 1;
-  const isLoggedIn = !!currentLoggedUser;
+  const safePage = currentPage > totalPages ? totalPages : currentPage;
   const pinsRef = useRef<HTMLDivElement | null>(null);
 
   const handlePageChange = (page: number) => {
@@ -40,7 +41,7 @@ export default function UserProfileClient({
     if (pinsRef.current) {
       pinsRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
-  }, [currentPage]);
+  }, [safePage]);
 
   /**
    * PL: Pobiera aktualnie zalogowanego użytkownika z sessionStorage.
@@ -50,38 +51,42 @@ export default function UserProfileClient({
     apiFetch('/api/auth/me/')
       .then(res => res.json())
       .then(data => setCurrentLoggedUser(data.username))
-      .catch(() => {});
+      .catch(() => { });
   }, []);
+
+  /**
+   * PL: Pobiera ogrody użytkownika, aby wyświetlić sekcję "Joined Gardens".
+   * EN: Fetches user gardens to display the "Joined Gardens" section.
+   */
+  useEffect(() => {
+    if (!user?.username) return;
+    apiFetch(`/api/garden/?member=${encodeURIComponent(user.username)}`)
+      .then(res => (res.ok ? res.json() : []))
+      .then(data => {
+        if (!Array.isArray(data)) return;
+        const joined = data.filter(
+          (g: any) => g.owner !== user.username && g.user_count > 1
+        );
+        setUserWithGardens(prev =>
+          prev ? { ...prev, joined_gardens: joined } : prev
+        );
+      })
+      .catch(() => { });
+  }, [user?.username]);
 
   useEffect(() => {
     if (!user?.id || !currentLoggedUser) return;
     apiFetch(`/api/pins/?owner=${user.id}`)
       .then(res => res.json())
       .then(data => setPins(Array.isArray(data) ? data : []))
-      .catch(() => {});
+      .catch(() => { });
   }, [user?.id, currentLoggedUser]);
-
-  /**
-   * PL: Synchronizacja stanu profilu na podstawie zalogowanego użytkownika.
-   * EN: Profile state synchronization based on the logged-in user.
-   */
-  useEffect(() => {
-    setIsOwnProfile(
-      !!(currentLoggedUser && user && currentLoggedUser === user.username)
-    );
-  }, [user, currentLoggedUser]);
-
-  useEffect(() => {
-    if (currentPage > totalPages) {
-      setCurrentPage(totalPages);
-    }
-  }, [totalPages, currentPage]);
 
   return (
     <ProfileContent
-      user={user}
+      user={userWithGardens}
       isOwnProfile={isOwnProfile}
-      currentPage={currentPage}
+      currentPage={safePage}
       setCurrentPage={handlePageChange}
       pins={pins}
       totalPages={totalPages}

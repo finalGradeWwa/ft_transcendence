@@ -1,37 +1,13 @@
 // /frontend/app/[locale]/profiles/[username]/gardens/[gardenId]/page.tsx
 
-import { HomePageClient } from '../../../../HomePageClient';
 import { getTranslations } from 'next-intl/server';
+import { HomePageClient } from '../../../../HomePageClient';
 import { GardenActions } from '@/components/gardens/GardenActions';
+import { serverFetch } from '@/lib/serverAuth';
 
 const API_URL = (
   process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000'
 ).replace(/\/$/, '');
-
-async function getGardenPlants(gardenId: string) {
-  try {
-    const response = await fetch(
-      `${API_URL}/api/plant/?garden=${encodeURIComponent(gardenId)}`,
-      { cache: 'no-store' }
-    );
-    if (!response.ok) return [];
-    return await response.json();
-  } catch {
-    return [];
-  }
-}
-
-async function getGarden(gardenId: string) {
-  try {
-    const response = await fetch(`${API_URL}/api/garden/${gardenId}/`, {
-      cache: 'no-store',
-    });
-    if (!response.ok) return null;
-    return await response.json();
-  } catch {
-    return null;
-  }
-}
 
 export default async function GardenPage({
   params,
@@ -41,14 +17,14 @@ export default async function GardenPage({
   const { username, gardenId } = await params;
   const tGardens = await getTranslations('GardensPage');
 
-  const [plantsData, garden] = await Promise.all([
-    getGardenPlants(gardenId),
-    getGarden(gardenId),
+  const [gardenRes, plantsRes] = await Promise.all([
+    serverFetch(`/api/garden/${gardenId}/`),
+    serverFetch(`/api/plant/?garden=${encodeURIComponent(gardenId)}`),
   ]);
 
-  if (!garden) {
-    return null;
-  }
+  if (!gardenRes.ok) return null;
+  const garden = await gardenRes.json();
+  const plantsData = plantsRes.ok ? await plantsRes.json() : [];
 
   const isDefault =
     garden.name?.includes("'s Garden") || garden.name === 'Default Garden';
@@ -56,30 +32,43 @@ export default async function GardenPage({
     ? tGardens('defaultGardenName')
     : garden.name || gardenId;
 
-  const plants = (Array.isArray(plantsData) ? plantsData : []).map((p: any) => {
-    const rawImage = p.image_url || p.image || p.thumbnail;
-    let finalImage = '/images/garden/garden-placeholder.webp';
+  const plants = (Array.isArray(plantsData) ? plantsData : []).map(
+    (p: any) => {
+      const rawImage = p.image_url || p.image || p.thumbnail;
+      let finalImage = '/images/garden/garden-placeholder.webp';
 
-    if (rawImage) {
-      if (rawImage.startsWith('http')) {
-        finalImage = rawImage;
-      } else {
-        const baseUrl = API_URL.endsWith('/') ? API_URL.slice(0, -1) : API_URL;
-        const imgPath = rawImage.startsWith('/') ? rawImage : `/${rawImage}`;
-        finalImage = `${baseUrl}${imgPath}`;
+      if (rawImage) {
+        if (rawImage.startsWith('http')) {
+          finalImage = rawImage;
+        } else {
+          const baseUrl = API_URL.endsWith('/')
+            ? API_URL.slice(0, -1)
+            : API_URL;
+          const imgPath = rawImage.startsWith('/')
+            ? rawImage
+            : `/${rawImage}`;
+          finalImage = `${baseUrl}${imgPath}`;
+        }
       }
-    }
 
-    return {
-      id: p.plant_id,
-      commonName: p.nickname,
-      latinName: p.species || '',
-      author: p.owner_username || p.owner || username,
-      garden: gardenDisplayName,
-      gardenId: parseInt(gardenId),
-      image: finalImage,
-    };
-  });
+      return {
+        id: p.plant_id,
+        commonName: p.nickname,
+        latinName: p.species || '',
+        author: p.owner_username || p.owner || username,
+        garden: gardenDisplayName,
+        gardenId: parseInt(gardenId),
+        image: finalImage,
+      };
+    }
+  );
+
+  const envMap: Record<string, string> = {
+    i: 'indoor',
+    o: 'outdoor',
+    g: 'greenhouse',
+  };
+  const envKey = envMap[garden.environment?.toLowerCase() || ''];
 
   return (
     <div className="min-h-screen bg-main-gradient pb-20 overflow-hidden">
@@ -95,19 +84,11 @@ export default async function GardenPage({
             </span>
           </h1>
           <div className="h-2 w-24 bg-primary-green mt-6 rounded-full" />
-          {(() => {
-            const envMap: Record<string, string> = {
-              i: 'indoor',
-              o: 'outdoor',
-              g: 'greenhouse',
-            };
-            const envKey = envMap[garden.environment?.toLowerCase() || ''];
-            return envKey ? (
-              <p className="text-neutral-600 mt-4 font-bold uppercase tracking-[0.3em] text-xs">
-                {tGardens(`environments.${envKey}` as any)}
-              </p>
-            ) : null;
-          })()}
+          {envKey && (
+            <p className="text-neutral-600 mt-4 font-bold uppercase tracking-[0.3em] text-xs">
+              {tGardens(`environments.${envKey}` as any)}
+            </p>
+          )}
         </div>
       </header>
 

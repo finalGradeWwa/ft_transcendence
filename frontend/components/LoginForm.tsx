@@ -26,7 +26,7 @@ interface LoginFormProps {
   t: (key: string) => string;
   tError: (key: string) => string;
   onLoginSuccess: () => void;
-  usernameRef: React.RefObject<HTMLInputElement>;
+  usernameRef: React.RefObject<HTMLInputElement | null>;
 }
 
 /**

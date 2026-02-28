@@ -1,6 +1,7 @@
 import { getTranslations } from 'next-intl/server';
 import { UserPlantsClient } from './UserPlantsClient';
 import NextImage from 'next/image';
+import { serverFetch } from '@/lib/serverAuth';
 
 interface UserPlantsPageProps {
   params: Promise<{
@@ -15,9 +16,8 @@ const API_URL = (
 
 async function getUserPlants(username: string) {
   try {
-    const response = await fetch(
-      `${API_URL}/api/plant/?username=${encodeURIComponent(username)}`,
-      { cache: 'no-store' }
+    const response = await serverFetch(
+      `/api/plant/?username=${encodeURIComponent(username)}`
     );
     if (!response.ok) return [];
     return await response.json();
@@ -34,9 +34,10 @@ export default async function UserPlantsPage({ params }: UserPlantsPageProps) {
 
   const plants = plantsData.map((p: any) => {
     const isDefaultGarden =
-      p.garden_name.includes("'s Garden") || p.garden_name === 'Home Garden';
+      p.garden_name?.includes("'s Garden") || p.garden_name === 'Home Garden' || p.garden_name === 'Default Garden';
 
-    let imageUrl = p.image;
+    const rawImage = p.image_url || p.image;
+    let imageUrl = rawImage;
     if (imageUrl && !imageUrl.startsWith('http')) {
       imageUrl = `${API_URL}${imageUrl}`;
     }
@@ -46,7 +47,7 @@ export default async function UserPlantsPage({ params }: UserPlantsPageProps) {
       commonName: p.nickname,
       latinName: p.species || '',
       author: p.owner_username,
-      garden: isDefaultGarden ? tGardens('defaultGardenName') : p.garden_name,
+      garden: isDefaultGarden ? tGardens('defaultGardenName') : (p.garden_name || ''),
       gardenId: p.garden_id,
       image: imageUrl,
     };

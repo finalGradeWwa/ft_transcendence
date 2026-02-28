@@ -13,14 +13,26 @@ import { LoginForm } from './LoginForm';
 import { ModalFooter } from './ModalFooter';
 import { Heading } from '@/components/Heading';
 import { Text } from '@/components/typography/Text';
+import { useTranslations } from 'next-intl';
+
+type TranslateFunction = ReturnType<typeof useTranslations>;
+
+interface ModalContentProps {
+  t: TranslateFunction;
+  tError: TranslateFunction;
+  onClose: () => void;
+  usernameRef: React.RefObject<HTMLInputElement | null>;
+}
 
 export const ModalContent = ({
   t,
   tError,
   onClose,
   usernameRef,
-  isRegistered,
-}: any) => {
+}: ModalContentProps) => {
+  const tRegister = useTranslations('RegisterPage');
+  const searchParams = useSearchParams();
+  const isRegistered = searchParams.get('registered') === 'true';
   return (
     <div
       className="bg-container-light p-6 rounded-lg shadow-2xl w-full max-sm:mx-4 max-w-sm border border-primary-green relative"
@@ -45,7 +57,7 @@ export const ModalContent = ({
       {isRegistered && (
         <div className="mb-6 p-3 bg-green-50 border border-green-500 rounded-lg">
           <Text className="text-green-800 font-bold text-sm text-center">
-            TEST: REJESTRACJA OK
+            {tRegister('successMessage')}
           </Text>
         </div>
       )}

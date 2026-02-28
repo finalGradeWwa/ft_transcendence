@@ -58,12 +58,6 @@ export const GlobalModalProvider = () => {
     }
   }, [isLoginParamPresent, isLoggedIn, pathname, router]);
 
-  useEffect(() => {
-    if (isLoginParamPresent && isLoggedIn === true) {
-      router.replace(pathname);
-    }
-  }, [isLoginParamPresent, isLoggedIn, pathname, router]);
-
   /**
    * PL: Zamyka modal i czyści parametry URL przy użyciu routera Next.js.
    * EN: Closes the modal and clears URL parameters using the Next.js router.

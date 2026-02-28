@@ -7,15 +7,10 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { apiFetch } from '@/lib/auth';
 
-const API_URL = (
-  process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000'
-).replace(/\/$/, '');
-
 export default function AddPlantPage({
-  params,
   searchParams,
 }: {
-  params: Promise<{ locale: string; username: string }>;
+  params: Promise<{ locale: string }>;
   searchParams: Promise<{ gardenId?: string }>;
 }) {
   const t = useTranslations('AddPlantPage');
@@ -29,18 +24,18 @@ export default function AddPlantPage({
     apiFetch('/api/auth/me/')
       .then(res => res.json())
       .then(data => setUsername(data.username))
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   useEffect(() => {
     async function fetchGardens() {
       try {
-        const response = await fetch(`${API_URL}/api/garden/`);
+        const response = await apiFetch('/api/garden/?owner=me');
         if (response.ok) {
           const data = await response.json();
           setGardens(data);
         }
-      } catch (err) {}
+      } catch (err) { }
     }
     fetchGardens();
   }, []);

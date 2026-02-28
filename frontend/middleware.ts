@@ -2,14 +2,21 @@
  * PL: Mechanizm Middleware dla next-intl. Pełni rolę "strażnika ruchu", który analizuje
  * każde żądanie przed wyrenderowaniem strony, obsługując wykrywanie języka,
  * automatyczne przekierowania oraz zarządzanie ciasteczkami lokalizacji.
- * * EN: Middleware mechanism for next-intl. Acts as a "traffic guardian" that analyzes
+ * Dodatkowo odświeża token JWT i przekazuje access token do Server Components.
+ *
+ * EN: Middleware mechanism for next-intl. Acts as a "traffic guardian" that analyzes
  * every request before rendering the page, handling language detection,
  * automatic redirects, and locale cookie management.
+ * Additionally refreshes the JWT token and passes the access token to Server Components.
  */
 
 import createMiddleware from 'next-intl/middleware';
 import { routing } from './i18n/navigation';
 import { NextRequest, NextResponse } from 'next/server';
+
+const API_URL = (
+  process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000'
+).replace(/\/$/, '');
 
 /**
  * PL: Inicjalizacja bazowego middleware dla next-intl.
@@ -18,14 +25,56 @@ import { NextRequest, NextResponse } from 'next/server';
 const handleI18nRouting = createMiddleware(routing);
 
 /**
- * PL: Rozszerzona logika middleware o blokadę dostępu do stron logowania/rejestracji dla zalogowanych.
- * EN: Extended middleware logic blocking access to login/register pages for authenticated users.
+ * PL: Odświeża access token na podstawie refresh_token cookie.
+ *     Zwraca { access, newRefresh } lub null przy błędzie.
+ * EN: Refreshes the access token using the refresh_token cookie.
+ *     Returns { access, newRefresh } or null on failure.
  */
-export default function middleware(request: NextRequest) {
+async function refreshAccessToken(
+  refreshToken: string
+): Promise<{ access: string; newRefresh?: string } | null> {
+  try {
+    const res = await fetch(`${API_URL}/api/auth/token/refresh/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Cookie: `refresh_token=${refreshToken}`,
+      },
+      cache: 'no-store',
+    });
+    if (!res.ok) return null;
+
+    const data = await res.json();
+    const access = data.access as string | undefined;
+    if (!access) return null;
+
+    // PL: Odczytaj nowy refresh token z Set-Cookie (backend ustawia go po rotacji)
+    // EN: Read new refresh token from Set-Cookie (backend sets it after rotation)
+    let newRefresh: string | undefined;
+    const setCookie = res.headers.get('set-cookie');
+    if (setCookie) {
+      const match = setCookie.match(/refresh_token=([^;]+)/);
+      if (match) newRefresh = match[1];
+    }
+
+    return { access, newRefresh };
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * PL: Rozszerzona logika middleware o blokadę dostępu do stron logowania/rejestracji dla zalogowanych
+ *     oraz odświeżanie tokenów JWT dla Server Components.
+ * EN: Extended middleware logic blocking access to login/register pages for authenticated users
+ *     and refreshing JWT tokens for Server Components.
+ */
+export default async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // PL: Sprawdzamy 'refresh_token' (zgodnie z Twoimi ciasteczkami w przeglądarce)
-  const hasSession = request.cookies.has('refresh_token');
+  const refreshToken = request.cookies.get('refresh_token')?.value;
+  const hasSession = !!refreshToken;
 
   const authPages = ['/login', '/register'];
   const isAuthPage = authPages.some(page =>
@@ -50,6 +99,43 @@ export default function middleware(request: NextRequest) {
     );
   }
 
+  // PL: Dla zalogowanych użytkowników odśwież token i przekaż access token do Server Components
+  // EN: For authenticated users, refresh the token and pass access token to Server Components
+  if (hasSession && refreshToken) {
+    const result = await refreshAccessToken(refreshToken);
+
+    if (result) {
+      // PL: Uruchom i18n routing na oryginalnym żądaniu
+      // EN: Run i18n routing on the original request
+      const response = handleI18nRouting(request);
+
+      // PL: Użyj wewnętrznego mechanizmu Next.js (x-middleware-override-headers)
+      //     do przekazania access tokena jako nagłówka żądania do Server Components.
+      // EN: Use Next.js internal mechanism (x-middleware-override-headers) to pass
+      //     the access token as a request header to Server Components.
+      const existingOverrides = response.headers.get('x-middleware-override-headers') || '';
+      const overrideList = existingOverrides ? existingOverrides.split(',') : [];
+      if (!overrideList.includes('x-access-token')) {
+        overrideList.push('x-access-token');
+      }
+      response.headers.set('x-middleware-override-headers', overrideList.join(','));
+      response.headers.set('x-middleware-request-x-access-token', result.access);
+
+      // PL: Jeśli backend zrotował refresh token, ustaw nowe cookie w odpowiedzi
+      // EN: If backend rotated the refresh token, set new cookie on the response
+      if (result.newRefresh) {
+        response.cookies.set('refresh_token', result.newRefresh, {
+          httpOnly: true,
+          sameSite: 'lax',
+          path: '/',
+          maxAge: 86400,
+        });
+      }
+
+      return response;
+    }
+  }
+
   return handleI18nRouting(request);
 }
 
@@ -61,7 +147,7 @@ export const config = {
   matcher: ['/', '/(pl|en|de|ar)/:path*', '/((?!api|_next|_vercel|.*\\..*).*)'],
 };
 
-/* 
+/*
 	Ten plik to "strażnik ruchu" (Middleware). Działa on na serwerze i analizuje każde zapytanie, które wpada do strony, zanim Next.js wyśle jakiekolwiek dane do przeglądarki.
 
 	1. Automatyczne przekierowania (Routing)

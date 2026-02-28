@@ -19,7 +19,13 @@
     "showMore": "Pokaż więcej roślin",
     "oauthLoginSuccess": "Logowanie przez GitHub zakończone sukcesem. Jesteś zalogowany.",
     "loginSuccess": "Zalogowano pomyślnie.",
-    "nav": ["Strona Główna", "Ogrody", "O nas", "Regulamin", "Kontakt"],
+    "nav": [
+      "Strona Główna",
+      "Ogrody",
+      "O nas",
+      "Regulamin",
+      "Kontakt"
+    ],
     "searchPlaceholder": "Wyszukiwanie jest aktywne",
     "searchInfo": "Tutaj będzie pełna logika wyszukiwania.",
     "rights": "Wszelkie prawa zastrzeżone.",
@@ -63,6 +69,7 @@
     "hidePassword": "Ukryj hasło"
   },
   "LandingPage": {
+    "appName": "Plant Portal",
     "description": "Twoja baza wiedzy o roślinach, galeria zdjęć i społeczność pasjonatów botaniki. Zaloguj się aby w pełni korzystać z serwisu!",
     "login": "Zaloguj się",
     "register": "Zarejestruj się"
@@ -88,8 +95,10 @@
       "joinedGardens": "Współdzielone ogrody"
     },
     "actions": {
-      "follow": "Obserwuj",
-      "unfollow": "Przestań obserwować"
+      "addFriend": "Dodaj znajomego",
+      "removeFriend": "Usuń znajomego",
+      "cancelRequest": "Anuluj zaproszenie",
+      "acceptRequest": "Akceptuj zaproszenie"
     },
     "settings": {
       "title": "Ustawienia",
@@ -235,6 +244,8 @@
     "addGardener": "Członkowie / Dodaj ogrodnika",
     "deleteGarden": "Usuń ogród",
     "confirmDelete": "Czy na pewno chcesz usunąć ten ogród? Wszystkie rośliny w nim zostaną również usunięte.",
+    "communitySpace": "Przestrzeń wspólna",
+    "gardenPlaceholderAlt": "Zastępcze zdjęcie ogrodu",
     "saveChanges": "Zapisz zmiany",
     "cancel": "Anuluj",
     "cannotEditDefault": "Główny ogród nie może być edytowany.",
@@ -269,8 +280,13 @@
     "placeholder": "Wpisz aby wyszukać...",
     "resultsCount": "{count, plural, one {Znaleziono # wynik} few {Znaleziono # wyniki} many {Znaleziono # wyników} other {Znaleziono # wyników}}",
     "noResults": "Nie znaleziono wyników dla \"{query}\"",
+    "sortAZ": "A \u2192 Z",
+    "sortZA": "Z \u2192 A",
+    "showMore": "Poka\u017c wi\u0119cej",
+    "showingOf": "Wy\u015bwietlono {shown} z {total}",
     "aria": {
-      "close": "Zamknij wyszukiwanie"
+      "close": "Zamknij wyszukiwanie",
+      "sortOrder": "Zmie\u0144 kolejno\u015b\u0107 sortowania"
     },
     "loading": "Trwa wyszukiwanie, proszę czekać..."
   },
@@ -314,6 +330,34 @@
     }
   },
   "PlantCard": {
-    "deleteConfirm": "Czy na pewno chcesz usunąć tę roślinę?"
+    "deleteConfirm": "Czy na pewno chcesz usunąć tę roślinę?",
+    "deleteTitle": "Usuń roślinę",
+    "anonymous": "Anonim",
+    "plantAlt": "Roślina"
+  },
+  "Metadata": {
+    "home": "Plant Portal — Twoja baza wiedzy o roślinach",
+    "homeDescription": "Przeglądaj rośliny, odkrywaj ogrody i dołącz do społeczności pasjonatów botaniki.",
+    "gardens": "Ogrody",
+    "gardensDescription": "Odkrywaj najnowsze ogrody stworzone przez członków naszej społeczności.",
+    "aboutUs": "O nas",
+    "aboutUsDescription": "Poznaj zespół odpowiedzialny za Plant Portal — projekt stworzony w 42Warsaw.",
+    "contact": "Kontakt",
+    "contactDescription": "Skontaktuj się z zespołem Plant Portal. Godziny otwarcia biura i kontakt mailowy.",
+    "terms": "Regulamin",
+    "termsDescription": "Zapoznaj się z regulaminem korzystania z serwisu Plant Portal.",
+    "privacyPolicy": "Polityka Prywatności",
+    "privacyPolicyDescription": "Dowiedz się, jak Plant Portal chroni Twoje dane osobowe.",
+    "profile": "{name}",
+    "profileDescription": "Zobacz profil użytkownika {name}, ogrody i kolekcję roślin.",
+    "chat": "Czat",
+    "chatDescription": "Rozmawiaj ze znajomymi na Plant Portal.",
+    "register": "Rejestracja",
+    "registerDescription": "Załóż darmowe konto w Plant Portal i zacznij dzielić się swoimi roślinami."
+  },
+  "NotFoundPage": {
+    "title": "Nie znaleziono strony",
+    "description": "Strona, której szukasz, nie istnieje lub została przeniesiona.",
+    "backHome": "Powrót na stronę główną"
   }
 }

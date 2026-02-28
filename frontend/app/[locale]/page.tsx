@@ -3,17 +3,30 @@ import { RtlWrapper } from '@/components/RtlWrapper';
 import { PlantType } from '../types/plantTypes';
 import { LandingPage } from './LandingPage';
 import { cookies } from 'next/headers';
+import { serverFetch } from '@/lib/serverAuth';
 import '../globals.css';
 
-const API_URL = (
-  process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000'
-).replace(/\/$/, '');
+/**
+ * PL: Generuje metadane SEO dla strony głównej.
+ * EN: Generates SEO metadata for the home page.
+ */
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'Metadata' });
+
+  return {
+    title: { absolute: t('home') },
+    description: t('homeDescription'),
+  };
+}
 
 async function getAllPlants(): Promise<PlantType[]> {
   try {
-    const response = await fetch(`${API_URL}/api/plant/`, {
-      cache: 'no-store',
-    });
+    const response = await serverFetch('/api/plant/');
 
     if (!response.ok) return [];
     const data = await response.json();
@@ -33,15 +46,6 @@ async function getAllPlants(): Promise<PlantType[]> {
     return [];
   }
 }
-
-const dummyPlants: Array<PlantType> = Array.from({ length: 20 }, (_, i) => ({
-  id: i + 1,
-  author: `user_${(i % 5) + 1}`,
-  latinName: `Plantae magnificum ${i + 1}`,
-  commonName: `Roslina Zwykla ${i + 1}`,
-  averageRating: (((i * 0.4) % 6) + 1).toFixed(1),
-  totalReviews: Math.floor(Math.random() * 50) + 1,
-}));
 
 export default async function FinalPage({
   params,
@@ -77,7 +81,7 @@ export default async function FinalPage({
 
   return (
     <RtlWrapper
-      plants={translatedPlants.length > 0 ? translatedPlants : dummyPlants}
+      plants={translatedPlants}
       locale={locale}
       showLogin={showLogin === 'true'}
       isRegistered={registered === 'true'}

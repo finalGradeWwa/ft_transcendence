@@ -23,6 +23,7 @@ export const UserGardensClient = ({
     initialCurrentUser
   );
   const [currentPage, setCurrentPage] = useState(1);
+
   const itemsPerPage = 12;
 
   const totalPages = Math.ceil(gardens.length / itemsPerPage) || 1;

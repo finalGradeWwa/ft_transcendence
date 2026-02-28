@@ -1,11 +1,9 @@
-'use client';
-
 /**
- * PL: Strona kontaktowa wyświetlająca dane firmy oraz link maila.
- * EN: Contact page displaying business details and email link.
+ * PL: Strona kontaktowa wyświetlająca dane firmy oraz link maila (Server Component z SSR).
+ * EN: Contact page displaying business details and email link (Server Component with SSR).
  */
 
-import { useTranslations } from 'next-intl';
+import { getTranslations } from 'next-intl/server';
 import { Icon } from '@/components/icons/ui/Icon';
 import NextImage from 'next/image';
 
@@ -76,11 +74,29 @@ const ContactView = ({ t }: any) => (
 );
 
 /**
- * PL: Główny komponent strony kontaktu zarządzający układem i stanem modalu.
- * EN: Main contact page component managing layout and modal state.
+ * PL: Generuje metadane SEO dla strony kontaktu na podstawie wybranego języka.
+ * EN: Generates SEO metadata for the contact page based on the selected locale.
  */
-export default function ContactPage() {
-  const t = useTranslations('HomePage');
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'Metadata' });
+
+  return {
+    title: t('contact'),
+    description: t('contactDescription'),
+  };
+}
+
+/**
+ * PL: Główny komponent strony kontaktu (Server Component) zarządzający układem.
+ * EN: Main contact page component (Server Component) managing layout.
+ */
+export default async function ContactPage() {
+  const t = await getTranslations('HomePage');
 
   return (
     <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pt-20 pb-12 flex flex-col justify-center h-full flex-grow">

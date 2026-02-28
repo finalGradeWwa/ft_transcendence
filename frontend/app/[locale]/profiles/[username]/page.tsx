@@ -1,5 +1,5 @@
 import UserProfileClient from '../UserProfileClient';
-import { cookies } from 'next/headers';
+import { getTranslations } from 'next-intl/server';
 
 const API_URL = (
   process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000'
@@ -7,12 +7,8 @@ const API_URL = (
 
 async function getUserProfile(username: string) {
   try {
-    const cookieStore = await cookies();
-    const refreshToken = cookieStore.get('refresh_token')?.value;
-
     const response = await fetch(`${API_URL}/users/profile/${username}/`, {
       cache: 'no-store',
-      headers: refreshToken ? { Cookie: `refresh_token=${refreshToken}` } : {},
     });
 
     if (!response.ok) return null;
@@ -22,16 +18,22 @@ async function getUserProfile(username: string) {
   }
 }
 
-async function getUserGardens(username: string) {
-  try {
-    const response = await fetch(`${API_URL}/api/garden/?member=${username}`, {
-      cache: 'no-store',
-    });
-    if (!response.ok) return [];
-    return await response.json();
-  } catch {
-    return [];
-  }
+/**
+ * PL: Generuje dynamiczne metadane SEO na podstawie nazwy użytkownika.
+ * EN: Generates dynamic SEO metadata based on the username.
+ */
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string; username: string }>;
+}) {
+  const { locale, username } = await params;
+  const t = await getTranslations({ locale, namespace: 'Metadata' });
+
+  return {
+    title: t('profile', { name: username }),
+    description: t('profileDescription', { name: username }),
+  };
 }
 
 export default async function ProfilePage({
@@ -44,17 +46,7 @@ export default async function ProfilePage({
 
   if (!user) return null;
 
-  const allGardens = await getUserGardens(username);
+  const userWithPins = { ...user, pins: [] };
 
-  if (Array.isArray(allGardens)) {
-    user.owned_gardens = allGardens.filter((g: any) => g.owner === username);
-    user.joined_gardens = allGardens.filter(
-      (g: any) => g.owner !== username && g.user_count > 1
-    );
-    user.gardens_count = user.owned_gardens.length;
-  }
-
-  user.pins = [];
-
-  return <UserProfileClient user={user} currentLoggedUser={null} />;
+  return <UserProfileClient user={userWithPins} currentLoggedUser={null} />;
 }
