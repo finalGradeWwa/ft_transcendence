@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from plants.serializers import PlantListSerializer
-from .models import Garden
+from .models import Garden, GardenUser
 
 
 class GardenCreateSerializer(serializers.ModelSerializer):
@@ -8,32 +8,31 @@ class GardenCreateSerializer(serializers.ModelSerializer):
         model = Garden
         fields = ("name", "environment")
 
+class GardenMemberSerializer(serializers.ModelSerializer):
+    """
+    Serializer for garden members to ensure consistent user data representation.
+    """
+    id = serializers.IntegerField(source='user.id', read_only=True)
+    username = serializers.CharField(source='user.username', read_only=True)
+    avatar_photo = serializers.ImageField(source='user.avatar_photo', read_only=True)
 
-class GardenListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = GardenUser
+        fields = ('id', 'username', 'avatar_photo')
+
+class GardenBaseSerializer(serializers.ModelSerializer):
+    """
+    Base serializer containing common fields for Garden listings and details.
+    """
     user_count = serializers.IntegerField(read_only=True)
     plant_count = serializers.IntegerField(read_only=True)
-    thumbnail = serializers.SerializerMethodField()
     owner = serializers.SerializerMethodField()
 
     def get_owner(self, obj):
-        owner = obj.owners.first()
-        try:
-            return owner.organization_user.user.username if owner else None
-        except AttributeError:
-            return None
-
-    def get_thumbnail(self, obj):
-        request = self.context.get("request")
-        plant = (
-            obj.plants.filter(image__isnull=False)
-            .exclude(image="")
-            .order_by("created_at")
-            .first()
-        )
-        if plant and plant.image:
-            if request:
-                return request.build_absolute_uri(plant.image.url)
-            return f"http://localhost:8000{plant.image.url}"
+        # Relies on prefetch_related("owners__organization_user__user") in ViewSet
+        owner_relation = obj.owners.first()
+        if owner_relation and owner_relation.organization_user:
+            return owner_relation.organization_user.user.username
         return None
 
     class Meta:
@@ -44,50 +43,44 @@ class GardenListSerializer(serializers.ModelSerializer):
             "environment",
             "user_count",
             "plant_count",
-            "thumbnail",
             "owner",
         )
         read_only_fields = fields
 
+class GardenListSerializer(GardenBaseSerializer):
+    thumbnail = serializers.SerializerMethodField()
+
+    def get_thumbnail(self, obj):
+        request = self.context.get("request")
+        # Get the first plant with an image to serve as thumbnail
+        plant = (
+            obj.plants.filter(image__isnull=False)
+            .exclude(image="")
+            .order_by("created_at")
+            .first()
+        )
+
+        if plant and plant.image:
+            if request:
+                return request.build_absolute_uri(plant.image.url)
+            return plant.image.url
+        return None
+
+    class Meta(GardenBaseSerializer.Meta):
+        fields = GardenBaseSerializer.Meta.fields + ("thumbnail",)
+
 
 """
-PL: Zwraca listę członków ogrodu z ich id, nazwą użytkownika i avatarem.
-EN: Returns a list of garden members with their id, username and avatar.
+Returns garden details including list of plants and members.
 """
-class GardenContentSerializer(serializers.ModelSerializer):
-    owner = serializers.SerializerMethodField()
-    user_count = serializers.IntegerField(read_only=True)
-    plant_count = serializers.IntegerField(read_only=True)
-    plants = PlantListSerializer(many=True)
+class GardenContentSerializer(GardenBaseSerializer):
+    plants = PlantListSerializer(many=True, read_only=True)
     members = serializers.SerializerMethodField()
 
-    def get_owner(self, garden):
-        owner = garden.owners.first()
-        try:
-            return owner.organization_user.user.username if owner else None
-        except AttributeError:
-            return None
+    def get_members(self, obj):
+        # Optimization: select_related is used to fetch user data in one go
+        queryset = obj.gardenuser_set.select_related('user').all()
+        return GardenMemberSerializer(queryset, many=True, context=self.context).data
 
-    def get_members(self, garden):
-        garden_users = garden.gardenuser_set.select_related('user').all()
-        return [
-            {
-                'id': gu.user.id,
-                'username': gu.user.username,
-                'avatar_photo': gu.user.avatar_photo.url if gu.user.avatar_photo else None,
-            }
-            for gu in garden_users
-        ]
-
-    class Meta:
-        model = Garden
-        fields = [
-            "garden_id",
-            "name",
-            "environment",
-            "plants",
-            "owner",
-            "members",
-            "user_count",
-            "plant_count",
-        ]
+    class Meta(GardenBaseSerializer.Meta):
+        fields = GardenBaseSerializer.Meta.fields + ("plants", "members")
