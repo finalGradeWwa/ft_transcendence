@@ -231,7 +231,7 @@ class GardenPlantIntegrationTests(APITestCase):
         Plant.objects.create(nickname='Basil', species='S2', garden=garden3, owner=self.user1)
         Plant.objects.create(nickname='Lettuce', species='S3', garden=self.garden2, owner=self.user2)
 
-        # User1 should see their 2 plants
+        # User1 should see their 2 plants (in gardens they are a member of)
         self.client.force_authenticate(user=self.user1)
         response = self.client.get('/api/plant/?owner=me')
         self.assertEqual(len(response.data), 2)
@@ -241,6 +241,6 @@ class GardenPlantIntegrationTests(APITestCase):
         response = self.client.get('/api/plant/?owner=me')
         self.assertEqual(len(response.data), 1)
 
-        # But both can see all plants
+        # User2 can only see plants in gardens they belong to (garden2 only)
         response = self.client.get('/api/plant/')
-        self.assertEqual(len(response.data), 3)
+        self.assertEqual(len(response.data), 1)
