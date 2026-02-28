@@ -12,7 +12,7 @@ class PlantListSerializer(serializers.ModelSerializer):
         if obj.image:
             if request:
                 return request.build_absolute_uri(obj.image.url)
-            return f"http://localhost:8000{obj.image.url}"
+            return obj.image.url
         return None
 
     garden_id = serializers.IntegerField(source='garden.garden_id', read_only=True)
@@ -34,7 +34,7 @@ class PlantSerializer(serializers.ModelSerializer):
             "garden",
             "image",
         )
- 
+
 # This serializer controls which fields users can modify when creating a new Plant
 class PlantCreateSerializer(serializers.ModelSerializer):
     garden = serializers.PrimaryKeyRelatedField(
@@ -43,7 +43,7 @@ class PlantCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Plant
         fields = ("nickname", "species", "garden", "image")
-    
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         request = self.context.get("request")

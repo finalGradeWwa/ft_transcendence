@@ -17,7 +17,7 @@ class PinWriteModeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Pin
         fields = ("image", "content", "garden", "plant")
-    
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         request = self.context.get("request")
@@ -29,7 +29,7 @@ class PinWriteModeSerializer(serializers.ModelSerializer):
             self.fields["plant"].queryset = Plant.objects.filter(
                 garden__in=self.fields["garden"].queryset
             )
-            
+
 
 # detail on user's wall
 class PinDetailReadModeSerializer(serializers.ModelSerializer):
@@ -62,17 +62,22 @@ class PinListReadModeSerializer(serializers.ModelSerializer):
     def get_garden_owner(self, obj):
         if not obj.garden:
             return None
-        try:
-            owner = obj.garden.owners.first()
-            return owner.organization_user.user.username if owner else None
-        except AttributeError:
-            return None
+        # Logic aligned with GardenBaseSerializer
+        owner_relation = obj.garden.owners.first()
+        if owner_relation and owner_relation.organization_user:
+            return owner_relation.organization_user.user.username
+        return None
 
     def get_garden_image(self, obj):
+        request = self.context.get("request")
         if not obj.garden:
             return None
-        first_plant = obj.garden.plants.filter(image__isnull=False).exclude(image='').order_by('plant_id').first()
+        # Consistent logic with GardenListSerializer (sort by created_at)
+        first_plant = obj.garden.plants.filter(image__isnull=False).exclude(image='').order_by('created_at').first()
+
         if first_plant and first_plant.image:
+            if request:
+                return request.build_absolute_uri(first_plant.image.url)
             return first_plant.image.url
         return None
 

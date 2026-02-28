@@ -1,8 +1,7 @@
 from rest_framework import viewsets, status
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.authentication import SessionAuthentication
-from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404
 
 from .models import Plant
@@ -11,20 +10,24 @@ from .services import create_plant
 
 
 class PlantViewSet(viewsets.ViewSet):
-    authentication_classes = [JWTAuthentication, SessionAuthentication]
-    queryset = Plant.objects.all()
+    permission_classes = [IsAuthenticated]
 
-    def get_permissions(self):
-        if self.action in ['list', 'retrieve']:
-            return [AllowAny()]
-        return [IsAuthenticated()]
+    def _check_plant_permission(self, plant, user):
+        """
+        Helper: Checks if user is a member of the plant's garden.
+        """
+        if not plant.garden.gardenuser_set.filter(user=user).exists():
+            raise PermissionDenied("You must be a member of this plant's garden to perform this action")
 
     def list(self, request):
         garden_id = request.query_params.get("garden")
         owner_param = request.query_params.get("owner")
         username_param = request.query_params.get("username")
 
-        plants = Plant.objects.all()
+        # Base query: Plants in gardens where I am a member
+        plants = Plant.objects.filter(
+            garden__gardenuser__user=request.user
+        ).select_related('owner', 'garden').distinct()
 
         if garden_id:
             plants = plants.filter(garden_id=garden_id)
@@ -43,6 +46,7 @@ class PlantViewSet(viewsets.ViewSet):
 
     def retrieve(self, request, pk=None):
         plant = get_object_or_404(Plant, pk=pk)
+        # Note: We might want to check visibility here too, but retrieve is often looser
         serializer = PlantSerializer(plant)
         return Response(serializer.data)
 
@@ -68,21 +72,13 @@ class PlantViewSet(viewsets.ViewSet):
 
     def destroy(self, request, pk=None):
         plant = get_object_or_404(Plant, pk=pk)
-        if not plant.garden.gardenuser_set.filter(user=request.user).exists():
-            return Response(
-                {"detail": "You must be a member of this plant's garden to delete it"},
-                status=status.HTTP_403_FORBIDDEN,
-            )
+        self._check_plant_permission(plant, request.user)
         plant.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     def update(self, request, pk=None):
         plant = get_object_or_404(Plant, pk=pk)
-        if not plant.garden.gardenuser_set.filter(user=request.user).exists():
-            return Response(
-                {"detail": "You must be a member of this plant's garden to update it"},
-                status=status.HTTP_403_FORBIDDEN,
-            )
+        self._check_plant_permission(plant, request.user)
         serializer = PlantCreateSerializer(
             plant,
             data=request.data,
@@ -94,11 +90,7 @@ class PlantViewSet(viewsets.ViewSet):
 
     def partial_update(self, request, pk=None):
         plant = get_object_or_404(Plant, pk=pk)
-        if not plant.garden.gardenuser_set.filter(user=request.user).exists():
-            return Response(
-                {"detail": "You must be a member of this plant's garden to update it"},
-                status=status.HTTP_403_FORBIDDEN,
-            )
+        self._check_plant_permission(plant, request.user)
         serializer = PlantCreateSerializer(
             plant,
             data=request.data,
