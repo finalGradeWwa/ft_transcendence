@@ -420,12 +420,14 @@ export const PinsGallery = ({
   itemsPerPage,
   currentLoggedUser,
   onDeleted,
+  showCreator,
 }: {
   pins: any[];
   currentPage: number;
   itemsPerPage: number;
   currentLoggedUser?: string | null;
   onDeleted?: (pinId: number) => void;
+  showCreator?: boolean;
 }) => {
   const t = useTranslations('ProfilePage');
   const tGardens = useTranslations('GardensPage');
@@ -464,6 +466,14 @@ export const PinsGallery = ({
           key={pin.id}
           className="p-6 bg-secondary-beige border border-primary-green/10 rounded-xl shadow-lg flex flex-col min-h-[140px] w-full outline outline-2 outline-neutral-900 outline-offset-2"
         >
+          {showCreator && pin.creator && (
+            <Link
+              href={`/profiles/${pin.creator}`}
+              className="text-primary-green font-bold text-sm hover:underline mb-2 rounded-md w-fit focus-visible:outline focus-visible:outline-2 focus-visible:outline-header-main focus-visible:outline-offset-2"
+            >
+              @{pin.creator}
+            </Link>
+          )}
           {(pin.plant_image || pin.garden_image) && (
             <div className="relative w-full h-64 sm:h-96 mb-4 overflow-hidden rounded-lg">
               <img

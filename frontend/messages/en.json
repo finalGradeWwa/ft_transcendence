@@ -33,6 +33,9 @@
     "terms": "Terms",
     "plantsCountLabel": "Number of plants",
     "addPin": "Add pin",
+    "feedTitle": "YOUR FEED",
+    "emptyFeed": "No posts from friends yet. Add friends to see their posts!",
+    "postedBy": "by",
     "firstPage": "First",
     "lastPage": "Last",
     "aria": {

@@ -21,6 +21,9 @@
     "loginSuccess": "Erfolgreich angemeldet.",
     "plantsCountLabel": "Anzahl der Pflanzen",
     "addPin": "Pin hinzufügen",
+    "feedTitle": "DEIN FEED",
+    "emptyFeed": "Noch keine Beiträge von Freunden. Füge Freunde hinzu, um ihre Beiträge zu sehen!",
+    "postedBy": "von",
     "firstPage": "Erste",
     "lastPage": "Letzte",
     "nav": [

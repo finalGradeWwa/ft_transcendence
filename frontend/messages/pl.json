@@ -33,6 +33,9 @@
     "terms": "Regulamin",
     "plantsCountLabel": "Liczba roślin",
     "addPin": "Dodaj pin",
+    "feedTitle": "TWÓJ FEED",
+    "emptyFeed": "Brak postów od znajomych. Dodaj znajomych, aby widzieć ich wpisy!",
+    "postedBy": "autor",
     "firstPage": "Początek",
     "lastPage": "Koniec",
     "aria": {
