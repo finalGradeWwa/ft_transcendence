@@ -1,6 +1,7 @@
 import { getTranslations } from 'next-intl/server';
-import { HomePageClient } from '../../../HomePageClient';
+import { UserPlantsClient } from './UserPlantsClient';
 import NextImage from 'next/image';
+import { serverFetch } from '@/lib/serverAuth';
 
 interface UserPlantsPageProps {
   params: Promise<{
@@ -9,40 +10,48 @@ interface UserPlantsPageProps {
   }>;
 }
 
+const API_URL = (
+  process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000'
+).replace(/\/$/, '');
+
+async function getUserPlants(username: string) {
+  try {
+    const response = await serverFetch(
+      `/api/plant/?username=${encodeURIComponent(username)}`
+    );
+    if (!response.ok) return [];
+    return await response.json();
+  } catch {
+    return [];
+  }
+}
+
 export default async function UserPlantsPage({ params }: UserPlantsPageProps) {
   const { username } = await params;
   const t = await getTranslations('ProfilePage');
+  const tGardens = await getTranslations('GardensPage');
+  const plantsData = await getUserPlants(username);
 
-  const fakePlants = [
-    {
-      id: 101,
-      author: username,
-      latinName: 'Monstera Deliciosa',
-      commonName: 'Mój Wielkolud',
-      garden: 'Salon Południowy',
-    },
-    {
-      id: 102,
-      author: username,
-      latinName: 'Ficus Lyrata',
-      commonName: 'Fikus Stefan',
-      garden: 'Sypialnia',
-    },
-    {
-      id: 103,
-      author: username,
-      latinName: 'Sansevieria Trifasciata',
-      commonName: 'Język Teściowej',
-      garden: 'Biuro',
-    },
-    {
-      id: 104,
-      author: username,
-      latinName: 'Crassula Ovata',
-      commonName: 'Drzewko Szczęścia',
-      garden: 'Taras',
-    },
-  ];
+  const plants = plantsData.map((p: any) => {
+    const isDefaultGarden =
+      p.garden_name?.includes("'s Garden") || p.garden_name === 'Home Garden' || p.garden_name === 'Default Garden';
+
+    const rawImage = p.image_url || p.image;
+    let imageUrl = rawImage;
+    if (imageUrl && !imageUrl.startsWith('http')) {
+      imageUrl = `${API_URL}${imageUrl}`;
+    }
+
+    return {
+      id: p.plant_id,
+      commonName: p.nickname,
+      latinName: p.species || '',
+      author: p.owner_username,
+      garden: isDefaultGarden ? tGardens('defaultGardenName') : (p.garden_name || ''),
+      gardenId: p.garden_id,
+      image: imageUrl,
+    };
+  });
 
   return (
     <div className="user-plants-page min-h-screen bg-main-gradient pb-20 overflow-hidden">
@@ -84,7 +93,7 @@ export default async function UserPlantsPage({ params }: UserPlantsPageProps) {
       </header>
 
       <div className="plants-grid-container overflow-hidden">
-        <HomePageClient plants={fakePlants} hideTitle />
+        <UserPlantsClient plants={plants} profileUsername={username} />
       </div>
     </div>
   );

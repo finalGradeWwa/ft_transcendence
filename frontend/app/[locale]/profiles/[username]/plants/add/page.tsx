@@ -7,6 +7,7 @@ import { AddPlantForm } from '@/components/plants/AddPlantForm';
 import { AddPlantSuccess } from '@/components/plants/AddPlantSuccess';
 import NextImage from 'next/image';
 import { apiFetch } from '@/lib/auth';
+import { useSearchParams } from 'next/navigation';
 
 /**
  * PL: Strona dodawania nowej rośliny.
@@ -18,6 +19,9 @@ export default function AddPlantPage({
   params: Promise<{ username: string }>;
 }) {
   const { username } = use(params);
+  // Pobieramy gardenId z parametrów URL (?gardenId=...)
+  const searchParams = useSearchParams();
+  const initialGardenId = searchParams.get('gardenId');
 
   const tr = useTranslations('AddPlantPage');
   const [isSuccess, setIsSuccess] = useState(false);
@@ -31,9 +35,7 @@ export default function AddPlantPage({
           const data = await response.json();
           setGardens(data);
         }
-      } catch (error) {
-        console.error('Failed to fetch gardens:', error);
-      }
+      } catch (error) {}
     };
     fetchGardens();
   }, []);
@@ -59,6 +61,7 @@ export default function AddPlantPage({
                     src="/images/other/add-plant.png"
                     alt="Kolekcja"
                     fill
+                    loading="eager"
                     className="object-contain"
                     sizes="80px"
                     priority
@@ -70,6 +73,7 @@ export default function AddPlantPage({
                   username={username}
                   gardens={gardens}
                   onSuccess={() => setIsSuccess(true)}
+                  initialGardenId={initialGardenId} // Przekazujemy ID ogrodu do formularza
                 />
               </div>
             </>

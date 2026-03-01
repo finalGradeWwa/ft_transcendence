@@ -1,17 +1,6 @@
-/**
- * Dynamic Profile Page Component (Serwerowy komponent profilu dynamicznego)
- * * EN: This server-side component extracts the 'username' from the dynamic URL
- * route (e.g., /profiles/[username]). It wraps the client-side profile
- * interface with a consistent background and passes the URL parameter
- * down to display user-specific data.
- * * PL: Ten komponent serwerowy wyodrębnia nazwę użytkownika (username) z dynamicznej
- * ścieżki adresu URL (np. /profiles/[username]). Otacza interfejs profilu po stronie
- * klienta spójnym tłem i przekazuje parametr URL w dół, aby wyświetlić dane
- * konkretnego użytkownika.
- */
-
+import { notFound } from 'next/navigation';
 import UserProfileClient from '../UserProfileClient';
-import { cookies } from 'next/headers';
+import { getTranslations } from 'next-intl/server';
 
 const API_URL = (
   process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000'
@@ -19,12 +8,8 @@ const API_URL = (
 
 async function getUserProfile(username: string) {
   try {
-    const cookieStore = await cookies();
-    const refreshToken = cookieStore.get('refresh_token')?.value;
-
     const response = await fetch(`${API_URL}/users/profile/${username}/`, {
       cache: 'no-store',
-      headers: refreshToken ? { Cookie: `refresh_token=${refreshToken}` } : {},
     });
 
     if (!response.ok) return null;
@@ -32,6 +17,24 @@ async function getUserProfile(username: string) {
   } catch (error) {
     return null;
   }
+}
+
+/**
+ * PL: Generuje dynamiczne metadane SEO na podstawie nazwy użytkownika.
+ * EN: Generates dynamic SEO metadata based on the username.
+ */
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string; username: string }>;
+}) {
+  const { locale, username } = await params;
+  const t = await getTranslations({ locale, namespace: 'Metadata' });
+
+  return {
+    title: t('profile', { name: username }),
+    description: t('profileDescription', { name: username }),
+  };
 }
 
 export default async function ProfilePage({
@@ -42,5 +45,9 @@ export default async function ProfilePage({
   const { username } = await params;
   const user = await getUserProfile(username);
 
-  return <UserProfileClient user={user} currentLoggedUser={null} />;
+  if (!user) notFound();
+
+  const userWithPins = { ...user, pins: [] };
+
+  return <UserProfileClient user={userWithPins} currentLoggedUser={null} />;
 }
