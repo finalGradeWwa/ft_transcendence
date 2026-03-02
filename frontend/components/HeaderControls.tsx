@@ -297,7 +297,7 @@ export function HeaderControls() {
             window.history.replaceState({}, '', url.toString());
           }
         })
-        .catch(err => {})
+        .catch(err => { })
         .finally(() => {
           setIsAuthLoading(false);
         });

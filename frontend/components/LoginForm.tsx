@@ -34,8 +34,9 @@ interface LoginFormProps {
  * EN: Sends a login request to the API.
  */
 const loginRequest = async (data: FormData): Promise<LoginResponse> => {
-  const apiUrl = getApiUrl();
-  const res = await fetch(`${apiUrl}/api/auth/login/`, {
+  // PL: Logowanie przez same-origin proxy — cookie ustawiane na tej samej domenie.
+  // EN: Login via same-origin proxy — cookie set on the same domain.
+  const res = await fetch('/api/auth/login/', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include',

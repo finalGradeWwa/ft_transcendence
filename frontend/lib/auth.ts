@@ -61,17 +61,16 @@ export async function logout(): Promise<void> {
   // EN: Get token BEFORE clearing, so backend can verify the user
   const token = getAccessToken();
 
-  // PL: Wywołaj backend z tokenem w headerze Authorization
-  // EN: Call backend with token in Authorization header
-
-  await apiFetch(`${getApiUrl()}/api/auth/logout/`, {
+  // PL: Wywołaj same-origin proxy logout z tokenem w headerze Authorization
+  // EN: Call same-origin logout proxy with token in Authorization header
+  await fetch('/api/auth/logout/', {
     method: 'POST',
     credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
     },
-  }).catch(() => {});
+  }).catch(() => { });
 
   // PL: Dopiero teraz usuń tokeny lokalnie
   // EN: Only now clear tokens locally
@@ -92,9 +91,9 @@ type RefreshResponse = { access?: string };
  * On failure, logs out the user and redirects to the login page.
  */
 export async function refreshAccessToken(): Promise<string> {
-  const apiUrl = getApiUrl();
-
-  const res = await fetch(`${apiUrl}/api/auth/token/refresh/`, {
+  // PL: Odświeżanie tokena przez same-origin proxy — cookie czytane z tej samej domeny.
+  // EN: Token refresh via same-origin proxy — cookie read from the same domain.
+  const res = await fetch('/api/auth/refresh/', {
     method: 'POST',
     credentials: 'include',
     headers: { 'Content-Type': 'application/json' },
@@ -106,7 +105,7 @@ export async function refreshAccessToken(): Promise<string> {
       const locale = window.location.pathname.split('/')[1] || 'pl';
       window.location.href = `/${locale}?showLogin=true`;
     }
-    return new Promise(() => {});
+    return new Promise(() => { });
   }
 
   const data = (await res.json()) as RefreshResponse;
