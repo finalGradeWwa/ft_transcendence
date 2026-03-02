@@ -5,7 +5,7 @@
  * EN: Collection of presentational components and interfaces for the user profile.
  */
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Heading } from '@/components/Heading';
 import { Link } from '@/i18n/navigation';
 import { useTranslations } from 'next-intl';
@@ -18,6 +18,12 @@ import { useToast } from '@/components/ToastProvider';
  * EN: Translation function type returned by useTranslations.
  */
 type TranslateFunction = ReturnType<typeof useTranslations>;
+
+export type FriendStatus =
+  | 'none'
+  | 'request-sent'
+  | 'request-received'
+  | 'friends';
 
 /**
  * PL: Interfejs definiujący dane profilu użytkownika przekazywane do komponentów.
@@ -50,6 +56,7 @@ export interface UserProfileProps {
     }>;
   } | null;
   currentLoggedUser: string | null;
+  initialFriendStatus?: FriendStatus | null;
 }
 
 /**
@@ -125,12 +132,6 @@ export const PersonalInfoSkeleton = () => (
 );
 
 /**
- * PL: Typ stanu relacji znajomości między użytkownikami.
- * EN: Type for friendship status between users.
- */
-type FriendStatus = 'loading' | 'none' | 'request-sent' | 'request-received' | 'friends';
-
-/**
  * PL: Przycisk zarządzania relacją znajomości (dodaj/usuń znajomego, anuluj/akceptuj zaproszenie).
  * EN: Friendship management button (add/remove friend, cancel/accept request).
  */
@@ -138,50 +139,20 @@ export const FriendRequestButton = ({
   userId,
   isOwnProfile,
   isLoggedIn,
+  initialStatus,
 }: {
   userId: number;
   isOwnProfile: boolean;
   isLoggedIn: boolean;
+  initialStatus: FriendStatus | null;
 }) => {
   const t = useTranslations('ProfilePage');
   const tErrors = useTranslations('errors');
   const { showToast } = useToast();
-  const [status, setStatus] = useState<FriendStatus>('loading');
+  const [status, setStatus] = useState<FriendStatus>(initialStatus ?? 'none');
   const [isProcessing, setIsProcessing] = useState(false);
 
-  useEffect(() => {
-    if (isOwnProfile || !isLoggedIn) return;
-
-    const checkStatus = async () => {
-      try {
-        const [friendsRes, outgoingRes, incomingRes] = await Promise.all([
-          apiFetch('/api/friends/'),
-          apiFetch('/api/friend-requests/outgoing/'),
-          apiFetch('/api/friend-requests/'),
-        ]);
-
-        const friends = friendsRes.ok ? await friendsRes.json() : [];
-        const outgoing = outgoingRes.ok ? await outgoingRes.json() : [];
-        const incoming = incomingRes.ok ? await incomingRes.json() : [];
-
-        if (Array.isArray(friends) && friends.some((u: any) => u.id === userId)) {
-          setStatus('friends');
-        } else if (Array.isArray(outgoing) && outgoing.some((u: any) => u.id === userId)) {
-          setStatus('request-sent');
-        } else if (Array.isArray(incoming) && incoming.some((u: any) => u.id === userId)) {
-          setStatus('request-received');
-        } else {
-          setStatus('none');
-        }
-      } catch {
-        setStatus('none');
-      }
-    };
-
-    checkStatus();
-  }, [userId, isOwnProfile, isLoggedIn]);
-
-  if (isOwnProfile || !isLoggedIn || status === 'loading') return null;
+  if (isOwnProfile || !isLoggedIn) return null;
 
   const handleAction = async () => {
     setIsProcessing(true);
@@ -253,11 +224,13 @@ export const PersonalInfoContent = ({
   t,
   isOwnProfile,
   currentLoggedUser,
+  initialFriendStatus,
 }: {
   user: NonNullable<UserProfileProps['user']>;
   t: TranslateFunction;
   isOwnProfile: boolean;
   currentLoggedUser: string | null;
+  initialFriendStatus: FriendStatus | null;
 }) => {
   const dateJoined = user.date_joined
     ? new Date(user.date_joined).toISOString().split('T')[0]
@@ -281,6 +254,7 @@ export const PersonalInfoContent = ({
           userId={user.id}
           isOwnProfile={isOwnProfile}
           isLoggedIn={!!currentLoggedUser}
+          initialStatus={initialFriendStatus}
         />
       </div>
     </div>
@@ -296,17 +270,27 @@ export const PersonalInfo = ({
   t,
   isOwnProfile,
   currentLoggedUser,
+  initialFriendStatus,
 }: {
   user: UserProfileProps['user'];
   t: TranslateFunction;
   isOwnProfile: boolean;
   currentLoggedUser: string | null;
+  initialFriendStatus: FriendStatus | null;
 }) => {
   if (!user) {
     return <PersonalInfoSkeleton />;
   }
 
-  return <PersonalInfoContent user={user} t={t} isOwnProfile={isOwnProfile} currentLoggedUser={currentLoggedUser} />;
+  return (
+    <PersonalInfoContent
+      user={user}
+      t={t}
+      isOwnProfile={isOwnProfile}
+      currentLoggedUser={currentLoggedUser}
+      initialFriendStatus={initialFriendStatus}
+    />
+  );
 };
 /**
  * PL: Karta statystyki (np. liczba ogrodów, roślin) z obsługą stanu ładowania.
@@ -722,6 +706,7 @@ export const ProfileContent = ({
   pins,
   totalPages,
   currentLoggedUser,
+  initialFriendStatus,
   onDeletedPin,
   pinsRef,
 }: {
@@ -732,6 +717,7 @@ export const ProfileContent = ({
   pins: Array<{ id: number; title: string; image: string }>;
   totalPages: number;
   currentLoggedUser?: string | null;
+  initialFriendStatus?: FriendStatus | null;
   onDeletedPin?: (pinId: number) => void;
   pinsRef?: React.RefObject<HTMLDivElement | null>;
 }) => {
@@ -742,7 +728,13 @@ export const ProfileContent = ({
     <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pt-4 pb-12 flex flex-col justify-center h-full flex-grow">
       <div className="bg-container-light/10 backdrop-blur-md py-6 px-0 sm:p-10 rounded-xl shadow-2xl w-full mt-12">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <PersonalInfo user={user} t={t} isOwnProfile={isOwnProfile} currentLoggedUser={currentLoggedUser ?? null} />
+          <PersonalInfo
+            user={user}
+            t={t}
+            isOwnProfile={isOwnProfile}
+            currentLoggedUser={currentLoggedUser ?? null}
+            initialFriendStatus={initialFriendStatus ?? null}
+          />
           <StatsSection user={user} />
         </div>
 

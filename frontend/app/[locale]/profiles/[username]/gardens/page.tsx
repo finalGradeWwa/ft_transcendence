@@ -23,6 +23,17 @@ export default async function UserGardensPage({
   const tGardens = await getTranslations('GardensPage');
 
   let gardens: GardenType[] = [];
+  let currentUser: string | null = null;
+
+  try {
+    const meResponse = await serverFetch('/api/auth/me/', { method: 'GET' });
+    if (meResponse.ok) {
+      const meData = (await meResponse.json()) as { username?: string };
+      currentUser = meData.username ?? null;
+    }
+  } catch {
+    currentUser = null;
+  }
 
   try {
     const response = await serverFetch(
@@ -123,7 +134,7 @@ export default async function UserGardensPage({
       <div className="gardens-grid-section overflow-hidden">
         <UserGardensClient
           gardens={gardens}
-          initialCurrentUser={null}
+          initialCurrentUser={currentUser}
           profileUsername={username}
         />
       </div>

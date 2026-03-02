@@ -2,6 +2,7 @@ import { getTranslations } from 'next-intl/server';
 import { LandingPage } from './LandingPage';
 import { FeedClient } from './FeedClient';
 import { cookies } from 'next/headers';
+import { serverFetch } from '@/lib/serverAuth';
 import '../globals.css';
 
 /**
@@ -43,9 +44,35 @@ export default async function FinalPage({
     );
   }
 
+  let initialPins: any[] = [];
+  let initialCurrentLoggedUser: string | null = null;
+
+  try {
+    const [meResponse, pinsResponse] = await Promise.all([
+      serverFetch('/api/auth/me/', { method: 'GET' }),
+      serverFetch('/api/pins/feed/', { method: 'GET' }),
+    ]);
+
+    if (meResponse.ok) {
+      const meData = (await meResponse.json()) as { username?: string };
+      initialCurrentLoggedUser = meData.username ?? null;
+    }
+
+    if (pinsResponse.ok) {
+      const pinsData = await pinsResponse.json();
+      initialPins = Array.isArray(pinsData) ? pinsData : [];
+    }
+  } catch {
+    initialPins = [];
+    initialCurrentLoggedUser = null;
+  }
+
   return (
     <div dir={locale === 'ar' ? 'rtl' : 'ltr'}>
-      <FeedClient />
+      <FeedClient
+        initialPins={initialPins}
+        initialCurrentLoggedUser={initialCurrentLoggedUser}
+      />
     </div>
   );
 }

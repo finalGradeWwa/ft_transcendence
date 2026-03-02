@@ -31,6 +31,17 @@ export default async function UserPlantsPage({ params }: UserPlantsPageProps) {
   const t = await getTranslations('ProfilePage');
   const tGardens = await getTranslations('GardensPage');
   const plantsData = await getUserPlants(username);
+  let currentUser: string | null = null;
+
+  try {
+    const meResponse = await serverFetch('/api/auth/me/', { method: 'GET' });
+    if (meResponse.ok) {
+      const meData = (await meResponse.json()) as { username?: string };
+      currentUser = meData.username ?? null;
+    }
+  } catch {
+    currentUser = null;
+  }
 
   const plants = plantsData.map((p: any) => {
     const isDefaultGarden =
@@ -93,7 +104,10 @@ export default async function UserPlantsPage({ params }: UserPlantsPageProps) {
       </header>
 
       <div className="plants-grid-container overflow-hidden">
-        <UserPlantsClient plants={plants} profileUsername={username} />
+        <UserPlantsClient
+          plants={plants}
+          initialCurrentUser={currentUser}
+        />
       </div>
     </div>
   );

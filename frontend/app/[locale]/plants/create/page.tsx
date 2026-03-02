@@ -1,76 +1,51 @@
-'use client';
+import { serverFetch } from '@/lib/serverAuth';
+import { CreatePlantClientPage } from './CreatePlantClientPage';
 
-import { useTranslations } from 'next-intl';
-import { AddPlantForm } from './AddPlantForm';
-import { useState, useEffect, use } from 'react';
-import { useRouter } from 'next/navigation';
-import Image from 'next/image';
-import { apiFetch } from '@/lib/auth';
+type Garden = {
+  garden_id: number;
+  name: string;
+};
 
-export default function AddPlantPage({
+type CurrentUser = {
+  username?: string;
+};
+
+export default async function AddPlantPage({
   searchParams,
 }: {
   params: Promise<{ locale: string }>;
   searchParams: Promise<{ gardenId?: string }>;
 }) {
-  const t = useTranslations('AddPlantPage');
-  const router = useRouter();
+  const { gardenId } = await searchParams;
 
-  const { gardenId } = use(searchParams);
-  const [username, setUsername] = useState<string>('');
-  const [gardens, setGardens] = useState([]);
+  let username = '';
+  let gardens: Garden[] = [];
 
-  useEffect(() => {
-    apiFetch('/api/auth/me/')
-      .then(res => res.json())
-      .then(data => setUsername(data.username))
-      .catch(() => { });
-  }, []);
+  try {
+    const [meResponse, gardensResponse] = await Promise.all([
+      serverFetch('/api/auth/me/', { method: 'GET' }),
+      serverFetch('/api/garden/?owner=me', { method: 'GET' }),
+    ]);
 
-  useEffect(() => {
-    async function fetchGardens() {
-      try {
-        const response = await apiFetch('/api/garden/?owner=me');
-        if (response.ok) {
-          const data = await response.json();
-          setGardens(data);
-        }
-      } catch (err) { }
+    if (meResponse.ok) {
+      const meData = (await meResponse.json()) as CurrentUser;
+      username = meData.username ?? '';
     }
-    fetchGardens();
-  }, []);
 
-  const handleSuccess = () => {
-    router.push(`/profiles/${username}/gardens`);
-  };
+    if (gardensResponse.ok) {
+      const gardensData = await gardensResponse.json();
+      gardens = Array.isArray(gardensData) ? gardensData : [];
+    }
+  } catch {
+    username = '';
+    gardens = [];
+  }
 
   return (
-    <div className="min-h-screen bg-main-gradient py-12 px-4 flex justify-center items-start">
-      <div className="bg-container-light p-8 rounded-xl shadow-2xl w-full max-w-2xl border border-primary-green overflow-hidden">
-        <div className="flex flex-wrap items-center justify-between mb-8 pb-4 border-b border-primary-green/10 gap-4">
-          <h1 className="uppercase tracking-widest !text-primary-green font-bold text-left m-0 break-words overflow-hidden">
-            {t('title')}
-          </h1>
-          <div className="hidden min-[400px]:block relative w-16 h-16 sm:w-20 sm:h-20 shrink-0">
-            <Image
-              src="/images/other/add-plant.png"
-              alt="Kolekcja"
-              fill
-              className="object-contain"
-              sizes="80px"
-            />
-          </div>
-        </div>
-
-        <div className="w-full overflow-hidden break-words">
-          <AddPlantForm
-            username={username}
-            gardens={gardens}
-            initialGardenId={gardenId}
-            onSuccess={handleSuccess}
-          />
-        </div>
-      </div>
-    </div>
+    <CreatePlantClientPage
+      username={username}
+      gardens={gardens}
+      initialGardenId={gardenId ?? null}
+    />
   );
 }

@@ -1,28 +1,27 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
-import { apiFetch } from '@/lib/auth';
 import { PlantCard } from '@/components/plants/PlantCard';
 import { PlantModal } from '@/components/plants/PlantModal';
 import { PlantType } from '@/app/[locale]/HomePageClient';
 
 interface UserPlantsClientProps {
   plants: PlantType[];
-  profileUsername: string;
+  initialCurrentUser: string | null;
 }
 
 export const UserPlantsClient = ({
   plants: initialPlants,
-  profileUsername,
+  initialCurrentUser,
 }: UserPlantsClientProps) => {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
 
   const [plants, setPlants] = useState<PlantType[]>(initialPlants);
-  const [currentUser, setCurrentUser] = useState<string | null>(null);
+  const [currentUser] = useState<string | null>(initialCurrentUser);
   const [selectedPlantIndex, setSelectedPlantIndex] = useState<number | null>(
     null
   );
@@ -41,13 +40,6 @@ export const UserPlantsClient = ({
 
   const btnStyle =
     'bg-[#186618] text-[#fff] px-4 py-2 rounded-lg font-bold text-xs uppercase tracking-widest cursor-pointer disabled:opacity-50 focus:outline focus:outline-2 focus:outline-[#fff] focus:outline-offset-2 active:outline-none';
-
-  useEffect(() => {
-    apiFetch('/api/auth/me/')
-      .then(res => res.json())
-      .then(data => setCurrentUser(data.username))
-      .catch(() => {});
-  }, []);
 
   const handlePageChange = (page: number) => {
     const params = new URLSearchParams(searchParams.toString());

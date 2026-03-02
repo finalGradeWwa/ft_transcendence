@@ -1,85 +1,44 @@
-'use client';
+import { serverFetch } from '@/lib/serverAuth';
+import { ProfileAddPlantClientPage } from './ProfileAddPlantClientPage';
 
-import { useState, use, useEffect } from 'react';
-import { Heading } from '@/components/Heading';
-import { useTranslations } from 'next-intl';
-import { AddPlantForm } from '@/components/plants/AddPlantForm';
-import { AddPlantSuccess } from '@/components/plants/AddPlantSuccess';
-import NextImage from 'next/image';
-import { apiFetch } from '@/lib/auth';
-import { useSearchParams } from 'next/navigation';
+type Garden = {
+  garden_id: number;
+  name: string;
+};
 
 /**
  * PL: Strona dodawania nowej rośliny.
  * EN: Add new plant page.
  */
-export default function AddPlantPage({
+export default async function AddPlantPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ username: string }>;
+  searchParams: Promise<{ gardenId?: string }>;
 }) {
-  const { username } = use(params);
-  // Pobieramy gardenId z parametrów URL (?gardenId=...)
-  const searchParams = useSearchParams();
-  const initialGardenId = searchParams.get('gardenId');
+  const { username } = await params;
+  const { gardenId } = await searchParams;
 
-  const tr = useTranslations('AddPlantPage');
-  const [isSuccess, setIsSuccess] = useState(false);
-  const [gardens, setGardens] = useState([]);
+  let gardens: Garden[] = [];
 
-  useEffect(() => {
-    const fetchGardens = async () => {
-      try {
-        const response = await apiFetch('/api/garden/?owner=me');
-        if (response.ok) {
-          const data = await response.json();
-          setGardens(data);
-        }
-      } catch (error) {}
-    };
-    fetchGardens();
-  }, []);
+  try {
+    const response = await serverFetch('/api/garden/?owner=me', {
+      method: 'GET',
+    });
+    if (response.ok) {
+      const data = await response.json();
+      gardens = Array.isArray(data) ? data : [];
+    }
+  } catch {
+    gardens = [];
+  }
 
   return (
-    <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 overflow-hidden">
-      <div className="py-12 flex justify-center">
-        <div className="bg-container-light p-8 rounded-xl shadow-2xl w-full max-w-2xl border border-primary-green overflow-hidden">
-          {isSuccess ? (
-            <AddPlantSuccess username={username} />
-          ) : (
-            <>
-              <div className="flex flex-wrap items-center justify-between mb-8 pb-4 border-b border-primary-green/10 gap-4">
-                <Heading
-                  as="h1"
-                  className="uppercase tracking-widest !text-primary-green font-bold text-left m-0 break-words overflow-hidden"
-                >
-                  {tr('title')}
-                </Heading>
-
-                <div className="hidden min-[400px]:block relative w-16 h-16 sm:w-20 sm:h-20 shrink-0">
-                  <NextImage
-                    src="/images/other/add-plant.png"
-                    alt="Kolekcja"
-                    fill
-                    loading="eager"
-                    className="object-contain"
-                    sizes="80px"
-                    priority
-                  />
-                </div>
-              </div>
-              <div className="w-full overflow-hidden break-words">
-                <AddPlantForm
-                  username={username}
-                  gardens={gardens}
-                  onSuccess={() => setIsSuccess(true)}
-                  initialGardenId={initialGardenId} // Przekazujemy ID ogrodu do formularza
-                />
-              </div>
-            </>
-          )}
-        </div>
-      </div>
-    </div>
+    <ProfileAddPlantClientPage
+      username={username}
+      gardens={gardens}
+      initialGardenId={gardenId ?? null}
+    />
   );
 }

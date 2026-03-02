@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { apiFetch } from '@/lib/auth';
 import { GardenCard } from '@/components/gardens/GardenCard';
@@ -19,9 +19,7 @@ export const UserGardensClient = ({
 }: UserGardensClientProps) => {
   const t = useTranslations('GardensPage');
   const [gardens, setGardens] = useState<GardenType[]>(initialGardens);
-  const [currentUser, setCurrentUser] = useState<string | null>(
-    initialCurrentUser
-  );
+  const [currentUser] = useState<string | null>(initialCurrentUser);
   const [currentPage, setCurrentPage] = useState(1);
 
   const itemsPerPage = 12;
@@ -32,13 +30,6 @@ export const UserGardensClient = ({
 
   const btnStyle =
     'bg-[#186618] text-[#fff] px-4 py-2 rounded-lg font-bold text-xs uppercase tracking-widest cursor-pointer disabled:opacity-50 focus:outline focus:outline-2 focus:outline-[#fff] focus:outline-offset-2 active:outline-none';
-
-  useEffect(() => {
-    apiFetch('/api/auth/me/')
-      .then(res => res.json())
-      .then(data => setCurrentUser(data.username))
-      .catch(() => {});
-  }, []);
 
   const handleDelete = async (gardenId: number) => {
     if (!confirm(t('confirmDelete'))) return;

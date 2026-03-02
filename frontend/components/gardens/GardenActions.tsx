@@ -1,9 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import { Link } from '@/i18n/navigation';
 import { Icon } from '@/components/icons/ui/Icon';
-import { apiFetch } from '@/lib/auth';
 
 export function GardenActions({
   gardenId,
@@ -11,6 +9,7 @@ export function GardenActions({
   isDefault,
   members,
   owner,
+  currentUser,
   tAddPlant,
   tAddGardener,
   tManageGarden,
@@ -20,25 +19,11 @@ export function GardenActions({
   isDefault: boolean;
   members: { id: number; username: string }[];
   owner: string;
+  currentUser: string | null;
   tAddPlant: string;
   tAddGardener: string;
   tManageGarden: string;
 }) {
-  const [currentUser, setCurrentUser] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    apiFetch('/api/auth/me/')
-      .then(res => res.json())
-      .then(data => {
-        setCurrentUser(data.username);
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
-  }, []);
-
-  if (loading) return null;
-
   const isMember = members.some(m => m.username === currentUser);
   const isOwner = currentUser === owner;
 

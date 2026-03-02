@@ -16,11 +16,18 @@ export default async function GardenPage({
 }) {
   const { username, gardenId } = await params;
   const tGardens = await getTranslations('GardensPage');
+  let currentUser: string | null = null;
 
-  const [gardenRes, plantsRes] = await Promise.all([
+  const [meRes, gardenRes, plantsRes] = await Promise.all([
+    serverFetch('/api/auth/me/', { method: 'GET' }),
     serverFetch(`/api/garden/${gardenId}/`),
     serverFetch(`/api/plant/?garden=${encodeURIComponent(gardenId)}`),
   ]);
+
+  if (meRes.ok) {
+    const meData = (await meRes.json()) as { username?: string };
+    currentUser = meData.username ?? null;
+  }
 
   if (!gardenRes.ok) return null;
   const garden = await gardenRes.json();
@@ -99,6 +106,7 @@ export default async function GardenPage({
           isDefault={isDefault}
           members={garden.members || []}
           owner={garden.owner || ''}
+          currentUser={currentUser}
           tAddPlant={tGardens('addPlant')}
           tAddGardener={tGardens('addGardener')}
           tManageGarden={tGardens('manageGarden')}
