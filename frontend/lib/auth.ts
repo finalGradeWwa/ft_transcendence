@@ -101,8 +101,12 @@ export async function refreshAccessToken(): Promise<string> {
   });
 
   if (!res.ok) {
-    await logout();
+    // Do NOT call logout() here — it calls apiFetch() → getValidAccessToken() → this same
+    // refreshPromise, creating a deadlock where the page hangs forever.
+    // Instead, clear local state directly and redirect.
+    clearAccessToken();
     if (typeof window !== 'undefined') {
+      localStorage.removeItem('username');
       const locale = window.location.pathname.split('/')[1] || 'pl';
       window.location.href = `/${locale}?showLogin=true`;
     }

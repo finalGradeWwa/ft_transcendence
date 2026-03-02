@@ -85,10 +85,11 @@ const useLoginForm = (
 
     try {
       const data = await loginRequest(formData);
-      clearAccessToken();
-      await getValidAccessToken();
-
       if (!data?.user) throw new Error('EMPTY_RESPONSE');
+
+      // Pre-fetch an access token using the refresh cookie just set by the login response.
+      clearAccessToken();
+      await getValidAccessToken().catch(() => {});
 
       localStorage.setItem('username', data.user.username);
       window.dispatchEvent(new Event('user-updated')); // PL: Powiadomienie nagłówka o zmianie.
