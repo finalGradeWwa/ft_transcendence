@@ -24,16 +24,29 @@ export async function POST(request: NextRequest) {
 		headers['Cookie'] = `refresh_token=${refreshToken}`;
 	}
 
-	const backendRes = await fetch(`${API_URL}/api/auth/logout/`, {
-		method: 'POST',
-		headers,
-	});
+	let status: number;
 
-	const response = new NextResponse(null, { status: backendRes.status });
+	try {
+		const backendRes = await fetch(`${API_URL}/api/auth/logout/`, {
+			method: 'POST',
+			headers,
+		});
+		status = backendRes.status;
+	} catch (error) {
+		console.error('Backend logout call failed. Proceeding to clear cookies.', error);
+		// PL: Operacja się powiodła z perspektywy klienta, bo czyścimy sesję.
+		// EN: The operation succeeded from the client's perspective because we're clearing the session.
+		status = 204; // No Content
+	}
 
-	// PL: Wyczyść cookie refresh_token na odpowiedzi same-origin
-	// EN: Clear refresh_token cookie on same-origin response
-	response.cookies.delete('refresh_token');
+	const response = new NextResponse(null, { status });
+
+	// PL: Zawsze czyść ciasteczka, niezależnie od odpowiedzi backendu, aby zapewnić wylogowanie.
+	// EN: Always clear cookies, regardless of the backend's response, to ensure logout.
+	response.cookies.delete({ name: 'refresh_token', path: '/' });
+	// PL: Usuwamy również access_token, jeśli jest ustawiany przez middleware.
+	// EN: We also delete the access_token if it's set by the middleware.
+	response.cookies.delete({ name: 'access_token', path: '/' });
 
 	return response;
 }

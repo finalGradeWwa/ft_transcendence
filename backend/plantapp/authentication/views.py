@@ -60,6 +60,7 @@ class RegisterView(APIView):
 
 		response = Response({
 			"user": UserSerializer(user).data,
+			"access": str(refresh.access_token),
 		}, status=status.HTTP_201_CREATED)
 		set_refresh_cookie(response, str(refresh))
 		return response
@@ -122,6 +123,7 @@ class LoginView(APIView):
 
 		response = Response({
             "user": UserSerializer(user).data,
+            "access": str(refresh.access_token),
         }, status=status.HTTP_200_OK)
 		set_refresh_cookie(response, str(refresh))
 		return response

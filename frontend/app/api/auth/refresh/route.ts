@@ -1,45 +1,25 @@
 /**
- * PL: Proxy odświeżania tokena — przekazuje refresh cookie do backendu i zwraca nowy access token.
- * EN: Token refresh proxy — forwards refresh cookie to backend and returns new access token.
+ * PL: Endpoint dla klienta do pobierania access tokena.
+ *     Nie komunikuje się z backendem. Zwraca access token, który został
+ *     wcześniej odświeżony i zapisany w cookie przez middleware.
+ * EN: Endpoint for the client to retrieve an access token.
+ *     It does not communicate with the backend. It returns the access token
+ *     that was previously refreshed and stored in a cookie by the middleware.
  */
 import { NextRequest, NextResponse } from 'next/server';
 
-const API_URL = (
-	process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000'
-).replace(/\/$/, '');
-
 export async function POST(request: NextRequest) {
-	const refreshToken = request.cookies.get('refresh_token')?.value;
+	// PL: Middleware jest odpowiedzialne za odświeżenie i ustawienie 'access_token' w cookie.
+	// EN: The middleware is responsible for refreshing and setting the 'access_token' cookie.
+	const accessToken = request.cookies.get('access_token')?.value;
 
-	if (!refreshToken) {
-		return NextResponse.json(
-			{ detail: 'No refresh cookie.' },
-			{ status: 401 }
-		);
+	if (accessToken) {
+		// PL: Zwróć token, który przygotował middleware.
+		// EN: Return the token prepared by the middleware.
+		return NextResponse.json({ access: accessToken });
 	}
 
-	const backendRes = await fetch(`${API_URL}/api/auth/token/refresh/`, {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json',
-			Cookie: `refresh_token=${refreshToken}`,
-		},
-		cache: 'no-store',
-	});
-
-	const data = await backendRes.text();
-
-	const response = new NextResponse(data, {
-		status: backendRes.status,
-		headers: { 'Content-Type': 'application/json' },
-	});
-
-	// PL: Przekopiuj Set-Cookie (nowy refresh token po rotacji) z backendu
-	// EN: Copy Set-Cookie (new refresh token after rotation) from backend
-	const setCookie = backendRes.headers.get('set-cookie');
-	if (setCookie) {
-		response.headers.set('set-cookie', setCookie);
-	}
-
-	return response;
+	// PL: Jeśli nie ma tokena, oznacza to, że middleware nie zdołał go odświeżyć (sesja wygasła).
+	// EN: If there's no token, it means the middleware failed to refresh it (session expired).
+	return NextResponse.json({ detail: 'Access token not found. Session may be expired.' }, { status: 401 });
 }
