@@ -43,9 +43,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    
-    container_name: ft_transcendence_backend_migrate
-    
+
     volumes:
       - ./backend:/app
       - backend_db:/app/plantapp
