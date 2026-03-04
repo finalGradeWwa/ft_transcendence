@@ -21,27 +21,6 @@ export function setAccessToken(token: string) {
   sessionStorage.setItem(ACCESS_TOKEN_KEY, token);
 }
 
-/**
- * PL: Sprawdza, czy token dostępu nie wygasa (< 3s.).
- * EN: Checks if the access token does not expire. (< 3s.)
- */
-function isTokenExpired(token: string): boolean {
-  try {
-    const base64Url = token.split('.')[1];
-    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    const jsonPayload = decodeURIComponent(
-      atob(base64)
-        .split('')
-        .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-        .join('')
-    );
-    const { exp } = JSON.parse(jsonPayload);
-    return Date.now() >= exp * 1000 - 3000;
-  } catch {
-    return true;
-  }
-}
-
 export function getAccessToken(): string | null {
   if (typeof window === 'undefined') return null;
   return sessionStorage.getItem(ACCESS_TOKEN_KEY);
@@ -125,9 +104,7 @@ export async function refreshAccessToken(): Promise<string> {
  */
 export async function getValidAccessToken(): Promise<string> {
   const existing = getAccessToken();
-  if (existing && !isTokenExpired(existing)) {
-    return existing;
-  }
+  if (existing) return existing;
 
   if (!refreshPromise) {
     refreshPromise = refreshAccessToken().finally(() => {

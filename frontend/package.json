@@ -14,7 +14,6 @@
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,css,md}\""
   },
   "dependencies": {
-    "@swc/helpers": "^0.5.19",
     "@tailwindcss/typography": "^0.5.19",
     "js-cookie": "^3.0.5",
     "lucide-react": "^0.562.0",

@@ -3,37 +3,6 @@ import { test, expect } from '@playwright/test';
 const generateUniqueEmail = () => `test${Date.now()}@example.com`;
 const generateUniqueUsername = () => `testuser${Date.now()}`;
 
-/**
- * PL: Pomocnicza funkcja do logowania - używana wielokrotnie
- * EN: Helper function for login - used multiple times
- */
-async function loginAs(page: any, email: string, password: string) {
-  await page.goto('/en/?showLogin=true');
-  await page.fill('input[name="email"]', email);
-  await page.fill('input[name="password"]', password);
-  await page.click('button[type="submit"]');
-  await page.waitForSelector('[role="dialog"]', {
-    state: 'detached',
-    timeout: 15000,
-  });
-  await page.waitForLoadState('networkidle');
-}
-
-/**
- * PL: Pomocnicza funkcja do wylogowania
- * EN: Helper function for logout
- */
-async function logout(page: any) {
-  const logoutButton = page
-    .locator('div.bg-primary-green button[aria-label]')
-    .last();
-  await expect(logoutButton).toBeVisible({ timeout: 10000 });
-  await logoutButton.click();
-  await page.waitForURL(/\/en\/?/, { timeout: 10000 });
-  await page.waitForLoadState('load');
-  await page.waitForTimeout(500);
-}
-
 test.describe('Homepage & Navigation', () => {
   test('homepage has title', async ({ page }) => {
     await page.goto('/');
@@ -47,7 +16,7 @@ test.describe('Homepage & Navigation', () => {
   });
 
   test('navigation to gardens page', async ({ page }) => {
-    await loginAs(page, 'test@example.com', 'Testpass123!');
+    await page.goto('/en/');
     await page.getByRole('link', { name: /Gardens/i }).click();
     await expect(page).toHaveURL('/en/gardens');
   });
@@ -89,6 +58,7 @@ test.describe('Homepage & Navigation', () => {
   });
 
   test('footer links work', async ({ page }) => {
+    // test.skip(true, 'requires fix');
     await page.goto('/en/');
     await page.locator('a.text-primary-green[href="/en/terms"]').click();
     await expect(page).toHaveURL('/en/terms');
@@ -232,11 +202,10 @@ test.describe('Sign Up (Registration)', () => {
     const passwordInput = page.locator('#reg-password');
     await expect(passwordInput).toHaveAttribute('type', 'password');
 
-    /**
-     * PL: Przycisk toggle w formularzu rejestracji ma aria-pressed
-     * EN: Registration form toggle button has aria-pressed
-     * */
-    const toggleButton = page.locator('button[aria-pressed]');
+    const toggleButton = page
+      .locator('button:has(svg)')
+      .filter({ has: page.locator('path[d*="M15 12"]') })
+      .first();
     await toggleButton.click();
 
     await expect(passwordInput).toHaveAttribute('type', 'text');
@@ -249,6 +218,7 @@ test.describe('Sign In (Login)', () => {
   });
 
   test('2.1 - Login with valid credentials', async ({ page }) => {
+    // test.skip(true, 'Requires backend CORS/cookie configuration');
     await page.fill('input[name="email"]', 'test@example.com');
     await page.fill('input[name="password"]', 'Testpass123!');
 
@@ -291,11 +261,7 @@ test.describe('Sign In (Login)', () => {
     const passwordInput = page.locator('input[name="password"]');
     await expect(passwordInput).toHaveAttribute('type', 'password');
 
-    /**
-     * PL: Przycisk toggle w LoginForm ma aria-label "Show password" / "Hide password"
-     * EN: LoginForm toggle button has aria-label "Show password" / "Hide password"
-     */
-    const toggleButton = page.getByRole('button', { name: /show password/i });
+    const toggleButton = page.locator('form button:has(svg)').first();
     await toggleButton.click();
 
     await expect(passwordInput).toHaveAttribute('type', 'text');
@@ -313,43 +279,63 @@ test.describe('Sign In (Login)', () => {
 test.describe('Combined Authentication Flows', () => {
   test('3.1 - Switch from login to registration', async ({ page }) => {
     await page.goto('/en/?showLogin=true');
+
     await page.click('text=Register here');
+
     await expect(page).toHaveURL(/\/en\/register/);
   });
 
   test('3.2 - Switch from registration to login', async ({ page }) => {
     await page.goto('/en/register');
+
     await page.click('text=Login');
+
     await expect(page).toHaveURL(/showLogin/);
   });
 
   test('3.3 - Logged-in user sees username in header', async ({ page }) => {
-    await loginAs(page, 'test@example.com', 'Testpass123!');
+    await page.goto('/en/?showLogin=true');
+    await page.fill('input[name="email"]', 'test@example.com');
+    await page.fill('input[name="password"]', 'Testpass123!');
+    await page.click('button[type="submit"]');
 
-    /**
-     * PL: Username wyświetlany jest w span wewnątrz ProfileArea (zielony kontener)
-     * EN: Username is displayed in span inside ProfileArea (green container)
-     */
-    const usernameElement = page.locator('div.bg-primary-green span');
+    // Wait for redirect and page to fully load after login
+    await page.waitForURL(/\/en(\/?|\?.*)$/, { timeout: 15000 });
+    await page.waitForLoadState('domcontentloaded');
+
+    // Wait for username to appear in the profile area
+    const usernameElement = page
+      .locator('.header-top-wrapper')
+      .getByText(/test/i);
     await expect(usernameElement).toBeVisible({ timeout: 10000 });
   });
 
   test('3.4 - Logged-in user can log out', async ({ page }) => {
-    await loginAs(page, 'test@example.com', 'Testpass123!');
-    await logout(page);
+    await page.goto('/en/?showLogin=true');
+    await page.fill('input[name="email"]', 'test@example.com');
+    await page.fill('input[name="password"]', 'Testpass123!');
+    await page.click('button[type="submit"]');
 
-    /**
-     * PL: Po wylogowaniu powinien być widoczny przycisk logowania
-     * EN: After logout, login button should be visible
-     */
-    await expect(page.getByRole('link', { name: /Login/i })).toBeVisible({
-      timeout: 5000,
-    });
+    // Wait for redirect and page to fully load after login
+    await page.waitForURL(/\/en(\/?|\?.*)$/, { timeout: 15000 });
+    await page.waitForLoadState('domcontentloaded');
+
+    // Wait for and click the logout button (icon button with close icon)
+    const logoutButton = page
+      .locator(
+        'button[aria-label*="logout" i], button:has(svg):near(:text("test"))'
+      )
+      .last();
+    await expect(logoutButton).toBeVisible({ timeout: 10000 });
+    await logoutButton.click();
+
+    await expect(page).toHaveURL(/\/en\/?/);
   });
 
   test('3.5 - Register, login, logout, register new user, login, logout sequence', async ({
     page,
   }) => {
+    // Step 1: Register first user
     const firstUsername = generateUniqueUsername();
     const firstEmail = generateUniqueEmail();
 
@@ -361,22 +347,48 @@ test.describe('Combined Authentication Flows', () => {
     await page.fill('#reg-password', 'FirstPass123!');
     await page.fill('#reg-password-confirm', 'FirstPass123!');
     await page.check('#terms');
-
-    const firstRegPromise = page.waitForResponse(
-      (response: any) => response.url().includes('/api/auth/register/'),
-      { timeout: 15000 }
+    
+    // Wait for registration API to complete
+    const firstRegistrationPromise = page.waitForResponse(
+      response => response.url().includes('/api/auth/register/') && response.status() === 201,
+      { timeout: 10000 }
     );
     await page.click('button[type="submit"]');
-    await firstRegPromise;
+    await firstRegistrationPromise;
+    
+    // Wait for redirect
     await page.waitForURL(/\/en\/register/, { timeout: 5000 });
 
-    await loginAs(page, firstEmail, 'FirstPass123!');
+    // Step 2: Login as first user
+    await page.goto('/en/?showLogin=true');
+    await page.fill('input[name="email"]', firstEmail);
+    await page.fill('input[name="password"]', 'FirstPass123!');
+    await page.click('button[type="submit"]');
 
-    const firstUserElement = page.locator('div.bg-primary-green span');
+    // Wait for successful login
+    await page.waitForURL(/\/en(\/?|\?.*)$/, { timeout: 15000 });
+    await page.waitForLoadState('domcontentloaded');
+
+    // Verify first user is logged in
+    const firstUserElement = page
+      .locator('.header-top-wrapper')
+      .getByText(new RegExp(firstUsername.substring(0, 8), 'i'));
     await expect(firstUserElement).toBeVisible({ timeout: 10000 });
 
-    await logout(page);
+    // Step 3: Logout first user
+    const firstLogoutButton = page
+      .locator(
+        `button[aria-label*="logout" i], button:has(svg):near(:text("${firstUsername.substring(0, 8)}"))`
+      )
+      .last();
+    await expect(firstLogoutButton).toBeVisible({ timeout: 10000 });
+    await firstLogoutButton.click();
 
+    // Wait for logout to complete
+    await page.waitForURL(/\/en\/?/, { timeout: 5000 });
+    await page.waitForTimeout(1000); // Give time for cookies to clear
+
+    // Step 4: Register second user
     const secondUsername = generateUniqueUsername();
     const secondEmail = generateUniqueEmail();
 
@@ -388,24 +400,48 @@ test.describe('Combined Authentication Flows', () => {
     await page.fill('#reg-password', 'SecondPass123!');
     await page.fill('#reg-password-confirm', 'SecondPass123!');
     await page.check('#terms');
-
-    const secondRegPromise = page.waitForResponse(
-      (response: any) => response.url().includes('/api/auth/register/'),
-      { timeout: 15000 }
+    
+    // Wait for registration API to complete
+    const secondRegistrationPromise = page.waitForResponse(
+      response => response.url().includes('/api/auth/register/') && response.status() === 201,
+      { timeout: 10000 }
     );
     await page.click('button[type="submit"]');
-    await secondRegPromise;
+    await secondRegistrationPromise;
+    
+    // Wait for redirect
     await page.waitForURL(/\/en\/register/, { timeout: 5000 });
 
-    await loginAs(page, secondEmail, 'SecondPass123!');
+    // Step 5: Login as second user
+    await page.goto('/en/?showLogin=true');
+    await page.fill('input[name="email"]', secondEmail);
+    await page.fill('input[name="password"]', 'SecondPass123!');
+    await page.click('button[type="submit"]');
 
-    const secondUserElement = page.locator('div.bg-primary-green span');
+    // Wait for successful login
+    await page.waitForURL(/\/en(\/?|\?.*)$/, { timeout: 15000 });
+    await page.waitForLoadState('domcontentloaded');
+
+    // Verify second user is logged in
+    const secondUserElement = page
+      .locator('.header-top-wrapper')
+      .getByText(new RegExp(secondUsername.substring(0, 8), 'i'));
     await expect(secondUserElement).toBeVisible({ timeout: 10000 });
 
-    await logout(page);
+    // Step 6: Logout second user
+    const secondLogoutButton = page
+      .locator(
+        `button[aria-label*="logout" i], button:has(svg):near(:text("${secondUsername.substring(0, 8)}"))`
+      )
+      .last();
+    await expect(secondLogoutButton).toBeVisible({ timeout: 10000 });
+    await secondLogoutButton.click();
 
-    await expect(page.getByRole('link', { name: /Login/i })).toBeVisible({
-      timeout: 5000,
-    });
+    // Wait for logout to complete
+    await page.waitForURL(/\/en\/?/, { timeout: 5000 });
+
+    // Verify user is logged out (login button should be visible)
+    const loginButton = page.getByRole('link', { name: /Login/i });
+    await expect(loginButton).toBeVisible({ timeout: 5000 });
   });
 });

@@ -125,11 +125,28 @@ export const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
       });
 
       const text = await response.text();
-
+      
+      // PL: Loguj odpowiedź dla debugowania w Docker
+      // EN: Log response for debugging in Docker
+      if (!text || text.trim().length === 0) {
+        console.error('Empty response from backend:', {
+          status: response.status,
+          statusText: response.statusText,
+          headers: Object.fromEntries(response.headers.entries()),
+        });
+      }
+      
       let data = null;
       try {
         data = text ? JSON.parse(text) : null;
       } catch (parseError) {
+        console.error('Failed to parse JSON response:', {
+          text: text.substring(0, 500),
+          status: response.status,
+          error: parseError,
+        });
+        // PL: Jeśli nie możemy sparsować, rzuć błąd z informacją
+        // EN: If we can't parse, throw error with info
         throw new Error(`Invalid JSON response: ${text.substring(0, 100)}`);
       }
 
@@ -155,6 +172,7 @@ export const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
       onSuccess();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (err: any) {
+      console.error('Błąd podczas rejestracji:', err);
       setError(
         err.name === 'TypeError' || err.message === 'Failed to fetch'
           ? tr('serverError')
@@ -184,47 +202,46 @@ export const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
         className="grid grid-cols-1 md:grid-cols-2 gap-6"
       >
         <Input
-          maxLength={100}
           id="reg-first-name"
-          name="first_name"
           label={tr('firstName')}
+          name="first_name"
           required
           disabled={isLoading}
           autoComplete="given-name"
         />
-
         <Input
-          maxLength={100}
           id="reg-last-name"
-          name="last_name"
           label={tr('lastName')}
+          name="last_name"
           required
           disabled={isLoading}
           autoComplete="family-name"
         />
-
         <Input
-          maxLength={50}
           id="reg-username"
-          name="username"
           label={tr('nick')}
+          name="username"
           required
           disabled={isLoading}
           autoComplete="username"
         />
-
         <Input
-          maxLength={200}
           id="reg-email"
+          label={tr('email')}
           type="email"
           name="email"
-          label={tr('email')}
           required
           disabled={isLoading}
           autoComplete="email"
         />
 
-        <div className="md:col-span-2 flex flex-col">
+        <div className="md:col-span-2">
+          <label
+            id="avatar-label"
+            className="block text-sm font-bold text-neutral-900 mb-1"
+          >
+            {tr('avatar')}
+          </label>
           <div className="flex flex-wrap items-center gap-5">
             <div
               aria-hidden="true"
@@ -249,21 +266,29 @@ export const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
 
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-4">
+                <input
+                  type="file"
+                  id="avatar-upload"
+                  name="avatar_photo"
+                  className="hidden"
+                  accept=".jpg,.jpeg,.png,.webp"
+                  ref={fileInputRef}
+                  onChange={handleFileChange}
+                  disabled={isLoading}
+                  aria-labelledby="avatar-label"
+                />
                 <label
                   htmlFor="avatar-upload"
+                  tabIndex={0}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      fileInputRef.current?.click();
+                    }
+                  }}
                   className="cursor-pointer bg-secondary-beige text-primary-green font-semibold py-2 px-4 rounded-full text-sm hover:bg-amber-100 transition-colors shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-gray-600 focus-visible:outline-offset-2"
                 >
                   {tr('chooseFile')}
-                  <input
-                    type="file"
-                    id="avatar-upload"
-                    name="avatar_photo"
-                    className="sr-only"
-                    accept=".jpg,.jpeg,.png,.webp"
-                    ref={fileInputRef}
-                    onChange={handleFileChange}
-                    disabled={isLoading}
-                  />
                 </label>
 
                 {fileName && (
@@ -271,7 +296,7 @@ export const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
                     type="button"
                     onClick={handleRemoveFile}
                     aria-label={`${tr('removeFile')}: ${fileName}`}
-                    className="text-red-600 text-xs font-bold hover:underline flex items-center gap-1 focus:outline-none focus:outline-2 focus:outline-gray-600 focus:outline-offset-0 rounded-sm"
+                    className="text-red-600 text-xs font-bold hover:underline flex items-center gap-1 focus:outline-none focus:outline focus:outline-2 focus:outline-gray-600 focus:outline-offset-0 rounded-sm"
                     disabled={isLoading}
                   >
                     <svg
@@ -295,25 +320,24 @@ export const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
               </div>
               <Text
                 variant="small"
-                className="italic max-w-[200px] truncate text-neutral-900"
+                className="italic max-w-[200px] truncate text-neutral-500"
                 aria-live="polite"
               >
                 {fileName || tr('noFileSelected')}
               </Text>
             </div>
           </div>
-          <Text variant="caption" className="mt-1 px-1 text-neutral-900">
+          <Text variant="caption" className="mt-1 px-1">
             {tr('avatarRequirements')}
           </Text>
         </div>
 
-        <div className="relative">
+        <div className="flex flex-col gap-1 relative">
           <Input
-            maxLength={128}
             id="reg-password"
+            label={tr('password')}
             type={showPassword ? 'text' : 'password'}
             name="password"
-            label={tr('password')}
             required
             disabled={isLoading}
             autoComplete="new-password"
@@ -342,55 +366,58 @@ export const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
                   d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88"
                 />
               ) : (
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-                />
+                <>
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+                  />
+                </>
               )}
             </svg>
           </button>
           <Text
             id="password-reqs"
             variant="caption"
-            className="leading-tight px-1 italic opacity-70 text-neutral-900 self-end pb-2 mt-1"
+            className="leading-tight px-1 italic opacity-70"
           >
             {tr('passwordRequirements')}
           </Text>
         </div>
 
         <Input
-          maxLength={128}
           id="reg-password-confirm"
+          label={tr('confirmPassword')}
           type={showPassword ? 'text' : 'password'}
           name="password_confirm"
-          label={tr('confirmPassword')}
           required
           disabled={isLoading}
           autoComplete="new-password"
         />
 
-        <div className="md:col-span-2 flex flex-col gap-1 mt-2">
-          <div className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              id="terms"
-              name="terms"
-              required
-              disabled={isLoading}
-              className="w-4 h-4 accent-primary-green focus:outline focus:outline-2 focus:outline-gray-600 focus:outline-offset-2"
-              aria-required="true"
-            />
-            <label htmlFor="terms" className="text-sm text-neutral-900">
-              {tr('acceptTerms')}
-            </label>
-          </div>
-          <Link
-            href="/terms"
-            className="underline font-bold text-primary-green italic rounded px-1 focus:outline-none focus:outline focus:outline-2 focus:outline-gray-600 focus:outline-offset-0 text-sm"
-          >
-            {tr('termsLink')}
-          </Link>
+        <div className="md:col-span-2 flex items-center gap-2 mt-2">
+          <input
+            type="checkbox"
+            id="terms"
+            name="terms"
+            required
+            disabled={isLoading}
+            className="w-4 h-4 accent-primary-green focus:outline focus:outline-2 focus:outline-gray-600 focus:outline-offset-2"
+          />
+          <label htmlFor="terms" className="text-sm text-neutral-900">
+            {tr('acceptTerms')}{' '}
+            <Link
+              href="/terms"
+              className="underline font-bold text-primary-green italic rounded px-1 focus:outline-none focus:outline focus:outline-2 focus:outline-gray-600 focus:outline-offset-0"
+            >
+              {tr('termsLink')}
+            </Link>
+          </label>
         </div>
 
         <Button
@@ -402,7 +429,7 @@ export const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
         </Button>
       </form>
 
-      <Text variant="small" className="mt-8 text-center text-neutral-900">
+      <Text variant="small" className="mt-8 text-center">
         {tr('alreadyHaveAccount')}{' '}
         <Link
           href="/?showLogin=true"

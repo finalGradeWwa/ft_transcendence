@@ -2,12 +2,12 @@
 
 /**
  * PL: Komponent kontenera modalu wyszukiwania. Obsługuje warstwę prezentacji (overlay),
- * interakcję z użytkownikiem, sortowanie, paginację oraz logikę dostępności (fokus i klawisz Escape).
+ * interakcję z użytkownikiem oraz logikę dostępności (fokus i klawisz Escape).
  * EN: Search modal container component. Handles the presentation layer (overlay),
- * user interaction, sorting, pagination, and accessibility logic (focus and Escape key).
+ * user interaction, and accessibility logic (focus and Escape key).
  */
 
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from '@/i18n/navigation';
 import { Icon } from '@/components/icons/ui/Icon';
@@ -28,8 +28,6 @@ interface SearchModalProps {
   onClose: () => void;
 }
 
-const RESULTS_PER_PAGE = 5;
-
 /**
  * PL: Komponent zarządzający widocznością i interakcjami modalu wyszukiwania.
  * EN: Component managing the visibility and interactions of the search modal.
@@ -39,36 +37,19 @@ const SearchModal = ({ isVisible, onClose }: SearchModalProps) => {
   const router = useRouter();
 
   const [searchQuery, setSearchQuery] = useState('');
+
+  // State storing search results (mock data).
   const [results, setResults] = useState<SearchResult[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [sortAsc, setSortAsc] = useState(true);
-  const [visibleCount, setVisibleCount] = useState(RESULTS_PER_PAGE);
+
+  // Ref to input field for autofocus.
   const searchInputRef = useRef<HTMLInputElement>(null);
-
-  /**
-   * PL: Posortowane wyniki wg nazwy użytkownika.
-   * EN: Results sorted by username.
-   */
-  const sortedResults = useMemo(() => {
-    const sorted = [...results].sort((a, b) =>
-      a.username.localeCompare(b.username)
-    );
-    return sortAsc ? sorted : sorted.reverse();
-  }, [results, sortAsc]);
-
-  /** PL: Wyniki ograniczone do bieżącej strony. EN: Results limited to current page. */
-  const visibleResults = sortedResults.slice(0, visibleCount);
-  const hasMore = visibleCount < sortedResults.length;
 
   useEffect(() => {
     const fetchUsers = async () => {
       if (searchQuery.trim() === '') {
         setResults([]);
-        setIsLoading(false);
         return;
       }
-
-      setIsLoading(true);
 
       try {
         const response = await apiFetch(
@@ -81,21 +62,14 @@ const SearchModal = ({ isVisible, onClose }: SearchModalProps) => {
         } else {
           setResults([]);
         }
-      } catch {
+      } catch (error) {
         setResults([]);
-      } finally {
-        setIsLoading(false);
       }
     };
 
     const timeoutId = setTimeout(fetchUsers, 300);
     return () => clearTimeout(timeoutId);
   }, [searchQuery]);
-
-  /** PL: Reset paginacji przy nowych wynikach. EN: Reset pagination on new results. */
-  useEffect(() => {
-    setVisibleCount(RESULTS_PER_PAGE);
-  }, [results]);
 
   const handleResultClick = (result: SearchResult) => {
     onClose();
@@ -113,8 +87,10 @@ const SearchModal = ({ isVisible, onClose }: SearchModalProps) => {
   useEffect(() => {
     if (!isVisible) return;
 
+    // PL: Ustawienie fokusu na searchbar dla lepszego UX. EN: Setting focus on searchbar for better UX.
     searchInputRef.current?.focus();
 
+    /** PL: Funkcja zamykająca modal po naciśnięciu ESC. EN: Function closing the modal on ESC press. */
     const handleEsc = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
 
     window.addEventListener('keydown', handleEsc);
@@ -122,15 +98,13 @@ const SearchModal = ({ isVisible, onClose }: SearchModalProps) => {
   }, [isVisible, onClose]);
 
   /**
-   * PL: Resetowanie pola i wyników po zamknięciu modalu.
-   * EN: Resetting the field and results when the modal is closed.
+   * PL:Resetowanie pola i wyników po zamknięciu modalu
+   * EN: Resetting the field and results when the modal is closed
    */
   useEffect(() => {
     if (!isVisible) {
       setSearchQuery('');
       setResults([]);
-      setSortAsc(true);
-      setVisibleCount(RESULTS_PER_PAGE);
     }
   }, [isVisible]);
 
@@ -138,10 +112,13 @@ const SearchModal = ({ isVisible, onClose }: SearchModalProps) => {
 
   return (
     <div
+      /** PL: Półprzezroczyste tło z efektem rozmycia. EN: Semi-transparent background with blur effect. */
       className="fixed inset-0 bg-black/50 flex justify-center items-center z-50 backdrop-blur-sm p-4"
       onClick={onClose}
     >
       <section
+        /** PL: Zatrzymanie bąbelkowania zdarzenia, aby kliknięcie wewnątrz modalu go nie zamykało.
+            EN: Stopping event bubbling so clicking inside the modal doesn't close it. */
         onClick={e => e.stopPropagation()}
         className="w-full max-w-md text-dark-text"
         role="dialog"
@@ -149,7 +126,7 @@ const SearchModal = ({ isVisible, onClose }: SearchModalProps) => {
         aria-labelledby="search-modal-title"
       >
         <div className="bg-secondary-beige rounded-lg shadow-xl border border-black/10">
-          {/** PL: Nagłówek modalu z tytułem i przyciskiem zamknięcia. EN: Modal header with title and close button. */}
+          {/** Modal header with title and close button. */}
           <header className="flex items-center justify-between p-4 border-b border-gray-200">
             <h2
               id="search-modal-title"
@@ -166,11 +143,10 @@ const SearchModal = ({ isVisible, onClose }: SearchModalProps) => {
             </button>
           </header>
 
-          {/** PL: Formularz wyszukiwania. EN: Search form. */}
+          {/** Search form with input field and icon. */}
           <form onSubmit={handleSubmit} className="p-4" role="search">
             <div className="relative">
               <input
-                maxLength={100}
                 ref={searchInputRef}
                 type="text"
                 value={searchQuery}
@@ -184,49 +160,24 @@ const SearchModal = ({ isVisible, onClose }: SearchModalProps) => {
             </div>
           </form>
 
-          {/** PL: Pasek sortowania — widoczny gdy są wyniki. EN: Sort bar — visible when results exist. */}
-          {searchQuery && results.length > 1 && (
-            <div className="px-4 pb-2 flex items-center justify-between">
-              <p className="text-sm text-dark-text/80">
-                {t('resultsCount', { count: results.length })}
-              </p>
-              <button
-                onClick={() => setSortAsc(prev => !prev)}
-                className="text-xs font-bold text-primary-green px-2 py-1 rounded hover:bg-primary-green/10 transition-colors"
-                aria-label={t('aria.sortOrder')}
-              >
-                {sortAsc ? t('sortAZ') : t('sortZA')}
-              </button>
-            </div>
-          )}
-
-          {/** PL: Kontener wyników z przewijaniem. EN: Scrollable results container. */}
+          {/** Scrollable results container - displays results, no results, or initial prompt. */}
           <nav className="max-h-96 overflow-y-auto">
-            {/** PL: Wskaźnik ładowania. EN: Loading indicator. */}
-            {isLoading && searchQuery && (
-              <div className="px-4 pb-4 text-center text-gray-500">
-                <div className="inline-block w-5 h-5 border-2 border-primary-green/30 border-t-primary-green rounded-full animate-spin mb-2" role="status" />
-                <p className="text-sm">{t('loading')}</p>
-              </div>
-            )}
-
-            {/** PL: Lista wyników wyszukiwania. EN: Search results list. */}
-            {!isLoading && searchQuery && visibleResults.length > 0 && (
+            {/** Display search results list. */}
+            {searchQuery && results.length > 0 && (
               <div className="px-4 pb-4">
-                {results.length === 1 && (
-                  <p className="text-sm text-dark-text/80 mb-2">
-                    {t('resultsCount', { count: results.length })}
-                  </p>
-                )}
+                <p className="text-sm text-dark-text/80 mb-2">
+                  {t('resultsCount', { count: results.length })}
+                </p>
 
                 <ul className="space-y-2">
-                  {visibleResults.map(result => (
+                  {results.map(result => (
                     <li key={result.id}>
                       <button
                         onClick={() => handleResultClick(result)}
                         className="w-full text-left px-4 py-3 rounded-lg hover:bg-white/50 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-green border border-transparent hover:border-primary-green/20"
                       >
                         <div className="flex items-center gap-3">
+                          {/* --- AWATAR --- */}
                           <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-200 shrink-0 border border-black/5">
                             {result.avatar_photo ? (
                               <img
@@ -256,31 +207,11 @@ const SearchModal = ({ isVisible, onClose }: SearchModalProps) => {
                     </li>
                   ))}
                 </ul>
-
-                {/** PL: Przycisk "pokaż więcej" i informacja o liczbie. EN: "Show more" button and count info. */}
-                {sortedResults.length > RESULTS_PER_PAGE && (
-                  <div className="mt-3 flex items-center justify-between text-sm">
-                    <span className="text-dark-text/60">
-                      {t('showingOf', {
-                        shown: visibleResults.length,
-                        total: sortedResults.length,
-                      })}
-                    </span>
-                    {hasMore && (
-                      <button
-                        onClick={() => setVisibleCount(prev => prev + RESULTS_PER_PAGE)}
-                        className="font-bold text-primary-green hover:underline"
-                      >
-                        {t('showMore')}
-                      </button>
-                    )}
-                  </div>
-                )}
               </div>
             )}
 
-            {/** PL: Komunikat o braku wyników. EN: No results message. */}
-            {!isLoading && searchQuery && results.length === 0 && (
+            {/** No results message. */}
+            {searchQuery && results.length === 0 && (
               <div className="px-4 pb-4 text-center text-gray-500">
                 <p>{t('noResults', { query: searchQuery })}</p>
               </div>

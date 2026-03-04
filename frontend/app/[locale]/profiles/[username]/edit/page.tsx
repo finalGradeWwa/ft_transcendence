@@ -83,7 +83,9 @@ export default function EditProfilePage({
             setPreviewUrl(getFullAvatarUrl(data.avatar_photo));
           }
         }
-      } catch (err) { }
+      } catch (err) {
+        console.error('Failed to fetch user data', err);
+      }
     };
     fetchUserData();
   }, [initialUsername]);
@@ -96,29 +98,14 @@ export default function EditProfilePage({
     };
   }, [previewUrl]);
 
-  /** PL: Obsługa zmiany pliku graficznego z walidacją formatu i rozmiaru. EN: Handling image file change with format and size validation. */
-  const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
-  const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
-
+  /** PL: Obsługa zmiany pliku graficznego i tworzenie tymczasowego podglądu. EN: Handling image file change and creating a temporary preview. */
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file) return;
-
-    if (!ALLOWED_TYPES.includes(file.type)) {
-      setError(tr('errorInvalidFormat'));
-      if (fileInputRef.current) fileInputRef.current.value = '';
-      return;
+    if (file) {
+      setFileName(file.name);
+      setPreviewUrl(URL.createObjectURL(file));
+      setError(null);
     }
-
-    if (file.size > MAX_FILE_SIZE) {
-      setError(tr('avatarRequirements'));
-      if (fileInputRef.current) fileInputRef.current.value = '';
-      return;
-    }
-
-    setFileName(file.name);
-    setPreviewUrl(URL.createObjectURL(file));
-    setError(null);
   };
 
   /** PL: Przywracanie poprzedniego awatara i resetowanie wyboru pliku. EN: Restoring previous avatar and resetting file selection. */
@@ -247,7 +234,6 @@ export default function EditProfilePage({
             className="grid grid-cols-1 md:grid-cols-2 gap-6"
           >
             <Input
-              maxLength={100}
               key={`fn-${userData.first_name}`}
               id="edit-first-name"
               label={tr('firstName')}
@@ -257,7 +243,6 @@ export default function EditProfilePage({
               disabled={isLoading}
             />
             <Input
-              maxLength={100}
               key={`ln-${userData.last_name}`}
               id="edit-last-name"
               label={tr('lastName')}
@@ -267,7 +252,6 @@ export default function EditProfilePage({
               disabled={isLoading}
             />
             <Input
-              maxLength={50}
               key={`un-${userData.username}`}
               id="edit-username"
               label={tr('nick')}
@@ -279,17 +263,14 @@ export default function EditProfilePage({
 
             {/* PL: Sekcja zarządzania awatarem z podglądem. EN: Avatar management section with preview. */}
             <div className="md:col-span-2">
-              <span
-                id="avatar-main-label"
+              <label
+                id="avatar-label"
                 className="block text-sm font-bold text-neutral-900 mb-1"
               >
                 {tr('avatar')}
-              </span>
+              </label>
               <div className="flex flex-wrap items-center gap-5">
-                <div
-                  className="w-16 h-16 rounded-full border-2 border-secondary-beige overflow-hidden bg-neutral-100 flex items-center justify-center shrink-0 shadow-sm"
-                  aria-hidden="true"
-                >
+                <div className="w-16 h-16 rounded-full border-2 border-secondary-beige overflow-hidden bg-neutral-100 flex items-center justify-center shrink-0 shadow-sm">
                   {previewUrl ? (
                     <img
                       src={previewUrl}
@@ -308,54 +289,40 @@ export default function EditProfilePage({
                 </div>
                 <div className="flex flex-col gap-2">
                   <div className="flex items-center gap-4">
+                    <input
+                      type="file"
+                      id="avatar-upload"
+                      name="avatar_photo"
+                      className="hidden"
+                      accept=".jpg,.jpeg,.png,.webp"
+                      ref={fileInputRef}
+                      onChange={handleFileChange}
+                      disabled={isLoading}
+                    />
                     <label
-                      id="avatar-button-label"
                       htmlFor="avatar-upload"
-                      className="cursor-pointer bg-secondary-beige text-primary-green font-semibold py-2 px-4 rounded-full text-sm hover:bg-amber-100 transition-colors shadow-sm focus-within:outline focus-within:outline-2 focus-within:outline-gray-600 focus-within:outline-offset-2"
+                      tabIndex={0}
+                      onKeyDown={e => {
+                        (e.key === 'Enter' || e.key === ' ') &&
+                          fileInputRef.current?.click();
+                      }}
+                      className="cursor-pointer bg-secondary-beige text-primary-green font-semibold py-2 px-4 rounded-full text-sm hover:bg-amber-100 transition-colors shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-gray-600 focus-visible:outline-offset-2"
                     >
                       {tr('chooseFile')}
-                      <input
-                        type="file"
-                        id="avatar-upload"
-                        name="avatar_photo"
-                        className="sr-only"
-                        accept=".jpg,.jpeg,.png,.webp"
-                        ref={fileInputRef}
-                        onChange={handleFileChange}
-                        disabled={isLoading}
-                        aria-labelledby="avatar-main-label avatar-button-label"
-                      />
                     </label>
-
                     {fileName && (
                       <button
                         type="button"
                         onClick={handleRemoveFile}
-                        aria-label={tr('removeFile')}
                         className="text-red-600 text-xs font-bold hover:underline flex items-center gap-1 focus:outline-none focus:outline focus:outline-2 focus:outline-gray-600 focus:outline-offset-0 rounded-sm"
                       >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          strokeWidth={2}
-                          stroke="currentColor"
-                          className="w-3 h-3"
-                          aria-hidden="true"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M6 18L18 6M6 6l12 12"
-                          />
-                        </svg>
                         {tr('removeFile')}
                       </button>
                     )}
                   </div>
                   <Text
                     variant="small"
-                    className="italic max-w-[200px] truncate text-neutral-600 font-bold"
+                    className="italic max-w-[200px] truncate text-neutral-500"
                   >
                     {fileName || tr('noFileSelected')}
                   </Text>
@@ -366,7 +333,6 @@ export default function EditProfilePage({
             {/* PL: Pola zmiany hasła z obsługą widoczności (ikonka oka). EN: Password change fields with visibility toggle (eye icon). */}
             <div className="flex flex-col gap-1 relative">
               <Input
-                maxLength={128}
                 id="old-password"
                 label={tr('currentPassword')}
                 type={showOldPassword ? 'text' : 'password'}
@@ -377,7 +343,6 @@ export default function EditProfilePage({
               <button
                 type="button"
                 onClick={() => setShowOldPassword(!showOldPassword)}
-                aria-label={showOldPassword ? 'Ukryj hasło' : 'Pokaż hasło'}
                 className="absolute right-1 top-6 p-3 text-primary-green hover:text-green-700 transition-colors focus:outline-none focus:outline focus:outline-2 focus:outline-gray-600 focus:outline-offset-0 rounded-md"
               >
                 <svg
@@ -386,7 +351,6 @@ export default function EditProfilePage({
                   viewBox="0 0 24 24"
                   stroke="currentColor"
                   strokeWidth={1.5}
-                  aria-hidden="true"
                 >
                   {showOldPassword ? (
                     <path
@@ -414,14 +378,13 @@ export default function EditProfilePage({
             <div className="hidden md:block" aria-hidden="true" />
 
             <div className="md:col-span-2 mt-2">
-              <Text className="font-black uppercase tracking-widest text-primary-green border-b-2 border-secondary-beige/60 pb-1">
+              <Text className="font-bold uppercase tracking-wider text-primary-green border-b border-secondary-beige pb-1">
                 {tr('changePasswordLabel')}
               </Text>
             </div>
 
             <div className="flex flex-col gap-1 relative">
               <Input
-                maxLength={128}
                 id="reg-password"
                 label={tr('password')}
                 type={showNewPassword ? 'text' : 'password'}
@@ -429,13 +392,12 @@ export default function EditProfilePage({
                 disabled={isLoading}
                 autoComplete="new-password"
               />
-              <p className="text-[10px] text-neutral-600 font-bold mt-1 px-1">
+              <p className="text-[10px] text-neutral-500 mt-1 px-1">
                 {tr('passwordRequirements')}
               </p>
               <button
                 type="button"
                 onClick={() => setShowNewPassword(!showNewPassword)}
-                aria-label={showNewPassword ? 'Ukryj hasło' : 'Pokaż hasło'}
                 className="absolute right-1 top-6 p-3 text-primary-green hover:text-green-700 transition-colors focus:outline-none focus:outline focus:outline-2 focus:outline-gray-600 focus:outline-offset-0 rounded-md"
               >
                 <svg
@@ -444,7 +406,6 @@ export default function EditProfilePage({
                   viewBox="0 0 24 24"
                   stroke="currentColor"
                   strokeWidth={1.5}
-                  aria-hidden="true"
                 >
                   {showNewPassword ? (
                     <path
@@ -471,7 +432,6 @@ export default function EditProfilePage({
             </div>
 
             <Input
-              maxLength={128}
               id="reg-password-confirm"
               label={tr('confirmPassword')}
               type={showNewPassword ? 'text' : 'password'}

@@ -9,28 +9,9 @@ import fs from 'fs';
 import path from 'path';
 import { notFound } from 'next/navigation';
 import ReactMarkdown from 'react-markdown';
-import { getTranslations } from 'next-intl/server';
 
 interface TermsPageProps {
   params: Promise<{ locale: string }>;
-}
-
-/**
- * PL: Generuje metadane SEO dla strony regulaminu.
- * EN: Generates SEO metadata for the terms page.
- */
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ locale: string }>;
-}) {
-  const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: 'Metadata' });
-
-  return {
-    title: t('terms'),
-    description: t('termsDescription'),
-  };
 }
 
 /**

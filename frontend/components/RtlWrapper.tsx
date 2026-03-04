@@ -21,7 +21,6 @@ interface RtlWrapperProps {
   locale: string;
   showLogin?: boolean;
   isRegistered?: boolean;
-  hideTitle?: boolean;
 }
 
 export const RtlWrapper = ({
@@ -29,7 +28,6 @@ export const RtlWrapper = ({
   locale,
   showLogin,
   isRegistered,
-  hideTitle,
 }: RtlWrapperProps) => {
   return (
     /**
@@ -41,7 +39,6 @@ export const RtlWrapper = ({
         plants={plants}
         showLogin={showLogin}
         isRegistered={isRegistered}
-        hideTitle={hideTitle}
       />
     </div>
   );

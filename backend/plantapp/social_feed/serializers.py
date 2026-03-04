@@ -4,32 +4,32 @@ from gardens.models import Garden
 from plants.models import Plant
 
 class PinWriteModeSerializer(serializers.ModelSerializer):
-    garden = serializers.PrimaryKeyRelatedField(
-        queryset=Garden.objects.none(),
-        required=False,
-        allow_null=True
-    )
-    plant = serializers.PrimaryKeyRelatedField(
-        queryset=Plant.objects.none(),
-        required=False,
-        allow_null=True
-    )
-    class Meta:
-        model = Pin
-        fields = ("image", "content", "garden", "plant")
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        request = self.context.get("request")
-        if request:
-            user = request.user
-            self.fields["garden"].queryset = Garden.objects.filter(
-                gardenuser__user=user
-            )
-            self.fields["plant"].queryset = Plant.objects.filter(
-                garden__in=self.fields["garden"].queryset
-            )
-
+	garden = serializers.PrimaryKeyRelatedField(
+		queryset=Garden.objects.none(),
+		required=False,
+		allow_null=True
+	)
+	plant = serializers.PrimaryKeyRelatedField(
+		queryset=Plant.objects.none(),
+		required=False,
+		allow_null=True
+	)
+	class Meta:
+		model = Pin
+		fields = ("image", "content", "garden", "plant")
+    
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+		request = self.context.get("request")
+		if request:
+			user = request.user
+			self.fields["garden"].queryset = Garden.objects.filter(
+				gardenuser__user=user
+			)
+			self.fields["plant"].queryset = Plant.objects.filter(
+				garden__in=self.fields["garden"].queryset
+			)
+			
 
 # detail on user's wall
 class PinDetailReadModeSerializer(serializers.ModelSerializer):
@@ -50,51 +50,11 @@ class PinDetailReadModeSerializer(serializers.ModelSerializer):
 # list on user's feed
 class PinListReadModeSerializer(serializers.ModelSerializer):
     creator = serializers.StringRelatedField(read_only=True)
-    plant_name = serializers.CharField(source='plant.nickname', read_only=True, allow_null=True)
-    plant_id = serializers.IntegerField(source='plant.plant_id', read_only=True, allow_null=True)
-    plant_image = serializers.ImageField(source='plant.image', read_only=True, allow_null=True)
-    plant_owner = serializers.CharField(source='plant.owner.username', read_only=True, allow_null=True)
-    garden_id = serializers.IntegerField(source='garden.garden_id', read_only=True, allow_null=True)
-    garden_name = serializers.CharField(source='garden.name', read_only=True, allow_null=True)
-    garden_owner = serializers.SerializerMethodField()
-    garden_image = serializers.SerializerMethodField()
-
-    def get_garden_owner(self, obj):
-        if not obj.garden:
-            return None
-        # Logic aligned with GardenBaseSerializer
-        owner_relation = obj.garden.owners.first()
-        if owner_relation and owner_relation.organization_user:
-            return owner_relation.organization_user.user.username
-        return None
-
-    def get_garden_image(self, obj):
-        request = self.context.get("request")
-        if not obj.garden:
-            return None
-        # Consistent logic with GardenListSerializer (sort by created_at)
-        first_plant = obj.garden.plants.filter(image__isnull=False).exclude(image='').order_by('created_at').first()
-
-        if first_plant and first_plant.image:
-            if request:
-                return request.build_absolute_uri(first_plant.image.url)
-            return first_plant.image.url
-        return None
-
     class Meta:
         model = Pin
         fields = (
-            "id",
             "content",
             "image",
             "creator",
             "created_at",
-            "plant_name",
-            "plant_id",
-            "plant_image",
-            "plant_owner",
-            "garden_id",
-            "garden_name",
-            "garden_owner",
-            "garden_image",
         )

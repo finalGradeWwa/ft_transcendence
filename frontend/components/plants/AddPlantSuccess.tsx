@@ -25,7 +25,10 @@ export function AddPlantSuccess({ username }: AddPlantSuccessProps) {
       </h2>
 
       {/** PL: Szczegółowy komunikat dla użytkownika. EN: Detailed message for the user. */}
-      <p className="text-neutral-600">{t('success.message')}</p>
+      <p className="text-neutral-600">
+        {t('success.message') ||
+          'Twoja nowa roślina została pomyślnie zarejestrowana w ogrodzie.'}
+      </p>
 
       {/** PL: Przycisk nawigacyjny do kolekcji roślin użytkownika. EN: Navigation button to user's plant collection. */}
       <div className="pt-4">

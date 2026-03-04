@@ -88,7 +88,7 @@ class ChangePasswordView(APIView):
 class LogoutView(APIView):
     # PL: Zmieniamy na IsAuthenticated, aby wymusić błąd 401 dla niezalogowanych.
     # EN: Changed to IsAuthenticated to force 401 error for unauthenticated users.
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated] 
 
     def post(self, request):
         refresh_token = request.COOKIES.get(REFRESH_COOKIE_NAME)
@@ -109,6 +109,7 @@ class LogoutView(APIView):
         return response
 
 # POST /api/auth/login/
+
 class LoginView(APIView):
 
 	permission_classes = [AllowAny]
