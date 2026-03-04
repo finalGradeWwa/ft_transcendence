@@ -1,44 +1,70 @@
 'use client';
 
-/**
- * PL: Główny komponent kliencki strony głównej. Wyświetla siatkę rekomendowanych roślin.
- * EN: Main client-side home page component. Displays a grid of recommended plants.
- */
-
 import React from 'react';
-import Image from 'next/image';
 import { useTranslations } from 'next-intl';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { Icon } from '@/components/icons/ui/Icon';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
+import { PlantModal } from '@/components/plants/PlantModal';
+import { PlantCard } from '@/components/plants/PlantCard';
 
 export type PlantType = {
   id: number;
   latinName: string;
   commonName: string;
   garden?: string;
+  gardenId?: number;
   author?: string;
   averageRating?: string;
+  image?: string;
+  plants_count?: number;
 };
 
 export const HomePageClient = ({
   plants,
   hideTitle,
+  gardenUsername,
 }: {
   plants: Array<PlantType>;
   showLogin?: boolean;
   isRegistered?: boolean;
   hideTitle?: boolean;
+  gardenUsername?: string;
 }) => {
   const t = useTranslations('HomePage');
   const searchParams = useSearchParams();
   const router = useRouter();
+  const pathname = usePathname();
   const authStatus = searchParams.get('auth');
   const authProvider = searchParams.get('provider');
 
-  // Keep a local flag so the banner stays visible after we clean the URL.
+  const currentPage = Number(searchParams.get('page')) || 1;
+  const itemsPerPage = 12;
+
+  const totalPages = Math.ceil(plants.length / itemsPerPage) || 1;
+  const sortedPlants = [...plants].reverse();
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const currentPlants = sortedPlants.slice(
+    startIndex,
+    startIndex + itemsPerPage
+  );
+
+  const btnStyle =
+    'bg-[#186618] text-[#fff] px-4 py-2 rounded-lg font-bold text-xs uppercase tracking-widest cursor-pointer disabled:opacity-50 focus:outline focus:outline-2 focus:outline-[#fff] focus:outline-offset-2 active:outline-none';
+
+  const handlePageChange = (page: number) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('page', page.toString());
+    router.push(`${pathname}?${params.toString()}`, { scroll: false });
+    requestAnimationFrame(() => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  };
+
   const [showLoginSuccess, setShowLoginSuccess] = React.useState(false);
   const [isExiting, setIsExiting] = React.useState(false);
   const [loginProvider, setLoginProvider] = React.useState<string | null>(null);
+  const [selectedPlantIndex, setSelectedPlantIndex] = React.useState<
+    number | null
+  >(null);
 
   React.useEffect(() => {
     if (authStatus !== 'login_success') return;
@@ -46,8 +72,6 @@ export const HomePageClient = ({
     setShowLoginSuccess(true);
     setLoginProvider(authProvider);
 
-    // Clean the URL so the message doesn't reappear on refresh.
-    // Delay the replace slightly so the user actually sees the banner.
     const timeout = window.setTimeout(() => {
       const url = new URL(window.location.href);
       url.searchParams.delete('auth');
@@ -102,51 +126,71 @@ export const HomePageClient = ({
         )}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {plants.map((plant, idx) => (
-            <article
+          {currentPlants.map(plant => (
+            <PlantCard
               key={plant.id}
-              className="bg-secondary-beige p-4 rounded-xl shadow-lg border border-subtle-gray transition transform hover:scale-[1.02] duration-300 flex flex-col h-full"
-            >
-              <div className="relative w-full h-48 mb-3 overflow-hidden rounded-lg">
-                <Image
-                  src={`/images/temp/plant_${(plant.id % 5) + 1}.jpg`}
-                  alt={plant.commonName || plant.latinName || 'Roślina'}
-                  fill
-                  sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 25vw"
-                  className="object-cover"
-                  loading={idx === 0 ? 'eager' : 'lazy'}
-                  priority={idx === 0}
-                  decoding="async"
-                />
-              </div>
-
-              <div className="space-y-1 text-sm text-neutral-900 flex-grow">
-                <h2 className="text-xl font-bold text-primary-green overflow-hidden">
-                  {plant.commonName}
-                </h2>
-                <p className="text-xs italic opacity-80 overflow-hidden">
-                  {plant.latinName}
-                </p>
-
-                <div className="pt-3 space-y-1 text-xs uppercase tracking-wider font-semibold overflow-hidden">
-                  <div className="flex items-center gap-1.5 text-dark-text">
-                    <Icon name="user" size={14} className="text-dark-text" />
-                    <span className="text-amber-900 leading-none font-bold">
-                      {plant.author || 'Anonim'}
-                    </span>
-                  </div>
-                  <p className="text-dark-text">
-                    Ogród:{' '}
-                    <span className="text-primary-green font-bold">
-                      {plant.garden || 'Brak ogrodu'}
-                    </span>
-                  </p>
-                </div>
-              </div>
-            </article>
+              plant={plant}
+              gardenUsername={gardenUsername}
+              onClick={() => setSelectedPlantIndex(sortedPlants.indexOf(plant))}
+            />
           ))}
         </div>
+
+        {totalPages > 1 && (
+          <div className="mt-12 flex max-[520px]:grid justify-center items-center gap-2 w-fit mx-auto">
+            <button
+              onClick={() => handlePageChange(1)}
+              disabled={currentPage === 1}
+              className={btnStyle}
+            >
+              {t('firstPage')}
+            </button>
+            <button
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+              className={btnStyle}
+            >
+              &lt;
+            </button>
+
+            <div className="text-white-text font-bold text-sm text-center w-full min-w-[60px] whitespace-nowrap">
+              {currentPage} / {totalPages}
+            </div>
+
+            <button
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className={btnStyle}
+            >
+              &gt;
+            </button>
+            <button
+              onClick={() => handlePageChange(totalPages)}
+              disabled={currentPage === totalPages}
+              className={btnStyle}
+            >
+              {t('lastPage')}
+            </button>
+          </div>
+        )}
       </section>
+
+      {selectedPlantIndex !== null && (
+        <PlantModal
+          plant={sortedPlants[selectedPlantIndex]}
+          onClose={() => setSelectedPlantIndex(null)}
+          onPrev={
+            selectedPlantIndex > 0
+              ? () => setSelectedPlantIndex(selectedPlantIndex - 1)
+              : undefined
+          }
+          onNext={
+            selectedPlantIndex < sortedPlants.length - 1
+              ? () => setSelectedPlantIndex(selectedPlantIndex + 1)
+              : undefined
+          }
+        />
+      )}
     </>
   );
 };

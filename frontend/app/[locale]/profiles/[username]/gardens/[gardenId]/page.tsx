@@ -1,93 +1,131 @@
-'use client';
+// /frontend/app/[locale]/profiles/[username]/gardens/[gardenId]/page.tsx
 
-import { useState, use } from 'react';
-import { useTranslations } from 'next-intl';
-import Link from 'next/link';
+import { HomePageClient } from '../../../../HomePageClient';
+import { getTranslations } from 'next-intl/server';
+import { GardenActions } from '@/components/gardens/GardenActions';
 
-const BackLink = ({ href, label }: { href: string; label: string }) => (
-  <div className="mb-6 flex">
-    <Link
-      href={href}
-      className="bg-primary-green text-header-main font-black uppercase text-[10px] tracking-widest px-6 py-2.5 rounded-full shadow-xl hover:opacity-90 transition-all flex items-center justify-center gap-2 outline-none"
-    >
-      <span className="text-sm">←</span>
-      <span>{label}</span>
-    </Link>
-  </div>
-);
+const API_URL = (
+  process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000'
+).replace(/\/$/, '');
 
-const GardenForm = ({
-  onSubmit,
-  value,
-  onChange,
-  t,
-}: {
-  onSubmit: (e: React.FormEvent) => void;
-  value: string;
-  onChange: (val: string) => void;
-  t: any;
-}) => (
-  <form onSubmit={onSubmit} className="space-y-6">
-    <div>
-      <label
-        htmlFor="gardenName"
-        className="block text-dark-text font-bold uppercase text-[10px] tracking-[0.3em] mb-2"
-      >
-        {t('gardenNameLabel')}
-      </label>
-      <input
-        id="gardenName"
-        type="text"
-        value={value}
-        onChange={e => onChange(e.target.value)}
-        required
-        className="w-full bg-white/50 border-2 border-primary-green/20 rounded-xl px-4 py-3 text-dark-text focus:border-primary-green focus:outline-none transition-all font-medium"
-      />
-    </div>
-    <button
-      type="submit"
-      className="w-full bg-primary-green text-header-main font-black uppercase text-sm tracking-widest py-4 rounded-xl shadow-lg hover:opacity-90 active:scale-[0.98] focus:outline focus:outline-2 focus:outline-gray-600 focus:outline-offset-2"
-    >
-      {t('submit')}
-    </button>
-  </form>
-);
-
-interface AddGardenPageProps {
-  params: Promise<{ username: string }>;
+async function getGardenPlants(gardenId: string) {
+  try {
+    const response = await fetch(
+      `${API_URL}/api/plant/?garden=${encodeURIComponent(gardenId)}`,
+      { cache: 'no-store' }
+    );
+    if (!response.ok) return [];
+    return await response.json();
+  } catch {
+    return [];
+  }
 }
 
-export default function AddGardenPage({ params }: AddGardenPageProps) {
-  const { username } = use(params);
-  const t = useTranslations('GardensPage');
-  const [gardenName, setGardenName] = useState('');
+async function getGarden(gardenId: string) {
+  try {
+    const response = await fetch(`${API_URL}/api/garden/${gardenId}/`, {
+      cache: 'no-store',
+    });
+    if (!response.ok) return null;
+    return await response.json();
+  } catch {
+    return null;
+  }
+}
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-  };
+export default async function GardenPage({
+  params,
+}: {
+  params: Promise<{ username: string; gardenId: string }>;
+}) {
+  const { username, gardenId } = await params;
+  const tGardens = await getTranslations('GardensPage');
+
+  const [plantsData, garden] = await Promise.all([
+    getGardenPlants(gardenId),
+    getGarden(gardenId),
+  ]);
+
+  if (!garden) {
+    return null;
+  }
+
+  const isDefault =
+    garden.name?.includes("'s Garden") || garden.name === 'Default Garden';
+  const gardenDisplayName = isDefault
+    ? tGardens('defaultGardenName')
+    : garden.name || gardenId;
+
+  const plants = (Array.isArray(plantsData) ? plantsData : []).map((p: any) => {
+    const rawImage = p.image_url || p.image || p.thumbnail;
+    let finalImage = '/images/garden/garden-placeholder.webp';
+
+    if (rawImage) {
+      if (rawImage.startsWith('http')) {
+        finalImage = rawImage;
+      } else {
+        const baseUrl = API_URL.endsWith('/') ? API_URL.slice(0, -1) : API_URL;
+        const imgPath = rawImage.startsWith('/') ? rawImage : `/${rawImage}`;
+        finalImage = `${baseUrl}${imgPath}`;
+      }
+    }
+
+    return {
+      id: p.plant_id,
+      commonName: p.nickname,
+      latinName: p.species || '',
+      author: p.owner_username || p.owner || username,
+      garden: gardenDisplayName,
+      gardenId: parseInt(gardenId),
+      image: finalImage,
+    };
+  });
 
   return (
-    <div className="bg-main-gradient min-h-screen pb-20 pt-12 px-4">
-      <div className="max-w-2xl mx-auto">
-        <BackLink
-          href={`/profiles/${username}/gardens`}
-          label={t('backToList')}
-        />
-
-        <div className="bg-secondary-beige rounded-3xl shadow-2xl overflow-hidden border border-primary-green/10 p-8 sm:p-10">
-          <header className="mb-8">
-            <h1 className="text-3xl font-black text-dark-text uppercase tracking-tight">
-              {t('title')}
-            </h1>
-          </header>
-
-          <GardenForm
-            onSubmit={handleSubmit}
-            value={gardenName}
-            onChange={setGardenName}
-            t={t}
-          />
+    <div className="min-h-screen bg-main-gradient pb-20 overflow-hidden">
+      <header className="max-w-7xl mx-auto px-0 sm:px-6 lg:px-8 pt-12 pb-4">
+        <div className="bg-gradient-to-r from-secondary-beige/90 via-secondary-beige/80 to-header-main/60 p-6 sm:p-8 md:p-10 rounded-2xl border-b-4 border-primary-green/20 shadow-xl relative overflow-hidden mx-4 sm:mx-0 outline outline-2 outline-neutral-900 outline-offset-2">
+          <h1 className="text-2xl sm:text-4xl md:text-5xl font-black tracking-tighter">
+            <span className="text-primary-green uppercase mr-4">
+              {garden.owner_username || garden.owner || username}
+            </span>
+            <span className="text-primary-green/30 font-light mr-4">—</span>
+            <span className="text-neutral-800 uppercase">
+              {gardenDisplayName}
+            </span>
+          </h1>
+          <div className="h-2 w-24 bg-primary-green mt-6 rounded-full" />
+          {(() => {
+            const envMap: Record<string, string> = {
+              i: 'indoor',
+              o: 'outdoor',
+              g: 'greenhouse',
+            };
+            const envKey = envMap[garden.environment?.toLowerCase() || ''];
+            return envKey ? (
+              <p className="text-neutral-600 mt-4 font-bold uppercase tracking-[0.3em] text-xs">
+                {tGardens(`environments.${envKey}` as any)}
+              </p>
+            ) : null;
+          })()}
         </div>
+      </header>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
+        <GardenActions
+          gardenId={gardenId}
+          username={username}
+          isDefault={isDefault}
+          members={garden.members || []}
+          owner={garden.owner || ''}
+          tAddPlant={tGardens('addPlant')}
+          tAddGardener={tGardens('addGardener')}
+          tManageGarden={tGardens('manageGarden')}
+        />
+      </div>
+
+      <div className="overflow-hidden px-0 sm:px-4">
+        <HomePageClient plants={plants} hideTitle />
       </div>
     </div>
   );

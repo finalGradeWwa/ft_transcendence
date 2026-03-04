@@ -9,6 +9,7 @@ import { Heading } from '@/components/Heading';
 import { Link } from '@/i18n/navigation';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
+import { apiFetch } from '@/lib/auth';
 
 /**
  * PL: Interfejs definiujący dane profilu użytkownika przekazywane do komponentów.
@@ -24,6 +25,16 @@ export interface UserProfileProps {
     plants: number;
     plants_count?: number;
     gardens_count?: number;
+    owned_gardens?: Array<{
+      id: number;
+      name: string;
+      owner: string;
+    }>;
+    joined_gardens?: Array<{
+      id: number;
+      name: string;
+      owner: string;
+    }>;
     pins: Array<{
       id: number;
       title: string;
@@ -44,11 +55,6 @@ export const getAvatarUrl = (path?: string) => {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
   if (!apiUrl) {
-    if (process.env.NODE_ENV === 'development') {
-      console.warn(
-        'NEXT_PUBLIC_API_URL is not defined! Check your .env.local file.'
-      );
-    }
     return path;
   }
 
@@ -206,7 +212,7 @@ export const StatCard = ({
     return (
       <Link
         href={href}
-        className="bg-container-light p-6 rounded-xl border border-primary-green/20 shadow-sm text-center hover:shadow-md hover:border-primary-green hover:bg-container-light/90 transition-all duration-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-header-main focus-visible:outline-offset-2"
+        className="bg-container-light p-6 rounded-xl border-2 border-primary-green/20 shadow-sm text-center hover:shadow-md hover:bg-container-light/90 transition-all duration-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-header-main focus-visible:outline-offset-2 outline outline-2 outline-neutral-900 outline-offset-2"
       >
         {content}
       </Link>
@@ -214,7 +220,7 @@ export const StatCard = ({
   }
 
   return (
-    <div className="bg-container-light p-6 rounded-xl border border-primary-green/20 shadow-sm text-center">
+    <div className="bg-container-light p-6 rounded-xl border-2 border-primary-green/20 shadow-sm text-center outline outline-2 outline-neutral-900 outline-offset-2">
       {content}
     </div>
   );
@@ -236,7 +242,7 @@ export const PaginationControls = ({
   t: any;
 }) => {
   const btnStyle =
-    'inline-flex items-center justify-center rounded-md px-3 py-1.5 bg-primary-green text-white hover:bg-green-700 disabled:opacity-50';
+    'inline-flex items-center justify-center rounded-md px-3 py-1.5 bg-primary-green text-white hover:opacity-85 disabled:opacity-50 transition transition-opacity duration-300';
 
   if (totalPages <= 1) return null;
 
@@ -255,7 +261,10 @@ export const PaginationControls = ({
         &lt;
       </button>
 
-      <span className="text-white font-bold text-[10px]" aria-current="page">
+      <span
+        className="text-white font-bold text-[14px] rounded-md tracking-[4px] bg-transparent text-right px-1"
+        aria-current="page"
+      >
         {currentPage}/{totalPages}
       </span>
 
@@ -279,13 +288,25 @@ export const PinsGallery = ({
   pins,
   currentPage,
   itemsPerPage,
+  currentLoggedUser,
+  onDeleted,
 }: {
-  pins: Array<{ id: number; title: string; image: string }>;
+  pins: any[];
   currentPage: number;
   itemsPerPage: number;
+  currentLoggedUser?: string | null;
+  onDeleted?: (pinId: number) => void;
 }) => {
-  const t = useTranslations('GardensPage');
+  const t = useTranslations('ProfilePage');
+  const tGardens = useTranslations('GardensPage');
 
+  const getGardenName = (name: string | null) => {
+    if (!name) return '';
+    if (name.includes("'s Garden") || name === 'Default Garden') {
+      return tGardens('defaultGardenName');
+    }
+    return name;
+  };
   const currentPins = pins.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
@@ -293,23 +314,85 @@ export const PinsGallery = ({
 
   if (currentPins.length === 0) {
     return (
-      <div className="col-span-4 py-4 text-center text-white font-bold text-[16px] uppercase">
+      <div className="py-12 text-center text-header-main font-bold text-[14px] uppercase tracking-widest border-2 border-dashed border-black/10 rounded-xl">
         {t('noPins')}
       </div>
     );
   }
 
+  const getImageUrl = (url: string | null) => {
+    if (!url) return null;
+    if (url.startsWith('http')) return url;
+    return `${process.env.NEXT_PUBLIC_API_URL}${url}`;
+  };
+
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-      {currentPins.map(pin => (
-        <div key={pin.id} className="relative aspect-square">
-          <Image
-            src={pin.image}
-            alt={pin.title}
-            fill
-            sizes="(max-width: 768px) 50vw, 25vw"
-            className="object-cover rounded-xl shadow-lg"
-          />
+    <div className="grid grid-cols-1 gap-6 w-full max-w-[95%] sm:w-4/5 mx-auto">
+      {currentPins.map((pin: any) => (
+        <div
+          key={pin.id}
+          className="p-6 bg-secondary-beige border border-primary-green/10 rounded-xl shadow-lg flex flex-col min-h-[140px] w-full outline outline-2 outline-neutral-900 outline-offset-2"
+        >
+          {(pin.plant_image || pin.garden_image) && (
+            <div className="relative w-full h-64 sm:h-96 mb-4 overflow-hidden rounded-lg">
+              <img
+                src={
+                  getImageUrl(pin.plant_image) ||
+                  getImageUrl(pin.garden_image) ||
+                  ''
+                }
+                alt={pin.plant_name || pin.garden_name || 'Pin'}
+                className="w-full h-full object-cover"
+              />
+            </div>
+          )}
+          <p className="text-black font-semibold text-lg flex-grow leading-snug">
+            {pin.content || pin.note}
+          </p>
+          <div className="mt-4 pt-3 border-t-2 border-black/5 flex flex-wrap items-center justify-between gap-y-4 text-[10px] font-black uppercase tracking-tighter">
+            {pin.plant_id && pin.plant_owner ? (
+              <Link
+                href={`/profiles/${pin.plant_owner}/plants`}
+                className="text-primary-green font-bold text-[14px] hover:underline rounded-md p-2 focus-visible focus-visible:ring-2 focus-visible:ring-header-main focus-visible:ring-offset-2 focus-visible:ring-offset-black outline-none"
+              >
+                {pin.plant_name}
+              </Link>
+            ) : pin.garden_id && pin.garden_owner ? (
+              <Link
+                href={`/profiles/${pin.garden_owner}/gardens/${pin.garden_id}`}
+                className="text-primary-green font-bold text-[14px] hover:underline rounded-md p-2 focus-visible focus-visible:ring-2 focus-visible:ring-header-main focus-visible:ring-offset-2 focus-visible:ring-offset-black outline-none"
+              >
+                {getGardenName(pin.garden_name)}
+              </Link>
+            ) : (
+              <span className="text-primary-green">
+                {pin.plant_name || pin.garden_name || ''}
+              </span>
+            )}
+            <span className="flex flex-wrap items-center justify-end flex-grow gap-4 text-dark-text/70 font-mono text-base sm:text-lg font-normal">
+              <span className="whitespace-nowrap">
+                {pin.created_at
+                  ? new Date(pin.created_at).toLocaleDateString()
+                  : ''}
+              </span>
+              {currentLoggedUser === pin.creator && (
+                <button
+                  onClick={async () => {
+                    if (!confirm(t('confirmDeletePin'))) return;
+                    const res = await apiFetch(`/api/pins/${pin.id}/`, {
+                      method: 'DELETE',
+                    });
+                    if (res.ok || res.status === 204) {
+                      onDeleted?.(pin.id);
+                    }
+                  }}
+                  className="aspect-square w-8 flex items-center justify-center text-orange-700 hover:text-orange-600 font-bold text-2xl rounded-md transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-dark-text focus-visible:outline-offset-4"
+                >
+                  ✕
+                </button>
+              )}
+            </span>
+          </div>
         </div>
       ))}
     </div>
@@ -329,7 +412,7 @@ export const EditProfileButton = ({
 }) => (
   <Link
     href={`/profiles/${username}/edit`}
-    className="flex items-center whitespace-nowrap gap-2 px-4 py-2 bg-primary-green/90 text-white rounded-lg font-bold uppercase text-[10px] tracking-widest transition-all hover:bg-green-700 shadow-sm w-fit leading-none"
+    className="flex items-center whitespace-nowrap gap-2 px-4 py-2 bg-primary-green/90 text-white rounded-lg font-bold uppercase text-[10px] tracking-widest transition-opacity hover:opacity-90 shadow-sm w-fit leading-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-header-main focus-visible:outline-offset-4"
   >
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -362,8 +445,66 @@ export const StatsSection = ({ user }: { user: UserProfileProps['user'] }) => {
         count={user?.plants_count}
         label={t('stats.plants')}
         isLoading={!user}
-        href={`/profiles/${user?.username}/plants`} // ← DODAJ
+        href={`/profiles/${user?.username}/plants`}
       />
+    </div>
+  );
+};
+
+export const JoinedGardensSection = ({
+  gardens,
+}: {
+  gardens: any[] | undefined;
+}) => {
+  const tProfile = useTranslations('ProfilePage');
+  const tGardens = useTranslations('GardensPage');
+
+  if (!gardens || gardens.length === 0) return null;
+
+  return (
+    <div className="mt-12 pt-8 border-t-2 border-black/10 w-full">
+      <h2 className="text-[14px] font-header-main font-bold uppercase tracking-[0.1em] mb-6 text-center md:text-left">
+        {tProfile('sections.joinedGardens')}
+      </h2>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {gardens.map(garden => {
+          const isMainGarden =
+            garden.name.includes("'s Garden") ||
+            garden.name === 'Default Garden' ||
+            garden.is_default;
+          const displayName = isMainGarden
+            ? tGardens('defaultGardenName')
+            : garden.name;
+
+          return (
+            <Link
+              key={garden.garden_id || garden.id}
+              href={`/profiles/${garden.owner}/gardens/${garden.garden_id || garden.id}`}
+              className="flex items-center bg-container-light gap-4 px-4 py-2 rounded-xl border-2 border-black hover:opacity-90 transition-opacity duration-200 ease-in-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-header-main focus-visible:outline-offset-1"
+            >
+              <div className="w-8 h-8 bg-secondary-beige rounded-md flex items-center justify-center overflow-hidden shrink-0 border border-black/10">
+                {garden.thumbnail ? (
+                  <img
+                    src={garden.thumbnail}
+                    alt=""
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <span className="text-sm">🌿</span>
+                )}
+              </div>
+              <div className="flex flex-col min-w-0">
+                <span className="font-black text-black text-sm truncate uppercase tracking-tight">
+                  {displayName}
+                </span>
+                <span className="text-[10px] font-bold text-primary-green uppercase mt-0.5 truncate whitespace-nowrap">
+                  {tGardens('owner')}: {garden.owner}
+                </span>
+              </div>
+            </Link>
+          );
+        })}
+      </div>
     </div>
   );
 };
@@ -381,6 +522,9 @@ export const ProfileFooter = ({
   itemsPerPage,
   t,
   username,
+  currentLoggedUser,
+  onDeletedPin,
+  pinsRef,
 }: {
   isOwnProfile: boolean;
   currentPage: number;
@@ -390,13 +534,26 @@ export const ProfileFooter = ({
   itemsPerPage: number;
   t: any;
   username?: string;
+  currentLoggedUser?: string | null;
+  onDeletedPin?: (pinId: number) => void;
+  pinsRef?: React.RefObject<HTMLDivElement | null>;
 }) => (
-  <div className="mt-8 pt-8 border-t border-white/20 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+  <div
+    ref={pinsRef}
+    className="mt-8 pt-8 border-t border-white/20 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start"
+  >
     <div className="lg:col-span-2 flex justify-center lg:justify-start">
       {isOwnProfile && <EditProfileButton t={t} username={username} />}
     </div>
-    <div className="lg:col-span-10 bg-white/5 p-5 ml-4 rounded-xl border border-white/5">
-      <div className="flex justify-between items-center mb-4">
+    <div className="lg:col-span-10 bg-white/5 py-5 px-0 sm:px-5 ml-0 sm:ml-4 rounded-xl border border-white/5">
+      <PinsGallery
+        pins={pins}
+        currentPage={currentPage}
+        itemsPerPage={itemsPerPage}
+        currentLoggedUser={currentLoggedUser}
+        onDeleted={onDeletedPin}
+      />
+      <div className="flex justify-between items-center mb-4 mt-6">
         <PaginationControls
           currentPage={currentPage}
           totalPages={totalPages}
@@ -404,11 +561,6 @@ export const ProfileFooter = ({
           t={t}
         />
       </div>
-      <PinsGallery
-        pins={pins}
-        currentPage={currentPage}
-        itemsPerPage={itemsPerPage}
-      />
     </div>
   </div>
 );
@@ -428,6 +580,9 @@ export const ProfileContent = ({
   setCurrentPage,
   pins,
   totalPages,
+  currentLoggedUser,
+  onDeletedPin,
+  pinsRef,
 }: {
   user: UserProfileProps['user'];
   isOwnProfile: boolean;
@@ -435,17 +590,23 @@ export const ProfileContent = ({
   setCurrentPage: (page: number) => void;
   pins: Array<{ id: number; title: string; image: string }>;
   totalPages: number;
+  currentLoggedUser?: string | null;
+  onDeletedPin?: (pinId: number) => void;
+  pinsRef?: React.RefObject<HTMLDivElement | null>;
 }) => {
   const t = useTranslations('ProfilePage');
   const itemsPerPage = 4;
 
   return (
     <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pt-4 pb-12 flex flex-col justify-center h-full flex-grow">
-      <div className="bg-container-light/10 backdrop-blur-md p-6 sm:p-10 rounded-xl shadow-2xl w-full mt-12">
+      <div className="bg-container-light/10 backdrop-blur-md py-6 px-0 sm:p-10 rounded-xl shadow-2xl w-full mt-12">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <PersonalInfo user={user} t={t} isOwnProfile={isOwnProfile} />
           <StatsSection user={user} />
         </div>
+
+        <JoinedGardensSection gardens={user?.joined_gardens} />
+
         <ProfileFooter
           isOwnProfile={isOwnProfile}
           currentPage={currentPage}
@@ -455,6 +616,9 @@ export const ProfileContent = ({
           itemsPerPage={itemsPerPage}
           t={t}
           username={user?.username}
+          currentLoggedUser={currentLoggedUser}
+          onDeletedPin={onDeletedPin}
+          pinsRef={pinsRef}
         />
       </div>
     </div>

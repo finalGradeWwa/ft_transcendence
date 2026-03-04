@@ -8,7 +8,7 @@ import { apiFetch } from '@/lib/auth';
 import { useRouter } from '@/i18n/navigation';
 
 const fieldCls =
-  'w-full p-3 rounded bg-white border border-primary-green/20 focus:border-primary-green text-dark-text font-medium outline-none transition-all';
+  'w-full p-3 rounded bg-white border border-primary-green/20 focus:border-primary-green text-dark-text font-medium outline-none transition-all focus:outline focus:outline-2 focus:outline-gray-600 focus:outline-offset-0';
 const labelCls =
   'block text-primary-green font-bold mb-2 uppercase text-xs tracking-widest';
 
@@ -70,7 +70,9 @@ export default function AddGardenPage({
       <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8">
         <div className="py-12 flex justify-center">
           <div className="bg-container-light p-8 rounded-xl shadow-2xl w-full max-w-2xl border border-primary-green text-center">
-            <div className="text-6xl mb-4">🌱</div>
+            <div className="text-6xl mb-4" aria-hidden="true">
+              🌱
+            </div>
             <Heading as="h2" className="!text-primary-green mb-4">
               {t('success.title')}
             </Heading>
@@ -86,7 +88,10 @@ export default function AddGardenPage({
       <div className="py-12 flex justify-center">
         <div className="bg-container-light p-8 rounded-xl shadow-2xl w-full max-w-2xl border border-primary-green">
           <div className="flex items-center justify-between mb-8 pb-4 border-b border-primary-green/10">
-            <Heading as="h1" className="!text-primary-green">
+            <Heading
+              as="h1"
+              className="uppercase tracking-widest !text-primary-green font-bold text-left m-0 break-words overflow-hidden"
+            >
               {t('title')}
             </Heading>
             <div className="relative w-16 h-16">
@@ -94,6 +99,8 @@ export default function AddGardenPage({
                 src="/images/other/garden.webp"
                 alt=""
                 fill
+                priority
+                loading="eager"
                 className="object-contain"
                 sizes="64px"
               />
@@ -101,15 +108,22 @@ export default function AddGardenPage({
           </div>
 
           {error && (
-            <div className="mb-6 p-3 font-bold text-red-700 bg-red-50 border-2 border-red-600 rounded text-center">
+            <div
+              role="alert"
+              className="mb-6 p-3 font-bold text-red-700 bg-red-50 border-2 border-red-600 rounded text-center"
+            >
               {error}
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6 p-2">
             <section>
-              <label className={labelCls}>{t('gardenNameLabel')}</label>
+              <label htmlFor="garden-name" className={labelCls}>
+                {t('gardenNameLabel')}
+              </label>
               <input
+                maxLength={30}
+                id="garden-name"
                 required
                 type="text"
                 disabled={isLoading}
@@ -121,8 +135,11 @@ export default function AddGardenPage({
             </section>
 
             <section>
-              <label className={labelCls}>{t('environmentLabel')}</label>
+              <label htmlFor="garden-environment" className={labelCls}>
+                {t('environmentLabel')}
+              </label>
               <select
+                id="garden-environment"
                 required
                 disabled={isLoading}
                 className={fieldCls}
@@ -138,7 +155,7 @@ export default function AddGardenPage({
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-primary-green text-white font-black py-4 rounded-xl uppercase tracking-[0.2em] shadow-xl hover:opacity-90 transition-all disabled:opacity-50"
+              className="w-full bg-primary-green text-white font-black py-4 rounded-xl uppercase tracking-[0.2em] shadow-xl hover:opacity-90 transition-all disabled:opacity-50 focus:outline focus:outline-2 focus:outline-gray-600 focus:outline-offset-[3px]"
             >
               {isLoading ? '...' : t('submit')}
             </button>

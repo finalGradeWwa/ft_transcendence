@@ -1,0 +1,105 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
+import { apiFetch } from '@/lib/auth';
+import { GardenCard } from '@/components/gardens/GardenCard';
+import { GardenType } from '@/app/[locale]/GardensPageClient';
+
+interface UserGardensClientProps {
+  gardens: GardenType[];
+  initialCurrentUser: string | null;
+  profileUsername: string;
+}
+
+export const UserGardensClient = ({
+  gardens: initialGardens,
+  initialCurrentUser,
+  profileUsername,
+}: UserGardensClientProps) => {
+  const t = useTranslations('GardensPage');
+  const [gardens, setGardens] = useState<GardenType[]>(initialGardens);
+  const [currentUser, setCurrentUser] = useState<string | null>(
+    initialCurrentUser
+  );
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 12;
+
+  const totalPages = Math.ceil(gardens.length / itemsPerPage) || 1;
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const currentGardens = gardens.slice(startIndex, startIndex + itemsPerPage);
+
+  const btnStyle =
+    'bg-[#186618] text-[#fff] px-4 py-2 rounded-lg font-bold text-xs uppercase tracking-widest cursor-pointer disabled:opacity-50 focus:outline focus:outline-2 focus:outline-[#fff] focus:outline-offset-2 active:outline-none';
+
+  useEffect(() => {
+    apiFetch('/api/auth/me/')
+      .then(res => res.json())
+      .then(data => setCurrentUser(data.username))
+      .catch(() => {});
+  }, []);
+
+  const handleDelete = async (gardenId: number) => {
+    if (!confirm(t('confirmDelete'))) return;
+    try {
+      const res = await apiFetch(`/api/garden/${gardenId}/`, {
+        method: 'DELETE',
+      });
+      if (res.ok || res.status === 204) {
+        setGardens(prev => prev.filter(g => g.id !== gardenId));
+      }
+    } catch {}
+  };
+
+  return (
+    <section className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {currentGardens.map((garden, idx) => (
+          <GardenCard
+            key={garden.id}
+            garden={garden}
+            priority={idx < 4}
+            canDelete={currentUser === profileUsername && !garden.isDefault}
+            onDelete={() => handleDelete(garden.id)}
+          />
+        ))}
+      </div>
+
+      {totalPages > 1 && (
+        <div className="mt-12 flex max-[520px]:grid justify-center items-center gap-2 w-fit mx-auto">
+          <button
+            onClick={() => setCurrentPage(1)}
+            disabled={currentPage === 1}
+            className={btnStyle}
+          >
+            {t('firstPage')}
+          </button>
+          <button
+            onClick={() => setCurrentPage(p => p - 1)}
+            disabled={currentPage === 1}
+            className={btnStyle}
+          >
+            &lt;
+          </button>
+          <div className="text-white-text font-bold text-sm text-center w-full min-w-[60px] whitespace-nowrap">
+            {currentPage} / {totalPages}
+          </div>
+          <button
+            onClick={() => setCurrentPage(p => p + 1)}
+            disabled={currentPage === totalPages}
+            className={btnStyle}
+          >
+            &gt;
+          </button>
+          <button
+            onClick={() => setCurrentPage(totalPages)}
+            disabled={currentPage === totalPages}
+            className={btnStyle}
+          >
+            {t('lastPage')}
+          </button>
+        </div>
+      )}
+    </section>
+  );
+};

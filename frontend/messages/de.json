@@ -2,7 +2,7 @@
   "HomePage": {
     "title": "Plant Portal",
     "description": "Ihre ultimative Wissensdatenbank und Galerie für Pflanzen.",
-    "recommended": "EMPFOHLEN",
+    "recommended": "NEUESTE",
     "search": "Pflanzen suchen...",
     "login": "Anmelden",
     "email": "E-Mail-Adresse",
@@ -12,11 +12,17 @@
     "cancel": "Abbrechen",
     "noAccount": "Kein Konto?",
     "register": "Registrieren!",
+    "authRequiredTitle": "Willkommen in unserer Community!",
+    "authRequiredDesc": "Melden Sie sich an, um empfohlene Pflanzen zu sehen und alle Funktionen unseres Dienstes zu nutzen.",
     "author": "Autor:",
     "rating": "Bewertung:",
     "showMore": "Mehr Pflanzen anzeigen",
     "oauthLoginSuccess": "GitHub-Anmeldung erfolgreich. Du bist jetzt eingeloggt.",
     "loginSuccess": "Erfolgreich angemeldet.",
+    "plantsCountLabel": "Anzahl der Pflanzen",
+    "addPin": "Pin hinzufügen",
+    "firstPage": "Erste",
+    "lastPage": "Letzte",
     "nav": [
       "Startseite",
       "Gärten",
@@ -44,7 +50,9 @@
       "profile": "Benutzerprofil",
       "logout": "Abmelden",
       "userTools": "Benutzer-Tools",
-      "chat": "Chat öffnen"
+      "chat": "Chat öffnen",
+      "previousSlide": "Vorheriges Bild",
+      "nextSlide": "Nächstes Bild"
     },
     "contact": {
       "name": "John Weeder",
@@ -56,7 +64,14 @@
       "officeHours": "Montag - Freitag 9:00 - 17:00 Uhr"
     },
     "or": "Oder",
-    "githubLogin": "Mit GitHub anmelden"
+    "githubLogin": "Mit GitHub anmelden",
+    "showPassword": "Passwort anzeigen",
+    "hidePassword": "Passwort verbergen"
+  },
+  "LandingPage": {
+    "description": "Ihre Pflanzen-Wissensdatenbank, Fotogalerie und eine Gemeinschaft von Botanik-Enthusiasten. Melden Sie sich an, um den Dienst vollumfänglich zu nutzen!",
+    "login": "Anmelden",
+    "register": "Registrieren"
   },
   "ProfilePage": {
     "title": "Benutzerprofil",
@@ -65,12 +80,18 @@
     "userPlantsTitle": "Deine Pflanzensammlung",
     "userCollection": "Pflanzensammlung von {name}",
     "profileDescription": "Teilen wir die Schönheit der Pflanzen.",
+    "noPins": "Keine Einträge",
+    "confirmDeletePin": "Sind Sie sicher, dass Sie diesen Pin löschen möchten? Das Löschen eines Pins löscht weder die Pflanze noch den Garten.",
     "stats": {
       "gardens": "Gärten",
       "plants": "Pflanzen",
+      "owner": "Besitzer",
       "followers": "Follower",
       "following": "Gefolgt",
       "pins": "Pins"
+    },
+    "sections": {
+      "joinedGardens": "Gemeinsame Gärten"
     },
     "actions": {
       "follow": "Folgen",
@@ -187,9 +208,12 @@
       "photo": "Pflanzenfoto"
     },
     "errors": {
+      "photoRequired": "Foto hinzufügen!",
+      "fileTooLarge": "MAX 5MB",
       "fillAllFields": "Bitte füllen Sie alle Felder aus und fügen Sie ein Foto hinzu.",
       "addPlantFailed": "Fehler beim Hinzufügen der Pflanze.",
-      "unexpectedError": "Ein unerwarteter Fehler ist aufgetreten."
+      "unexpectedError": "Ein unerwarteter Fehler ist aufgetreten.",
+      "nicknameExists": "Eine Pflanze mit diesem Namen existiert bereits in deinem Garten."
     },
     "success": {
       "title": "Pflanze hinzugefügt!",
@@ -203,6 +227,7 @@
     "backToList": "Zurück zur Gartenliste",
     "latestGardens": "Neueste Gärten",
     "owner": "Besitzer",
+    "unknownOwner": "Unbekannt",
     "plantsAmount": "Pflanzen",
     "viewGarden": "Garten ansehen",
     "plantsCountLabel": "Anzahl der Pflanzen",
@@ -211,6 +236,22 @@
     "noPins": "Keine Einträge",
     "defaultGardenName": "Hauptgarten",
     "environmentLabel": "Umgebung",
+    "manageGarden": "Garten verwalten",
+    "addPlant": "Pflanze hinzufügen",
+    "addGardener": "Mitglieder / Gärtner hinzufügen",
+    "deleteGarden": "Garten löschen",
+    "confirmDelete": "Sind Sie sicher, dass Sie diesen Garten löschen möchten? Alle darin enthaltenen Pflanzen werden ebenfalls entfernt.",
+    "saveChanges": "Änderungen speichern",
+    "cancel": "Abbrechen",
+    "cannotEditDefault": "Der Hauptgarten kann nicht bearbeitet werden.",
+    "accessDenied": "Zugriff verweigert",
+    "back": "Zurück",
+    "firstPage": "Erste",
+    "lastPage": "Letzte",
+    "fields": {
+      "name": "Gartenname",
+      "environment": "Umgebung"
+    },
     "environments": {
       "indoor": "Drinnen",
       "outdoor": "Draußen",
@@ -239,12 +280,46 @@
     },
     "loading": "Suche wird ausgeführt, bitte warten..."
   },
-  "NotificationsModal": {
-    "title": "Freundschaftsanfragen",
-    "close": "Benachrichtigungen schließen",
-    "loading": "Anfragen werden geladen...",
-    "noRequests": "Keine ausstehenden Freundschaftsanfragen",
-    "accept": "Freundschaftsanfrage annehmen",
-    "reject": "Freundschaftsanfrage ablehnen"
+  "MembersPage": {
+    "title": "Gartenmitglieder",
+    "back": "Zurück zum Garten",
+    "searchPlaceholder": "Benutzer suchen...",
+    "search": "Suche",
+    "add": "Hinzufügen",
+    "addSuccess": "Benutzer zum Garten hinzugefügt!",
+    "addError": "Fehler beim Hinzufügen des Benutzers.",
+    "currentMembers": "Teilnehmer",
+    "remove": "Entfernen",
+    "removeSuccess": "Benutzer aus dem Garten entfernt.",
+    "removeError": "Fehler beim Entfernen des Benutzers.",
+    "confirmRemove": "Sind Sie sicher, dass Sie diesen Benutzer aus dem Garten entfernen möchten?"
+  },
+  "AddPinPage": {
+    "title": "Pin hinzufügen",
+    "typePlant": "Pflanze",
+    "typeGarden": "Garten",
+    "selectPlant": "Ausgewählte Pflanze",
+    "selectGarden": "Ausgewählter Garten",
+    "descriptionLabel": "Notiz / Beschreibung",
+    "placeholder": "Schreiben Sie etwas über diesen Ort oder diese Pflanze...",
+    "submit": "Pin speichern",
+    "back": "Mein Profil",
+    "searchLabel": "Suchen",
+    "errors": {
+      "selectItem": "Wähle eine Pflanze oder einen Garten aus",
+      "addDescription": "Notizinhalt hinzufügen",
+      "tooLong": "Maximal 150 Zeichen"
+    },
+    "NotificationsModal": {
+      "title": "Freundschaftsanfragen",
+      "close": "Benachrichtigungen schließen",
+      "loading": "Anfragen werden geladen...",
+      "noRequests": "Keine ausstehenden Freundschaftsanfragen",
+      "accept": "Freundschaftsanfrage annehmen",
+      "reject": "Freundschaftsanfrage ablehnen"
+    }
+  },
+  "PlantCard": {
+    "deleteConfirm": "Sind Sie sicher, dass Sie diese Pflanze löschen möchten?"
   }
 }

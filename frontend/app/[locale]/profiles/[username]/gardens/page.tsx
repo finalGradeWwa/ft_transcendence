@@ -1,5 +1,5 @@
 import { getTranslations } from 'next-intl/server';
-import { HomePageClient } from '../../../HomePageClient';
+import { UserGardensClient } from './UserGardensClient';
 import NextImage from 'next/image';
 
 interface UserGardensPageProps {
@@ -9,38 +9,76 @@ interface UserGardensPageProps {
   }>;
 }
 
+const API_URL = (
+  process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000'
+).replace(/\/$/, '');
+
+async function getUserGardens(username: string) {
+  try {
+    const response = await fetch(
+      `${API_URL}/api/garden/?username=${encodeURIComponent(username)}`,
+      { cache: 'no-store' }
+    );
+    if (!response.ok) return [];
+    return await response.json();
+  } catch {
+    return [];
+  }
+}
+
 export default async function UserGardensPage({
   params,
 }: UserGardensPageProps) {
   const { username } = await params;
-  const t = await getTranslations('ProfilePage');
+  const tProfile = await getTranslations('ProfilePage');
+  const tGardens = await getTranslations('GardensPage');
+  const gardensData = await getUserGardens(username);
 
-  const fakeGardens = [
-    {
-      id: 201,
-      author: username,
-      latinName: 'COMMUNITY SPACE',
-      commonName: 'Słoneczny Balkon',
-      garden: '12 Plants',
-    },
-    {
-      id: 202,
-      author: username,
-      latinName: 'PRIVATE ASYLUM',
-      commonName: 'Miejska Dżungla',
-      garden: '42 Plants',
-    },
-    {
-      id: 203,
-      author: username,
-      latinName: 'OFFICE PROJECT',
-      commonName: 'Biuro Open Space',
-      garden: '8 Plants',
-    },
-  ];
+  const gardensDataMapped = gardensData.map((g: any) => {
+    const ownerFromTitle = g.name.includes("'s")
+      ? g.name.split("'s")[0]
+      : username;
+
+    const isDefault =
+      g.name.includes("'s Garden") || g.name === 'Default Garden';
+    const displayName = isDefault ? tGardens('defaultGardenName') : g.name;
+
+    const envMap: Record<string, string> = {
+      i: 'indoor',
+      o: 'outdoor',
+      g: 'greenhouse',
+    };
+
+    const rawValue = String(g.environment || '')
+      .toLowerCase()
+      .charAt(0);
+    const envKey = envMap[rawValue] || 'indoor';
+    const translatedEnv = tGardens(`environments.${envKey}` as any);
+
+    const rawImage = g.thumbnail || g.image_url || g.image;
+    let finalImage = '/images/garden/garden-placeholder.webp';
+
+    if (rawImage) {
+      finalImage = rawImage.startsWith('http')
+        ? rawImage
+        : `${API_URL}${rawImage.startsWith('/') ? '' : '/'}${rawImage}`;
+    }
+
+    return {
+      id: g.garden_id,
+      name: displayName,
+      owner: ownerFromTitle,
+      plantsCount: g.plant_count || 0,
+      styleName: translatedEnv,
+      image: finalImage,
+      isDefault: isDefault,
+    };
+  });
+
+  const gardens = [...gardensDataMapped].reverse();
 
   return (
-    <main className="user-gardens-page min-h-screen bg-main-gradient pb-20 overflow-hidden">
+    <div className="user-gardens-page min-h-screen bg-main-gradient pb-20 overflow-hidden">
       <header className="page-header max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-4 overflow-hidden">
         <div className="profile-summary-card bg-gradient-to-r from-secondary-beige/90 via-secondary-beige/80 to-header-main/60 p-6 sm:p-8 md:p-10 rounded-2xl border-b-4 border-primary-green/20 shadow-xl relative overflow-hidden flex items-center justify-between">
           <div className="profile-info-content relative z-10 flex-1">
@@ -53,13 +91,13 @@ export default async function UserGardensPage({
                   —
                 </span>
                 <span className="profile-stats-label inline-block whitespace-normal">
-                  {t('stats.gardens') || 'Gardens'}
+                  {tProfile('stats.gardens') || 'Gardens'}
                 </span>
               </span>
             </h1>
             <div className="profile-accent-bar h-2 w-24 bg-primary-green mt-6 rounded-full" />
             <p className="profile-description text-neutral-600 mt-4 font-bold uppercase tracking-[0.3em] text-xs block whitespace-normal overflow-wrap-anywhere">
-              {t('profileDescription')}
+              {tProfile('profileDescription')}
             </p>
           </div>
 
@@ -89,8 +127,12 @@ export default async function UserGardensPage({
       </header>
 
       <div className="gardens-grid-section overflow-hidden">
-        <HomePageClient plants={fakeGardens} hideTitle />
+        <UserGardensClient
+          gardens={gardens}
+          initialCurrentUser={null}
+          profileUsername={username}
+        />
       </div>
-    </main>
+    </div>
   );
 }

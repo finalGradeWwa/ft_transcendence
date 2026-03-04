@@ -355,3 +355,18 @@ UserProfile (chat_app_userprofile)
 ___
 # resources (+ AI usage)
 - 📘 Canva Visualisation: [canva](https://www.canva.com/design/DAG97aUDBss/Z4gOAUNjw9QdsX-HSqcBqA/edit) (created by mwojtcza)
+
+# Browser-Specific Notes & Known Issues
+
+## Firefox
+Next.js Dev Mode Prefetch Warning: You may see a warning regarding _next/static/chunks/...css being preloaded but not used.
+Status: This is a known Next.js development server issue specific to Firefox's strict preloading checks.
+Resolution: It does not affect functionality and is automatically resolved in production builds (next build && next start).
+Font Warnings: Occasional warnings about unused fonts may appear depending on the local environment and cache.
+
+## Edge / Chromium-based Browsers
+Lazy Loading Interventions: Edge may log an [Intervention] message stating that images are replaced with placeholders and load events are deferred.
+Reason: This is a native performance optimization for images marked with loading="lazy". It ensures better initial page load speed by prioritizing core content over off-screen images.
+
+## General / Cross-Browser
+UI Rendering (CSS Outlines): This project utilizes specific CSS styling including dark outlines with a 2px offset for improved accessibility and focus visibility. In rare cases, older browser versions may render focus-ring offsets differently; for the best experience, use the latest evergreen browsers.

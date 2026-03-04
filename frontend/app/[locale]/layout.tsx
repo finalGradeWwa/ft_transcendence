@@ -24,6 +24,8 @@ const inter = Inter({
   subsets: ['latin', 'latin-ext'],
   display: 'swap',
   variable: '--font-inter',
+  preload: false,
+  weight: ['400', '700', '900'],
 });
 
 /**

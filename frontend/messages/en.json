@@ -2,7 +2,7 @@
   "HomePage": {
     "title": "Plant Portal",
     "description": "Your ultimate plant knowledge base and gallery.",
-    "recommended": "RECOMMENDED",
+    "recommended": "LATEST",
     "search": "Search plants...",
     "login": "Login",
     "email": "Email Address",
@@ -12,6 +12,8 @@
     "cancel": "Cancel",
     "noAccount": "Don't have an account?",
     "register": "Register here!",
+    "authRequiredTitle": "Welcome to our community!",
+    "authRequiredDesc": "Log in to see recommended plants and take full advantage of our service.",
     "author": "Author:",
     "rating": "Rating:",
     "showMore": "Show more plants",
@@ -23,6 +25,10 @@
     "rights": "All rights reserved.",
     "privacy": "Privacy Policy",
     "terms": "Terms",
+    "plantsCountLabel": "Number of plants",
+    "addPin": "Add pin",
+    "firstPage": "First",
+    "lastPage": "Last",
     "aria": {
       "close": "Close",
       "homePageLink": "home page",
@@ -38,7 +44,9 @@
       "profile": "User profile",
       "logout": "Logout",
       "userTools": "User tools",
-      "chat": "Open chat"
+      "chat": "Open chat",
+      "previousSlide": "Previous image",
+      "nextSlide": "Next image"
     },
     "contact": {
       "name": "John Weeder",
@@ -50,7 +58,14 @@
       "officeHours": "Monday - Friday 9:00 AM - 5:00 PM"
     },
     "or": "Or",
-    "githubLogin": "Sign in with GitHub"
+    "githubLogin": "Sign in with GitHub",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password"
+  },
+  "LandingPage": {
+    "description": "Your plant knowledge base, photo gallery, and community of botany enthusiasts. Log in to take full advantage of the site!",
+    "login": "Log in",
+    "register": "Register"
   },
   "ProfilePage": {
     "title": "User Profile",
@@ -59,12 +74,18 @@
     "userPlantsTitle": "Your Plant Collection",
     "userCollection": "{name}'s plant collection",
     "profileDescription": "Let's share the beauty of plants.",
+    "noPins": "No entries",
+    "confirmDeletePin": "Are you sure you want to delete this pin? Deleting a pin does not delete the plant or garden.",
     "stats": {
       "gardens": "Gardens",
       "plants": "Plants",
+      "owner": "Owner",
       "followers": "Followers",
       "following": "Following",
       "pins": "Pins"
+    },
+    "sections": {
+      "joinedGardens": "Shared Gardens"
     },
     "actions": {
       "follow": "Follow",
@@ -181,9 +202,12 @@
       "photo": "Plant photo"
     },
     "errors": {
+      "photoRequired": "Add a photo!",
+      "fileTooLarge": "MAX 5MB",
       "fillAllFields": "Please fill in all fields and add a photo.",
       "addPlantFailed": "Error while adding the plant.",
-      "unexpectedError": "An unexpected error occurred."
+      "unexpectedError": "An unexpected error occurred.",
+      "nicknameExists": "A plant with this name already exists in your garden."
     },
     "success": {
       "title": "Plant added!",
@@ -197,6 +221,7 @@
     "backToList": "Back to gardens list",
     "latestGardens": "Latest Gardens",
     "owner": "Owner",
+    "unknownOwner": "Unknown",
     "plantsAmount": "Plants",
     "viewGarden": "View Garden",
     "plantsCountLabel": "Number of plants",
@@ -205,6 +230,22 @@
     "noPins": "No entries",
     "defaultGardenName": "Main Garden",
     "environmentLabel": "Environment",
+    "manageGarden": "Manage garden",
+    "addPlant": "Add plant",
+    "addGardener": "Members / Add gardener",
+    "deleteGarden": "Delete garden",
+    "confirmDelete": "Are you sure you want to delete this garden? All plants inside it will also be removed.",
+    "saveChanges": "Save changes",
+    "cancel": "Cancel",
+    "cannotEditDefault": "The main garden cannot be edited.",
+    "accessDenied": "Access denied",
+    "back": "Go back",
+    "firstPage": "First",
+    "lastPage": "Last",
+    "fields": {
+      "name": "Garden name",
+      "environment": "Environment"
+    },
     "environments": {
       "indoor": "Indoor",
       "outdoor": "Outdoor",
@@ -233,12 +274,46 @@
     },
     "loading": "Searching, please wait..."
   },
-  "NotificationsModal": {
-    "title": "Friend Requests",
-    "close": "Close notifications",
-    "loading": "Loading requests...",
-    "noRequests": "No pending friend requests",
-    "accept": "Accept friend request",
-    "reject": "Reject friend request"
+  "MembersPage": {
+    "title": "Garden Members",
+    "back": "Back to garden",
+    "searchPlaceholder": "Search for user...",
+    "search": "Search",
+    "add": "Add",
+    "addSuccess": "User added to the garden!",
+    "addError": "Error while adding user.",
+    "currentMembers": "Participants",
+    "remove": "Remove",
+    "removeSuccess": "User removed from the garden.",
+    "removeError": "Error while removing the user.",
+    "confirmRemove": "Are you sure you want to remove this user from the garden?"
+  },
+  "AddPinPage": {
+    "title": "Add Pin",
+    "typePlant": "Plant",
+    "typeGarden": "Garden",
+    "selectPlant": "Selected Plant",
+    "selectGarden": "Selected Garden",
+    "descriptionLabel": "Note / Description",
+    "placeholder": "Write something about this place or plant...",
+    "submit": "Save Pin",
+    "back": "My Profile",
+    "searchLabel": "Search",
+    "errors": {
+      "selectItem": "Select a plant or garden",
+      "addDescription": "Add note content",
+      "tooLong": "Maximum 150 characters"
+    },
+    "NotificationsModal": {
+      "title": "Friend Requests",
+      "close": "Close notifications",
+      "loading": "Loading requests...",
+      "noRequests": "No pending friend requests",
+      "accept": "Accept friend request",
+      "reject": "Reject friend request"
+    }
+  },
+  "PlantCard": {
+    "deleteConfirm": "Are you sure you want to delete this plant?"
   }
 }

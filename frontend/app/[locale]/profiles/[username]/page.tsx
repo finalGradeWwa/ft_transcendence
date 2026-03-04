@@ -1,15 +1,3 @@
-/**
- * Dynamic Profile Page Component (Serwerowy komponent profilu dynamicznego)
- * * EN: This server-side component extracts the 'username' from the dynamic URL
- * route (e.g., /profiles/[username]). It wraps the client-side profile
- * interface with a consistent background and passes the URL parameter
- * down to display user-specific data.
- * * PL: Ten komponent serwerowy wyodrębnia nazwę użytkownika (username) z dynamicznej
- * ścieżki adresu URL (np. /profiles/[username]). Otacza interfejs profilu po stronie
- * klienta spójnym tłem i przekazuje parametr URL w dół, aby wyświetlić dane
- * konkretnego użytkownika.
- */
-
 import UserProfileClient from '../UserProfileClient';
 import { cookies } from 'next/headers';
 
@@ -34,6 +22,18 @@ async function getUserProfile(username: string) {
   }
 }
 
+async function getUserGardens(username: string) {
+  try {
+    const response = await fetch(`${API_URL}/api/garden/?member=${username}`, {
+      cache: 'no-store',
+    });
+    if (!response.ok) return [];
+    return await response.json();
+  } catch {
+    return [];
+  }
+}
+
 export default async function ProfilePage({
   params,
 }: {
@@ -41,6 +41,20 @@ export default async function ProfilePage({
 }) {
   const { username } = await params;
   const user = await getUserProfile(username);
+
+  if (!user) return null;
+
+  const allGardens = await getUserGardens(username);
+
+  if (Array.isArray(allGardens)) {
+    user.owned_gardens = allGardens.filter((g: any) => g.owner === username);
+    user.joined_gardens = allGardens.filter(
+      (g: any) => g.owner !== username && g.user_count > 1
+    );
+    user.gardens_count = user.owned_gardens.length;
+  }
+
+  user.pins = [];
 
   return <UserProfileClient user={user} currentLoggedUser={null} />;
 }

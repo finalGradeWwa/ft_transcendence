@@ -24,6 +24,7 @@ const nextConfig: NextConfig = {
         pathname: '/media/**',
       },
     ],
+    unoptimized: process.env.NODE_ENV === 'development',
   },
 };
 

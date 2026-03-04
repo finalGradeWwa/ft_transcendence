@@ -51,7 +51,7 @@ class PinViewSet(viewsets.ViewSet):
             else:
                 pins = pins.filter(creator_id=owner_param)
         
-        serializer = PinListReadModeSerializer(pins, many=True)
+        serializer = PinListReadModeSerializer(pins, many=True, context={"request": request})
         return Response(serializer.data)
 
     @action(detail=False, methods=['get'], url_path='feed')
@@ -68,7 +68,7 @@ class PinViewSet(viewsets.ViewSet):
             Q(creator__in=friends_ids) | Q(creator=request.user)
         ).order_by('-created_at')
         
-        serializer = PinListReadModeSerializer(pins, many=True)
+        serializer = PinListReadModeSerializer(pins, many=True, context={"request": request})
         return Response(serializer.data)
 
     @action(detail=False, methods=['get'], url_path='profile_feed')
@@ -78,7 +78,7 @@ class PinViewSet(viewsets.ViewSet):
         GET /api/pins/profile_feed/
         """
         pins = Pin.objects.filter(creator=request.user).order_by('-created_at')
-        serializer = PinListReadModeSerializer(pins, many=True)
+        serializer = PinListReadModeSerializer(pins, many=True, context={"request": request})
         return Response(serializer.data)
 
     def destroy(self, request, pk):

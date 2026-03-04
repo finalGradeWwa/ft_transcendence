@@ -34,7 +34,7 @@ export const ModalContent = ({
         <Icon name="close" size={20} />
       </button>
 
-      <Heading as="h2" className="mb-4 text-neutral-900">
+      <Heading as="h2" id="login-title" className="mb-4 text-neutral-900">
         {t('login')}
       </Heading>
 
