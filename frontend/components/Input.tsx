@@ -15,7 +15,7 @@ import React, { forwardRef, InputHTMLAttributes } from 'react';
  */
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string;
-  id?: string;
+  id?: string; // Dodaj ten znak zapytania
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(

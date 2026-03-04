@@ -42,7 +42,7 @@ const IconButton = ({ onClick, icon, label, href }: any) => {
  * PL: Menu szybkiego dodawania rośliny lub ogrodu.
  * EN: Quick add menu for plant or garden.
  */
-const AddMenu = ({ user, tP, tG, tHome, close }: any) => (
+const AddMenu = ({ user, tP, tG, close }: any) => (
   <div className="absolute right-0 md:right-[-48px] mt-4 w-64 bg-primary-green rounded-xl shadow-2xl overflow-hidden z-[100] py-1 flex flex-col">
     <Link
       href={`/profiles/${user}/plants/add`}
@@ -58,14 +58,6 @@ const AddMenu = ({ user, tP, tG, tHome, close }: any) => (
       className="flex items-center gap-3 px-4 py-2 text-sm font-bold text-white hover:bg-black/10"
     >
       <Icon name="plus" size={14} aria-hidden="true" /> {tG('title')}
-    </Link>
-    <div className="border-t border-white/20 mx-2 my-1" aria-hidden="true" />
-    <Link
-      href={`/profiles/${user}/map/add-pin`}
-      onClick={close}
-      className="flex items-center gap-3 px-4 py-2 text-sm font-bold text-white hover:bg-black/10"
-    >
-      <Icon name="plus" size={14} aria-hidden="true" /> {tHome('addPin')}
     </Link>
   </div>
 );
@@ -238,9 +230,9 @@ export function HeaderControls() {
 
     const checkMessages = async () => {
       try {
-        // PL: Używamy apiFetch, który automatycznie doda token Bearer i bazowy URL.
-        // EN: Using apiFetch, which automatically adds the Bearer token and base URL.
-        const response = await apiFetch('/chat/unread-count/');
+        const response = await apiFetch('/chat/unread-count/', {
+          method: 'GET',
+        });
 
         const contentType = response.headers.get('content-type');
         const isJson = contentType && contentType.includes('application/json');
@@ -253,13 +245,16 @@ export function HeaderControls() {
             setHasNewMessages(data.unread_count > 0);
           } else {
             // Obsługa błędów API zwróconych w JSONie (np. 401, 403)
+            console.error('Chat count error details:', data);
             setHasNewMessages(false);
           }
         } else {
           // PL: Jeśli to nie JSON, nie robimy nic (zapobiega SyntaxError)
+          console.warn('Chat count endpoint returned non-JSON response');
           setHasNewMessages(false);
         }
       } catch (error) {
+        console.error('Failed to fetch unread messages', error);
         setHasNewMessages(false);
       }
     };
@@ -297,7 +292,9 @@ export function HeaderControls() {
             window.history.replaceState({}, '', url.toString());
           }
         })
-        .catch(err => {})
+        .catch(err => {
+          console.error('Failed to fetch user after OAuth:', err);
+        })
         .finally(() => {
           setIsAuthLoading(false);
         });
@@ -307,7 +304,7 @@ export function HeaderControls() {
   const isLoading = usernameLoading || isAuthLoading;
 
   return (
-    <div className="header-top-wrapper flex flex-col md:flex-row items-center justify-center gap-x-6 gap-y-4">
+    <div className="flex flex-col md:flex-row items-center justify-center gap-x-6 gap-y-4">
       <select
         value={locale}
         onChange={e => router.replace(pathname, { locale: e.target.value })}
@@ -333,28 +330,7 @@ export function HeaderControls() {
             label={tAria('searchBtn')}
           />
         )}
-        {/**
-         * PL: Przycisk dodawania - widoczny tylko dla zalogowanych.
-         * EN: Add button - visible only for logged-in users.
-         */}
-        {username && (
-          <div className="relative" ref={addMenuRef}>
-            <IconButton
-              onClick={() => setIsAddMenuOpen(!isAddMenuOpen)}
-              icon="plus"
-              label={tAria('add')}
-            />
-            {isAddMenuOpen && (
-              <AddMenu
-                user={username}
-                tP={tP}
-                tG={tG}
-                tHome={tHome}
-                close={closeMenu}
-              />
-            )}
-          </div>
-        )}
+
         {/**
          * PL: Przycisk powiadomień - widoczny tylko dla zalogowanych.
          * EN: Notifications button - visible only for logged-in users.
@@ -367,6 +343,22 @@ export function HeaderControls() {
           />
         )}
 
+        {/**
+         * PL: Przycisk dodawania - widoczny tylko dla zalogowanych.
+         * EN: Add button - visible only for logged-in users.
+         */}
+        {username && (
+          <div className="relative" ref={addMenuRef}>
+            <IconButton
+              onClick={() => setIsAddMenuOpen(!isAddMenuOpen)}
+              icon="plus"
+              label={tAria('add')}
+            />
+            {isAddMenuOpen && (
+              <AddMenu user={username} tP={tP} tG={tG} close={closeMenu} />
+            )}
+          </div>
+        )}
         {/**
          * PL: Przycisk przejścia do czatu - widoczny tylko dla zalogowanych.
          * EN: Chat button - visible only for logged-in users.

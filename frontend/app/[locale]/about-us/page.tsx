@@ -1,10 +1,12 @@
+'use client';
+
 /**
- * PL: O nas — Server Component z SSR.
- * EN: About us — Server Component with SSR.
+ * PL: O nas.
+ * EN: About us.
  */
 
 import Image from 'next/image';
-import { getTranslations } from 'next-intl/server';
+import { useTranslations } from 'next-intl';
 
 const TEAM_MEMBERS = [
   { id: 1, img: '/images/about/01.webp' },
@@ -47,51 +49,32 @@ const MemberCard = ({ img }: { img: string }) => (
  * PL: Sekcja dolna: hasło końcowe oraz zdjęcie dekoracyjne.
  * EN: Footer section: final slogan and decorative image.
  */
-const FooterSection = ({
-  text,
-  imageAlt,
-}: {
-  text: string;
-  imageAlt: string;
-}) => (
-  <div className="w-full max-w-[600px] mx-auto flex flex-col items-center">
-    <p className="mb-6 text-white font-bold text-xl text-center">{text}</p>
-    <div className="relative w-full aspect-video overflow-hidden rounded-2xl shadow-2xl border-2 border-secondary-beige">
-      <Image
-        src="/images/about/about-img.webp"
-        fill
-        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 600px"
-        alt={imageAlt}
-        className="object-cover"
-      />
+const FooterSection = ({ text }: { text: string }) => {
+  // PL: Dodano hook tutaj, aby funkcja 't' była dostępna w tym komponencie.
+  const t = useTranslations('AboutUs');
+
+  return (
+    <div className="w-full max-w-[600px] mx-auto flex flex-col items-center">
+      <p className="mb-6 text-white font-bold text-xl text-center">{text}</p>
+      <div className="relative w-full aspect-video overflow-hidden rounded-2xl shadow-2xl border-2 border-secondary-beige">
+        <Image
+          src="/images/about/about-img.webp"
+          fill
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 600px"
+          alt={t('about_image_alt')}
+          className="object-cover"
+        />
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 /**
- * PL: Generuje metadane SEO dla strony "O nas" na podstawie wybranego języka.
- * EN: Generates SEO metadata for the "About us" page based on the selected locale.
+ * PL: Główny komponent strony "O nas". Zarządza układem siatki i treścią dynamiczną.
+ * EN: Main "About us" page component. Manages grid layout and dynamic content.
  */
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ locale: string }>;
-}) {
-  const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: 'Metadata' });
-
-  return {
-    title: t('aboutUs'),
-    description: t('aboutUsDescription'),
-  };
-}
-
-/**
- * PL: Główny komponent strony "O nas" (Server Component). Zarządza układem siatki i treścią dynamiczną.
- * EN: Main "About us" page component (Server Component). Manages grid layout and dynamic content.
- */
-export default async function AboutUsPage() {
-  const t = await getTranslations('AboutUs');
+export default function AboutUsPage() {
+  const t = useTranslations('AboutUs');
 
   return (
     <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pt-4 pb-12 flex flex-col justify-center h-full flex-grow">
@@ -107,7 +90,7 @@ export default async function AboutUsPage() {
         <p>{t('description')}</p>
       </article>
 
-      <FooterSection text={t('footerText')} imageAlt={t('about_image_alt')} />
+      <FooterSection text={t('footerText')} />
     </div>
   );
 }

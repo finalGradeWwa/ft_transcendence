@@ -17,10 +17,6 @@ export type PlantType = {
   averageRating: string; // PL: Ocena przechowywana jako tekst / EN: Rating stored as a string
   totalReviews: number;
   loadingType?: 'eager' | 'lazy'; // PL: Opcjonalny typ ładowania obrazu / EN: Optional image loading type
-  image?: string;
-  garden?: string;
-  gardenId?: number;
-  plants_count?: number;
 };
 
 /**

@@ -1,11 +1,12 @@
 /**
- * PL: Konfiguracja TypeScript (tsconfig.json). Definiuje zasady kompilacji,
- * rygorystyczność sprawdzania typów oraz mapowanie ścieżek dla Next.js,
+ * PL: Konfiguracja TypeScript (tsconfig.json). Definiuje zasady kompilacji, 
+ * rygorystyczność sprawdzania typów oraz mapowanie ścieżek dla Next.js, 
  * zapewniając poprawne wsparcie dla JSX i nowoczesnych modułów ES.
- * * EN: TypeScript configuration (tsconfig.json). Defines compilation rules,
- * type-checking strictness, and path mapping for Next.js,
+ * * EN: TypeScript configuration (tsconfig.json). Defines compilation rules, 
+ * type-checking strictness, and path mapping for Next.js, 
  * ensuring proper support for JSX and modern ES modules.
  */
+
 {
   "compilerOptions": {
     /**
@@ -13,11 +14,7 @@
      * EN: Target JavaScript version and environment libraries (DOM, ESNext).
      */
     "target": "ES2017",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -29,7 +26,7 @@
     "isolatedModules": true,
     "jsx": "react-jsx",
     "incremental": true,
-    "plugins": [
+   "plugins": [
       {
         "name": "next"
       }
@@ -43,19 +40,13 @@
      * PL: Ograniczenie automatycznego ładowania typów z @types.
      * EN: Restrict automatic loading of types from @types.
      */
-    "types": [
-      "node",
-      "react",
-      "react-dom"
-    ],
+    "types": ["node", "react", "react-dom"],
     /**
      * PL: Aliasy ścieżek - pozwala na używanie zapisu '@/' zamiast ścieżek względnych.
      * EN: Path aliases - allows using the '@/' notation instead of relative paths.
      */
     "paths": {
-      "@/*": [
-        "./*"
-      ]
+      "@/*": ["./*"]
     }
   },
   /**
@@ -74,8 +65,5 @@
    * PL: Katalogi wykluczone z procesu kompilacji.
    * EN: Directories excluded from the compilation process.
    */
-  "exclude": [
-    "node_modules",
-    "playwright.config.ts"
-  ]
+  "exclude": ["node_modules"]
 }

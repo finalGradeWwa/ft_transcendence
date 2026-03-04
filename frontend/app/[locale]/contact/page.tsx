@@ -1,9 +1,11 @@
+'use client';
+
 /**
- * PL: Strona kontaktowa wyświetlająca dane firmy oraz link maila (Server Component z SSR).
- * EN: Contact page displaying business details and email link (Server Component with SSR).
+ * PL: Strona kontaktowa wyświetlająca dane firmy oraz link maila.
+ * EN: Contact page displaying business details and email link.
  */
 
-import { getTranslations } from 'next-intl/server';
+import { useTranslations } from 'next-intl';
 import { Icon } from '@/components/icons/ui/Icon';
 import NextImage from 'next/image';
 
@@ -51,7 +53,7 @@ const MailContent = ({ t }: any) => (
     <p className="text-neutral-900 mb-6">{t('contact.emailDescription')}</p>
     <a
       href={`mailto:${CONTACT_EMAIL}`}
-      className="w-full inline-block bg-primary-green text-white font-bold px-4 py-3 rounded-lg hover:opacity-90 transition-opacity duration-300 outline-none break-all focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-1 focus-visible:ring-offset-white"
+      className="w-full inline-block bg-primary-green text-white font-bold px-4 py-3 rounded-lg transition-transform hover:scale-[1.02] outline-none break-all"
     >
       {CONTACT_EMAIL}
     </a>
@@ -74,29 +76,11 @@ const ContactView = ({ t }: any) => (
 );
 
 /**
- * PL: Generuje metadane SEO dla strony kontaktu na podstawie wybranego języka.
- * EN: Generates SEO metadata for the contact page based on the selected locale.
+ * PL: Główny komponent strony kontaktu zarządzający układem i stanem modalu.
+ * EN: Main contact page component managing layout and modal state.
  */
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ locale: string }>;
-}) {
-  const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: 'Metadata' });
-
-  return {
-    title: t('contact'),
-    description: t('contactDescription'),
-  };
-}
-
-/**
- * PL: Główny komponent strony kontaktu (Server Component) zarządzający układem.
- * EN: Main contact page component (Server Component) managing layout.
- */
-export default async function ContactPage() {
-  const t = await getTranslations('HomePage');
+export default function ContactPage() {
+  const t = useTranslations('HomePage');
 
   return (
     <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pt-20 pb-12 flex flex-col justify-center h-full flex-grow">

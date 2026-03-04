@@ -1,78 +1,45 @@
 import { GardensPageClient } from '../GardensPageClient';
 import { getTranslations } from 'next-intl/server';
-import { serverFetch } from '@/lib/serverAuth';
-
-const API_URL = (
-  process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000'
-).replace(/\/$/, '');
 
 /**
- * PL: Generuje metadane SEO dla strony ogrodów.
- * EN: Generates SEO metadata for the gardens page.
+ * PL: Serwerowy komponent strony globalnej listy ogrodów.
+ * EN: Server-side component for the global gardens list page.
  */
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ locale: string }>;
-}) {
-  const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: 'Metadata' });
-
-  return {
-    title: t('gardens'),
-    description: t('gardensDescription'),
-  };
-}
 
 export default async function GlobalGardensPage() {
-  const t = await getTranslations('GardensPage');
-  let gardens: any[] = [];
-
-  try {
-    const response = await serverFetch('/api/garden/');
-    if (response.ok) {
-      const data = await response.json();
-
-      gardens = data.map((garden: any) => {
-        const envMap: Record<string, string> = {
-          i: 'indoor',
-          o: 'outdoor',
-          g: 'greenhouse',
-        };
-        const rawEnv = String(garden.environment || '')
-          .toLowerCase()
-          .charAt(0);
-        const envKey = envMap[rawEnv] || 'indoor';
-
-        const rawImage = garden.thumbnail;
-        let finalImage = '/images/garden/garden-placeholder.webp';
-        if (rawImage) {
-          finalImage = rawImage.startsWith('http')
-            ? rawImage
-            : `${API_URL}${rawImage.startsWith('/') ? '' : '/'}${rawImage}`;
-        }
-
-        return {
-          id: garden.garden_id,
-          name:
-            garden.name?.includes("'s Garden") ||
-              garden.name === 'Default Garden'
-              ? t('defaultGardenName')
-              : garden.name,
-          owner: garden.owner || t('unknownOwner'),
-          plantsCount: garden.plant_count || 0,
-          styleName: t(`environments.${envKey}`),
-          image: finalImage,
-        };
-      }).reverse();
-    }
-  } catch (error) {
-    console.error('Failed to fetch gardens:', error);
-  }
+  // Dane testowe do zastąpienia:
+  const fakeGardens = [
+    { id: 1, name: 'Miejska Dżungla', owner: 'user1', plantsCount: 12 },
+    { id: 2, name: 'Balkon Południowy', owner: 'plant_lover', plantsCount: 5 },
+    { id: 3, name: 'Ogród wertykalny', owner: 'stefan_green', plantsCount: 24 },
+    { id: 4, name: 'Ziołowy zakątek', owner: 'kuchnia_mamy', plantsCount: 8 },
+    { id: 5, name: 'Miejska Dżungla', owner: 'user1', plantsCount: 12 },
+    { id: 6, name: 'Balkon Południowy', owner: 'plant_lover', plantsCount: 5 },
+    { id: 7, name: 'Ogród wertykalny', owner: 'stefan_green', plantsCount: 24 },
+    { id: 8, name: 'Ziołowy zakątek', owner: 'kuchnia_mamy', plantsCount: 8 },
+    { id: 9, name: 'Miejska Dżungla', owner: 'user1', plantsCount: 12 },
+    { id: 10, name: 'Balkon Południowy', owner: 'plant_lover', plantsCount: 5 },
+    {
+      id: 11,
+      name: 'Ogród wertykalny',
+      owner: 'stefan_green',
+      plantsCount: 24,
+    },
+    { id: 12, name: 'Ziołowy zakątek', owner: 'kuchnia_mamy', plantsCount: 8 },
+    { id: 13, name: 'Miejska Dżungla', owner: 'user1', plantsCount: 12 },
+    { id: 14, name: 'Balkon Południowy', owner: 'plant_lover', plantsCount: 5 },
+    {
+      id: 15,
+      name: 'Ogród wertykalny',
+      owner: 'stefan_green',
+      plantsCount: 24,
+    },
+    { id: 16, name: 'Ziołowy zakątek', owner: 'kuchnia_mamy', plantsCount: 8 },
+  ];
 
   return (
-    <div className="bg-main-gradient min-h-screen">
-      <GardensPageClient gardens={gardens} />
+    <div className="bg-main-gradient">
+      <GardensPageClient gardens={fakeGardens} />
     </div>
   );
 }

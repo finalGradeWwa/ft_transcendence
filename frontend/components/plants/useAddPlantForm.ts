@@ -86,20 +86,13 @@ export const useAddPlantForm = ({
         body: formData,
       });
 
-      const result = await response.json().catch(() => ({}));
-
       if (!response.ok) {
-        if (result.nickname) {
-          setError(t('errors.nicknameExists'));
-        } else {
-          setError(t('errors.addPlantFailed'));
-        }
-        return;
+        throw new Error(t('errors.addPlantFailed'));
       }
 
       onSuccess();
     } catch (err: any) {
-      setError(t('errors.unexpectedError'));
+      setError(err.message || t('errors.unexpectedError'));
     } finally {
       setIsLoading(false);
     }

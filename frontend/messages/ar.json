@@ -2,7 +2,7 @@
   "HomePage": {
     "title": "بوابة النباتات",
     "description": "قاعدة معرفتك الشاملة ومعرضك للنباتات.",
-    "recommended": "الأحدث",
+    "recommended": "موصى به",
     "search": "بحث عن النباتات...",
     "login": "تسجيل الدخول",
     "email": "البريد الإلكتروني",
@@ -12,32 +12,17 @@
     "cancel": "إلغاء",
     "noAccount": "ليس لديك حساب؟",
     "register": "سجل الآن!",
-    "authRequiredTitle": "مرحباً بك في مجتمعنا!",
-    "authRequiredDesc": "سجل دخولك لرؤية النباتات الموصى بها والاستفادة الكاملة من ميزات الخدمة.",
     "author": "المؤلف:",
     "rating": "التقييم:",
     "showMore": "عرض المزيد من النباتات",
     "oauthLoginSuccess": "تم تسجيل الدخول عبر GitHub بنجاح. أنت الآن مسجل الدخول.",
     "loginSuccess": "تم تسجيل الدخول بنجاح.",
-    "nav": [
-      "الصفحة الرئيسية",
-      "الحدائق",
-      "من نحن",
-      "الشروط",
-      "اتصل بنا"
-    ],
+    "nav": ["الصفحة الرئيسية", "الحدائق", "من نحن", "الشروط", "اتصل بنا"],
     "searchPlaceholder": "البحث نشط",
     "searchInfo": "ستكون منطق البحث الكامل هنا.",
     "rights": "جميع الحقوق محفوظة.",
     "privacy": "سياسة الخصوصية",
     "terms": "الشروط",
-    "plantsCountLabel": "عدد النباتات",
-    "addPin": "إضافة دبوس",
-    "feedTitle": "آخر الأخبار",
-    "emptyFeed": "لا توجد منشورات من الأصدقاء بعد. أضف أصدقاء لرؤية منشوراتهم!",
-    "postedBy": "بواسطة",
-    "firstPage": "البداية",
-    "lastPage": "النهاية",
     "aria": {
       "close": "إغلاق",
       "homePageLink": "الصفحة الرئيسية",
@@ -53,9 +38,7 @@
       "profile": "ملف المستخدم",
       "logout": "تسجيل الخروج",
       "userTools": "أدوات المستخدم",
-      "chat": "افتح الدردشة",
-      "previousSlide": "الصورة السابقة",
-      "nextSlide": "الصورة التالية"
+      "chat": "افتح الدردشة"
     },
     "contact": {
       "name": "John Weeder",
@@ -67,15 +50,7 @@
       "officeHours": "الاثنين - الجمعة 9:00 صباحًا - 5:00 مساءً"
     },
     "or": "أو",
-    "githubLogin": "تسجيل الدخول عبر GitHub",
-    "showPassword_ar": "عرض كلمة المرور",
-    "hidePassword_ar": "إخفاء كلمة المرور"
-  },
-  "LandingPage": {
-    "appName": "Plant Portal",
-    "description": "قاعدة معرفتك بالنباتات، معرض صور، ومجتمع من عشاق علم النبات. سجل دخولك للاستفادة من الخدمة بشكل كامل!",
-    "login": "تسجيل الدخول",
-    "register": "إنشاء حساب"
+    "githubLogin": "تسجيل الدخول عبر GitHub"
   },
   "ProfilePage": {
     "title": "ملف المستخدم",
@@ -84,24 +59,16 @@
     "userPlantsTitle": "مجموعة نباتاتك",
     "userCollection": "مجموعة نباتات المستخدم {name}",
     "profileDescription": "لنشارك جمال النباتات.",
-    "noPins": "لا توجد مدخلات",
-    "confirmDeletePin": "هل أنت متأكد من أنك تريد حذف هذا الدبوس؟ حذف الدبوس لا يؤدي إلى حذف النبتة أو الحديقة.",
     "stats": {
       "gardens": "الحدائق",
       "plants": "النباتات",
-      "owner": "المالك",
       "followers": "متابعون",
       "following": "يتابع",
       "pins": "دبابيس"
     },
-    "sections": {
-      "joinedGardens": "الحدائق المشتركة"
-    },
     "actions": {
-      "addFriend": "إضافة صديق",
-      "removeFriend": "إزالة صديق",
-      "cancelRequest": "إلعاء الطلب",
-      "acceptRequest": "قبول الطلب"
+      "follow": "متابعة",
+      "unfollow": "إلغاء المتابعة"
     },
     "settings": {
       "title": "الإعدادات",
@@ -214,12 +181,9 @@
       "photo": "صورة النبات"
     },
     "errors": {
-      "photoRequired": "أضف صورة!",
-      "fileTooLarge": "الحد الأقصى ٥ ميجابايت",
       "fillAllFields": "يرجى ملء جميع الحقول وإضافة صورة.",
       "addPlantFailed": "حدث خطأ أثناء إضافة النبتة.",
-      "unexpectedError": "حدث خطأ غير متوقع.",
-      "nicknameExists": "هناك نبات بهذا الاسم موجود بالفعل في حديقتك."
+      "unexpectedError": "حدث خطأ غير متوقع."
     },
     "success": {
       "title": "تمت إضافة النبات!",
@@ -233,7 +197,6 @@
     "backToList": "العودة إلى قائمة الحدائق",
     "latestGardens": "أحدث الحدائق",
     "owner": "المالك",
-    "unknownOwner": "مجهول",
     "plantsAmount": "نباتات",
     "viewGarden": "عرض الحديقة",
     "plantsCountLabel": "عدد النباتات",
@@ -242,24 +205,6 @@
     "noPins": "لا توجد مدخلات",
     "defaultGardenName": "الحديقة الرئيسية",
     "environmentLabel": "البيئة",
-    "manageGarden": "إدارة الحديقة",
-    "addPlant": "إضافة نبات",
-    "addGardener": "الأعضاء / إضافة بستاني",
-    "deleteGarden": "حذف الحديقة",
-    "confirmDelete": "هل أنت متأكد أنك تريد حذف هذه الحديقة؟ سيتم أيضاً حذف جميع النباتات الموجودة بداخلها.",
-    "communitySpace": "مساحة مشتركة",
-    "gardenPlaceholderAlt": "صورة بديلة ل\u0644\u062d\u062f\u064a\u0642\u0629",
-    "saveChanges": "حفظ التغييرات",
-    "cancel": "إلغاء",
-    "cannotEditDefault": "لا يمكن تعديل الحديقة الرئيسية.",
-    "accessDenied": "تم رفض الوصول",
-    "back": "رجوع",
-    "firstPage": "البداية",
-    "lastPage": "النهاية",
-    "fields": {
-      "name": "اسم الحديقة",
-      "environment": "البيئة"
-    },
     "environments": {
       "indoor": "داخلي",
       "outdoor": "خارجي",
@@ -283,86 +228,17 @@
     "placeholder": "اكتب للبحث...",
     "resultsCount": "{count, plural, zero {لم يتم العثور على أي نتائج} one {تم العثور على نتيجة واحدة} two {تم العثور على نتيجتين} few {تم العثور على # نتائج} many {تم العثور على # نتيجة} other {تم العثور على # نتيجة}}",
     "noResults": "لم يتم العثور على نتائج لـ \"{query}\"",
-    "sortAZ": "أ → ي",
-    "sortZA": "ي → أ",
-    "showMore": "عرض المزيد",
-    "showingOf": "عرض {shown} من {total}",
     "aria": {
-      "close": "إغلاق البحث",
-      "sortOrder": "تغيير ترتيب الفرز"
+      "close": "إغلاق البحث"
     },
     "loading": "جارٍ تحميل نتائج البحث… يُرجى الانتظار"
   },
-  "MembersPage": {
-    "title": "أعضاء الحديقة",
-    "back": "العودة إلى الحديقة",
-    "searchPlaceholder": "البحث عن مستخدم...",
-    "search": "بحث",
-    "add": "إضافة",
-    "addSuccess": "تمت إضافة المستخدم إلى الحديقة!",
-    "addError": "حدث خطأ أثناء إضافة المستخدم.",
-    "currentMembers": "الأعضاء الحاليون",
-    "remove": "إزالة",
-    "removeSuccess": "تمت إزالة المستخدم من الحديقة.",
-    "removeError": "حدث خطأ أثناء إزالة المستخدم.",
-    "confirmRemove": "هل أنت متأكد من أنك تريد إزالة هذا المستخدم من الحديقة؟"
-  },
-  "AddPinPage": {
-    "title": "إضافة دبوس جديد",
-    "typePlant": "نبات",
-    "typeGarden": "حديقة",
-    "selectPlant": "النبات المختار",
-    "selectGarden": "الحديقة المختارة",
-    "descriptionLabel": "ملاحظة / وصف",
-    "placeholder": "اكتب شيئاً عن هذا المكان أو النبات...",
-    "submit": "حفظ الدبوس",
-    "back": "ملفي الشخصي",
-    "searchLabel": "بحث",
-    "noPlants": "لا توجد نباتات",
-    "noGardens": "لا توجد حدائق",
-    "errors": {
-      "selectItem": "اختر نبتة أو حديقة",
-      "addDescription": "أضف محتوى الملاحظة",
-      "tooLong": "الحد الأقصى 150 حرفاً"
-    },
-    "NotificationsModal": {
-      "title": "طلبات الصداقة",
-      "close": "إغلاق الإشعارات",
-      "loading": "جارٍ تحميل الطلبات...",
-      "noRequests": "لا توجد طلبات صداقة معلقة",
-      "accept": "قبول طلب الصداقة",
-      "reject": "رفض طلب الصداقة"
-    }
-  },
-  "PlantCard": {
-    "deleteConfirm": "هل أنت متأكد أنك تريد حذف هذه النبتة؟",
-    "deleteTitle": "حذف النبتة",
-    "anonymous": "مجهول",
-    "plantAlt": "نبتة"
-  },
-  "Metadata": {
-    "home": "بوابة النباتات — قاعدة معرفتك بالنباتات",
-    "homeDescription": "تصفح النباتات واستكشف الحدائق وانضم إلى مجتمع عشاق النباتات.",
-    "gardens": "الحدائق",
-    "gardensDescription": "اكتشف أحدث الحدائق التي أنشأها أعضاء مجتمعنا.",
-    "aboutUs": "من نحن",
-    "aboutUsDescription": "تعرف على الفريق وراء بوابة النباتات — مشروع من 42Warsaw.",
-    "contact": "اتصل بنا",
-    "contactDescription": "تواصل مع فريق بوابة النباتات. ساعات العمل والبريد الإلكتروني.",
-    "terms": "الشروط والأحكام",
-    "termsDescription": "اقرأ شروط وأحكام استخدام خدمة بوابة النباتات.",
-    "privacyPolicy": "سياسة الخصوصية",
-    "privacyPolicyDescription": "تعرف على كيفية تعامل بوابة النباتات مع بياناتك الشخصية وحمايتها.",
-    "profile": "{name}",
-    "profileDescription": "عرض ملف {name} الشخصي والحدائق ومجموعة النباتات.",
-    "chat": "الدردشة",
-    "chatDescription": "تحدث مع أصدقائك على بوابة النباتات.",
-    "register": "التسجيل",
-    "registerDescription": "أنشئ حسابًا مجانيًا في بوابة النباتات وابدأ بمشاركة نباتاتك."
-  },
-  "NotFoundPage": {
-    "title": "الصفحة غير موجودة",
-    "description": "الصفحة التي تبحث عنها غير موجودة أو تم نقلها.",
-    "backHome": "العودة إلى الصفحة الرئيسية"
+  "NotificationsModal": {
+    "title": "طلبات الصداقة",
+    "close": "إغلاق الإشعارات",
+    "loading": "جارٍ تحميل الطلبات...",
+    "noRequests": "لا توجد طلبات صداقة معلقة",
+    "accept": "قبول طلب الصداقة",
+    "reject": "رفض طلب الصداقة"
   }
 }

@@ -44,9 +44,6 @@ const LoginModal = ({ isVisible, onClose, t }: any) => {
   return (
     <div
       /** PL: Półprzezroczyste tło z efektem rozmycia. EN: Semi-transparent background with blur effect. */
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="login-title"
       className="fixed inset-0 bg-black/50 flex justify-center items-center z-50 backdrop-blur-sm p-4"
       onClick={onClose}
     >

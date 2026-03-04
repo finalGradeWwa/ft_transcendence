@@ -33,9 +33,9 @@ class GardenAPITests(APITestCase):
         self.create_url = reverse("garden-list")
         self.add_user_url = reverse("garden-add-user", args=[self.garden.pk])
 
-    def test_garden_detail_requires_authentication(self):
-            response = self.client.get(self.detail_url)
-            self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+    def test_authentication_required(self):
+        response = self.client.get(self.detail_url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_user_can_get_own_garden(self):
         self.client.force_authenticate(user=self.alice)
@@ -54,21 +54,22 @@ class GardenAPITests(APITestCase):
         self.assertEqual(response.data["environment"], "I")  # Default is indoor
 
     def test_list_all_gardens(self):
-        """Test that user sees gardens where they are owner or member"""
+        """Test that all gardens are visible to authenticated users"""
         # Create a garden for Bob
         create_garden(
             creator=self.bob,
             data={"name": "Bob's Garden"}
         )
 
-        # Alice can only see her own gardens (not Bob's)
+        # Alice can see all gardens (hers and Bob's)
         self.client.force_authenticate(user=self.alice)
         response = self.client.get(self.list_url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        # Alice has 2 gardens (auto-created "Home Garden" + "Alice's Garden" from setUp)
-        # Bob's gardens are not visible to Alice
-        self.assertEqual(len(response.data), 2)
+        # Alice has 2 gardens (auto-created "alice's Garden" + "Alice's Garden" from setUp)
+        # Bob has 2 gardens (auto-created "bob's Garden" + "Bob's Garden" from test)
+        # Total = 4 gardens
+        self.assertEqual(len(response.data), 4)
 
     def test_list_gardens_filter_by_owner_me(self):
         """Test filtering gardens by ?owner=me"""
@@ -103,12 +104,12 @@ class GardenAPITests(APITestCase):
             data={"name": "Bob's Garden"}
         )
 
-        # Alice filters by her own user ID
+        # Alice filters by Bob's user ID - should only see Bob's gardens
         self.client.force_authenticate(user=self.alice)
-        response = self.client.get(f'{self.list_url}?owner={self.alice.id}')
+        response = self.client.get(f'{self.list_url}?owner={self.bob.id}')
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        # Should see Alice's 2 gardens (auto-created Home Garden + Alice's Garden)
+        # Should see Bob's 2 gardens (auto-created + manually created)
         self.assertEqual(len(response.data), 2)
 
     def test_create_garden(self):
@@ -281,26 +282,26 @@ class GardenAPITests(APITestCase):
         )
 
     def test_owner_can_remove_garden_user(self):
-            garden_user = GardenUser.objects.create(
-                organization=self.garden,
-                user=self.bob,
-            )
+        garden_user = GardenUser.objects.create(
+            organization=self.garden,
+            user=self.bob,
+        )
 
-            self.client.force_authenticate(user=self.alice)
-            url = reverse(
-                "garden-remove-user",
-                args=[self.garden.pk]
-            )
+        self.client.force_authenticate(user=self.alice)
+        url = reverse(
+            "garden-remove-user",
+            args=[self.garden.pk, garden_user.pk]
+        )
 
-            response = self.client.delete(url, data={"user_id": self.bob.pk})
+        response = self.client.delete(url)
 
-            self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
-            self.assertFalse(
-                GardenUser.objects.filter(pk=garden_user.pk).exists()
-            )
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(
+            GardenUser.objects.filter(pk=garden_user.pk).exists()
+        )
         
     def test_non_owner_cannot_remove_garden_user(self):
-        GardenUser.objects.create(
+        garden_user = GardenUser.objects.create(
             organization=self.garden,
             user=self.bob,
         )
@@ -308,10 +309,10 @@ class GardenAPITests(APITestCase):
         self.client.force_authenticate(user=self.bob)
         url = reverse(
             "garden-remove-user",
-            args=[self.garden.pk]
+            args=[self.garden.pk, garden_user.pk]
         )
 
-        response = self.client.delete(url, data={"user_id": self.bob.pk})
+        response = self.client.delete(url)
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 

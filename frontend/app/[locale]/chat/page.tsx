@@ -4,6 +4,7 @@ import { useState, useRef, useEffect, FormEvent } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { apiFetch, getValidAccessToken } from '@/lib/auth';
 
+
 // same as models.py
 type User = {
   id: number;
@@ -67,12 +68,8 @@ export default function ChatPage() {
   }, [selectedFriend]);
 
   const buildWebSocketUrl = (token: string) => {
-    const wsBase = (
-      process.env.NEXT_PUBLIC_WS_URL ?? 'ws://localhost:8000'
-    ).replace(/\/$/, '');
-    const basePath = wsBase.endsWith('/ws')
-      ? `${wsBase}/chat/`
-      : `${wsBase}/ws/chat/`;
+    const wsBase = (process.env.NEXT_PUBLIC_WS_URL ?? 'ws://localhost:8000').replace(/\/$/, '');
+    const basePath = wsBase.endsWith('/ws') ? `${wsBase}/chat/` : `${wsBase}/ws/chat/`;
     return `${basePath}?token=${encodeURIComponent(token)}`;
   };
 
@@ -90,7 +87,7 @@ export default function ChatPage() {
         const me = (await meRes.json()) as Me;
         setCurrentUserId(me.id);
 
-        const followingRes = await apiFetch(`/api/friends/`, {
+        const followingRes = await apiFetch(`/users/${me.id}/following/`, {
           method: 'GET',
         });
         if (!followingRes.ok) {
@@ -169,10 +166,7 @@ export default function ChatPage() {
             }
 
             if (payload.type === 'message_sent' && payload.message) {
-              setMessages(prevMessages => [
-                ...prevMessages,
-                payload.message as Message,
-              ]);
+              setMessages(prevMessages => [...prevMessages, payload.message as Message]);
               setIsSending(false);
               return;
             }
@@ -228,9 +222,7 @@ export default function ChatPage() {
         );
 
         if (!conversationRes.ok) {
-          throw new Error(
-            `CONVERSATION_FETCH_FAILED:${conversationRes.status}`
-          );
+          throw new Error(`CONVERSATION_FETCH_FAILED:${conversationRes.status}`);
         }
 
         const data = (await conversationRes.json()) as ConversationResponse;
@@ -312,27 +304,17 @@ export default function ChatPage() {
     <div className="min-h-screen bg-gradient-to-br from-beige-900 via-beige-800 to-beige-900 text-white">
       <div className="container mx-auto px-4 py-8 max-w-6xl">
         <div className="bg-secondary-beige backdrop-blur-sm rounded-lg shadow-xl border border-secondary-beige flex h-[600px] overflow-hidden">
-          <aside
-            aria-label={t('friendsTitle')}
-            className="w-72 border-r border-primary-green/20 p-4 overflow-y-auto bg-black/5"
-          >
-            <h2 className="text-lg text-primary-green font-semibold mb-4">
-              {t('friendsTitle')}
-            </h2>
+          <aside className="w-72 border-r border-gray-700 p-4 overflow-y-auto">
+            <h2 className="text-lg font-semibold mb-4">{t('friendsTitle')}</h2>
 
             {isLoadingFriends ? (
-              <p className="text-sm text-gray-900 font-semibold">
-                {t('loadingFriends')}
-              </p>
+              <p className="text-sm text-gray-300">{t('loadingFriends')}</p>
             ) : friends.length === 0 ? (
-              <p className="text-sm text-gray-900 font-semibold">
-                {t('noFriends')}
-              </p>
+              <p className="text-sm text-gray-300">{t('noFriends')}</p>
             ) : (
               <ul className="space-y-2">
                 {friends.map(friend => {
-                  const fullName =
-                    `${friend.first_name ?? ''} ${friend.last_name ?? ''}`.trim();
+                  const fullName = `${friend.first_name ?? ''} ${friend.last_name ?? ''}`.trim();
                   const isSelected = selectedFriend?.id === friend.id;
 
                   return (
@@ -361,9 +343,7 @@ export default function ChatPage() {
           <div className="flex-1 flex flex-col">
             {selectedFriend && (
               <div className="border-b border-gray-700 px-6 py-3 bg-black/20">
-                <p className="font-semibold text-white">
-                  {selectedFriend.username}
-                </p>
+                <p className="font-semibold text-white">{selectedFriend.username}</p>
               </div>
             )}
 
@@ -373,66 +353,66 @@ export default function ChatPage() {
               </div>
             )}
 
-            {/* Messages Area */}
-            <div className="flex-1 overflow-y-auto p-6 space-y-4">
-              {!selectedFriend ? (
-                <p className="text-gray-900 font-semibold text-sm">
-                  {t('selectFriend')}
-                </p>
-              ) : isLoadingMessages ? (
-                <p className="text-gray-300 text-sm">{t('loadingMessages')}</p>
-              ) : (
-                messages.map(message => (
-                  <div
-                    key={message.id}
-                    className={`flex ${
-                      message.sender.id === currentUserId
-                        ? 'justify-end'
-                        : 'justify-start'
-                    }`}
-                  >
-                    <div
-                      className={`max-w-[70%] rounded-lg p-4 ${
-                        message.sender.id === currentUserId
-                          ? 'bg-green-600 text-white'
-                          : 'bg-gray-700 text-gray-100'
-                      }`}
-                    >
-                      <p className="text-xs font-semibold mb-1 opacity-80">
-                        {message.sender.username}
-                      </p>
-                      <p className="text-sm md:text-base">{message.content}</p>
-                      <p className="text-xs mt-1 opacity-70">
-                        {formatTime(message.timestamp)}
-                      </p>
-                    </div>
-                  </div>
-                ))
-              )}
-              <div ref={messagesEndRef} />
-            </div>
+          {/* Messages Area */}
+          <div className="flex-1 overflow-y-auto p-6 space-y-4">
+            {!selectedFriend ? (
+              <p className="text-gray-300 text-sm">{t('selectFriend')}</p>
+            ) : isLoadingMessages ? (
+              <p className="text-gray-300 text-sm">{t('loadingMessages')}</p>
+            ) : (
+              messages.map((message) => (
 
-            {/* Input Area */}
-            <div className="border-t border-gray-700 p-4">
-              <form onSubmit={handleSendMessage} className="flex gap-2">
-                <input
-                  maxLength={600}
-                  type="text"
-                  value={inputValue}
-                  onChange={e => setInputValue(e.target.value)}
-                  placeholder={t('typeMessage')}
-                  disabled={!selectedFriend || isSending}
-                  className="flex-1 bg-gray-700 text-white rounded-lg px-4 py-3 outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black focus-visible:ring-2 focus-visible:ring-white"
-                />
-                <button
-                  type="submit"
-                  disabled={!selectedFriend || isSending}
-                  className="bg-primary-green hover:opacity-90 text-white px-6 py-3 rounded-lg font-medium transition-all duration-300 outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black focus-visible:ring-2 focus-visible:ring-white disabled:opacity-50 disabled:cursor-not-allowed"
+              <div
+                key={message.id}
+                className={`flex ${
+                  message.sender.id === currentUserId
+				  ? 'justify-end'
+				  : 'justify-start'
+                }`}
+              >
+                <div
+                  className={`max-w-[70%] rounded-lg p-4 ${
+                    message.sender.id === currentUserId
+                      ? 'bg-green-600 text-white'
+                      : 'bg-gray-700 text-gray-100'
+                  }`}
                 >
-                  {t('send')}
-                </button>
-              </form>
-            </div>
+                  <p className="text-xs font-semibold mb-1 opacity-80">
+                    {message.sender.username}
+                  </p>
+                  <p className="text-sm md:text-base">{message.content}</p>
+                  <p className="text-xs mt-1 opacity-70">
+                    {formatTime(message.timestamp)}
+                  </p>
+
+                </div>
+              </div>
+
+              ))
+            )}
+			<div ref={messagesEndRef} />
+          </div>
+
+          {/* Input Area */}
+          <div className="border-t border-gray-700 p-4">
+            <form onSubmit={handleSendMessage} className="flex gap-2">
+              <input
+                type="text"
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                placeholder={t('typeMessage')}
+                disabled={!selectedFriend || isSending}
+                className="flex-1 bg-gray-700 text-white rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500 border border-gray-600"
+              />
+              <button
+                type="submit"
+                disabled={!selectedFriend || isSending}
+                className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-500"
+              >
+                {t('send')}
+              </button>
+            </form>
+          </div>
           </div>
         </div>
       </div>

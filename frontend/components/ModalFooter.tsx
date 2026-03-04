@@ -6,12 +6,9 @@
  */
 
 import { Link } from '@/i18n/navigation';
-import { useTranslations } from 'next-intl';
-
-type TranslateFunction = ReturnType<typeof useTranslations>;
 
 interface ModalFooterProps {
-  t: TranslateFunction;
+  t: any;
   onClose: () => void;
 }
 
