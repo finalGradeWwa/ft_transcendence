@@ -82,10 +82,11 @@ class GardenViewSet(viewsets.ViewSet):
         List gardens visible to the current user (where user is owner OR member).
         """
         # 1. Base Query: Gardens where I am Owner OR Member
-        gardens = self._get_detailed_gardens().filter(
-            Q(owners__organization_user__user=request.user) |
-            Q(gardenuser__user=request.user)
-        ).distinct()
+        # gardens = self._get_detailed_gardens().filter(
+        #     Q(owners__organization_user__user=request.user) |
+        #     Q(gardenuser__user=request.user)
+        # ).distinct()
+        gardens = self._get_detailed_gardens().distinct()
 
         # 2. Apply Filters
         owner_param = request.query_params.get("owner")
