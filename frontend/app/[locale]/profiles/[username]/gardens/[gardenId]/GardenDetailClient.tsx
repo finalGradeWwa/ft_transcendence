@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { HomePageClient } from '../../../../HomePageClient';
 import { GardenActions } from '@/components/gardens/GardenActions';
 import { apiFetch } from '@/lib/auth';
+import { buildImageUrl } from '@/lib/imageUrl';
 
 interface GardenDetailClientProps {
 	gardenId: string;
@@ -74,21 +75,8 @@ export const GardenDetailClient = ({ gardenId, username }: GardenDetailClientPro
 	const envKey = envMap[garden.environment?.toLowerCase() || ''];
 
 	const plants = plantsData.map((p: any) => {
-		let finalImage = '/images/garden/garden-placeholder.webp';
 		const rawImage = p.image_url || p.image || p.thumbnail;
-
-		if (rawImage) {
-			if (rawImage.startsWith('http')) {
-				try {
-					const u = new URL(rawImage);
-					finalImage = u.pathname.startsWith('/media/') ? u.pathname : rawImage;
-				} catch {
-					finalImage = rawImage;
-				}
-			} else {
-				finalImage = rawImage.startsWith('/') ? rawImage : `/${rawImage}`;
-			}
-		}
+		const finalImage = buildImageUrl(rawImage) || '/images/garden/garden-placeholder.webp';
 
 		return {
 			id: p.plant_id,

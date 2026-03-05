@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { apiFetch } from '@/lib/auth';
+import { buildImageUrl } from '@/lib/imageUrl';
 import { PlantCard } from '@/components/plants/PlantCard';
 import { PlantModal } from '@/components/plants/PlantModal';
 import { PlantType } from '@/app/[locale]/HomePageClient';
@@ -56,18 +57,6 @@ export const UserPlantsClient = ({
           const isDefaultGarden =
             p.garden_name.includes("'s Garden") || p.garden_name === 'Home Garden';
 
-          let imageUrl = p.image;
-          if (imageUrl) {
-            if (imageUrl.startsWith('http')) {
-              try {
-                const u = new URL(imageUrl);
-                if (u.pathname.startsWith('/media/')) imageUrl = u.pathname;
-              } catch { /* ignore */ }
-            } else {
-              imageUrl = imageUrl.startsWith('/') ? imageUrl : `/${imageUrl}`;
-            }
-          }
-
           return {
             id: p.plant_id,
             commonName: p.nickname,
@@ -75,7 +64,7 @@ export const UserPlantsClient = ({
             author: p.owner_username,
             garden: isDefaultGarden ? tGardens('defaultGardenName') : p.garden_name,
             gardenId: p.garden_id,
-            image: imageUrl,
+            image: buildImageUrl(p.image),
           };
         });
 

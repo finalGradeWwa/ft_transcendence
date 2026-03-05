@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { apiFetch } from '@/lib/auth';
+import { buildImageUrl } from '@/lib/imageUrl';
 import { GardenCard } from '@/components/gardens/GardenCard';
 import { GardenType } from '@/app/[locale]/GardensPageClient';
 
@@ -70,20 +71,7 @@ export const UserGardensClient = ({
           const translatedEnv = t(`environments.${envKey}` as any);
 
           const rawImage = g.thumbnail || g.image_url || g.image;
-          let finalImage = '/images/garden/garden-placeholder.webp';
-
-          if (rawImage) {
-            if (rawImage.startsWith('http')) {
-              try {
-                const u = new URL(rawImage);
-                finalImage = u.pathname.startsWith('/media/') ? u.pathname : rawImage;
-              } catch {
-                finalImage = rawImage;
-              }
-            } else {
-              finalImage = rawImage.startsWith('/') ? rawImage : `/${rawImage}`;
-            }
-          }
+          const finalImage = buildImageUrl(rawImage) || '/images/garden/garden-placeholder.webp';
 
           return {
             id: g.garden_id,
