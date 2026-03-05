@@ -48,52 +48,32 @@ export const GardensPageClient = ({
         if (!res.ok) { if (!cancelled) setLoading(false); return; }
         const allGardens = await res.json();
 
-        const mapped = await Promise.all(
-          allGardens
-            .filter((g: any) => g.user_count > 0)
-            .map(async (garden: any) => {
-              const plantsRes = await apiFetch(
-                `/api/plant/?garden=${garden.garden_id}`,
-                { skipRedirect: true }
-              );
-              const plants = plantsRes.ok ? await plantsRes.json() : [];
+        const mapped = allGardens
+          .filter((g: any) => g.user_count > 0)
+          .map((garden: any) => {
+            const envMap: Record<string, string> = {
+              i: 'indoor',
+              o: 'outdoor',
+              g: 'greenhouse',
+            };
+            const rawEnv = String(garden.environment || '')
+              .toLowerCase()
+              .charAt(0);
+            const envKey = envMap[rawEnv] || 'indoor';
 
-              const oldestPlantWithImage = plants
-                .filter((p: any) => p.image_url || p.image || p.thumbnail)
-                .sort((a: any, b: any) => (a.plant_id || 0) - (b.plant_id || 0))[0];
-
-              const rawImage = oldestPlantWithImage
-                ? oldestPlantWithImage.image_url ||
-                oldestPlantWithImage.image ||
-                oldestPlantWithImage.thumbnail
-                : garden.thumbnail;
-
-              const finalImage = buildImageUrl(rawImage);
-
-              const envMap: Record<string, string> = {
-                i: 'indoor',
-                o: 'outdoor',
-                g: 'greenhouse',
-              };
-              const rawEnv = String(garden.environment || '')
-                .toLowerCase()
-                .charAt(0);
-              const envKey = envMap[rawEnv] || 'indoor';
-
-              return {
-                id: garden.garden_id,
-                name:
-                  garden.name.includes("'s Garden") ||
-                    garden.name === 'Default Garden'
-                    ? t('defaultGardenName')
-                    : garden.name,
-                owner: garden.owner || t('unknownOwner'),
-                plantsCount: garden.plant_count || 0,
-                styleName: t(`environments.${envKey}`),
-                image: finalImage,
-              };
-            })
-        );
+            return {
+              id: garden.garden_id,
+              name:
+                garden.name.includes("'s Garden") ||
+                  garden.name === 'Default Garden'
+                  ? t('defaultGardenName')
+                  : garden.name,
+              owner: garden.owner || t('unknownOwner'),
+              plantsCount: garden.plant_count || 0,
+              styleName: t(`environments.${envKey}`),
+              image: buildImageUrl(garden.thumbnail),
+            };
+          });
 
         if (!cancelled) {
           setGardens([...mapped].reverse());
