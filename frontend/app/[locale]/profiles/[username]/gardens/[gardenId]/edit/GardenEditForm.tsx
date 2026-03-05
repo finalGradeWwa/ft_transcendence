@@ -23,13 +23,17 @@ export function GardenEditForm({ garden: initialGarden, username, gardenId }: an
 
     (async () => {
       try {
-        const res = await fetch(`/api/garden/${gardenId}/`, {
-          credentials: 'include'
-        });
+        const res = await apiFetch(`/api/garden/${gardenId}/`, { skipRedirect: true });
 
         if (!res.ok) {
           if (!cancelled) {
-            setError('Nie znaleziono ogrodu');
+            if (res.status === 401 || res.status === 403) {
+              setError('Brak uprawnień do edycji tego ogrodu');
+            } else if (res.status === 404) {
+              setError('Nie znaleziono ogrodu');
+            } else {
+              setError('Błąd wczytywania ogrodu');
+            }
             setInitialLoading(false);
           }
           return;
