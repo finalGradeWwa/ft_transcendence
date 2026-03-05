@@ -9,48 +9,9 @@ interface UserPlantsPageProps {
   }>;
 }
 
-const API_URL = (
-  process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000'
-).replace(/\/$/, '');
-
-async function getUserPlants(username: string) {
-  try {
-    const response = await fetch(
-      `${API_URL}/api/plant/?username=${encodeURIComponent(username)}`,
-      { cache: 'no-store' }
-    );
-    if (!response.ok) return [];
-    return await response.json();
-  } catch {
-    return [];
-  }
-}
-
 export default async function UserPlantsPage({ params }: UserPlantsPageProps) {
   const { username } = await params;
   const t = await getTranslations('ProfilePage');
-  const tGardens = await getTranslations('GardensPage');
-  const plantsData = await getUserPlants(username);
-
-  const plants = plantsData.map((p: any) => {
-    const isDefaultGarden =
-      p.garden_name.includes("'s Garden") || p.garden_name === 'Home Garden';
-
-    let imageUrl = p.image;
-    if (imageUrl && !imageUrl.startsWith('http')) {
-      imageUrl = `${API_URL}${imageUrl}`;
-    }
-
-    return {
-      id: p.plant_id,
-      commonName: p.nickname,
-      latinName: p.species || '',
-      author: p.owner_username,
-      garden: isDefaultGarden ? tGardens('defaultGardenName') : p.garden_name,
-      gardenId: p.garden_id,
-      image: imageUrl,
-    };
-  });
 
   return (
     <div className="user-plants-page min-h-screen bg-main-gradient pb-20 overflow-hidden">
@@ -92,7 +53,7 @@ export default async function UserPlantsPage({ params }: UserPlantsPageProps) {
       </header>
 
       <div className="plants-grid-container overflow-hidden">
-        <UserPlantsClient plants={plants} profileUsername={username} />
+        <UserPlantsClient plants={[]} profileUsername={username} />
       </div>
     </div>
   );

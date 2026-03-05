@@ -50,21 +50,25 @@ export interface UserProfileProps {
  */
 export const getAvatarUrl = (path?: string) => {
   if (!path) return '/images/favicon/fav_480.webp';
-  if (path.startsWith('http')) return path;
 
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-
-  if (!apiUrl) {
+  if (path.startsWith('http')) {
+    try {
+      const u = new URL(path);
+      if (u.pathname.startsWith('/media/')) return u.pathname;
+    } catch { /* ignore */ }
     return path;
   }
 
-  const baseUrl = apiUrl.replace(/\/+$/, '');
   const cleanPath = path.startsWith('/') ? path : `/${path}`;
 
   if (cleanPath.startsWith('/media/')) {
-    return `${baseUrl}${cleanPath}`;
+    return cleanPath;
   }
 
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+  if (!apiUrl) return path;
+
+  const baseUrl = apiUrl.replace(/\/+$/, '');
   return `${baseUrl}/media${cleanPath}`;
 };
 

@@ -9,7 +9,7 @@ import { PlantModal } from '@/components/plants/PlantModal';
 import { PlantType } from '@/app/[locale]/HomePageClient';
 
 interface UserPlantsClientProps {
-  plants: PlantType[];
+  plants?: PlantType[];
   profileUsername: string;
 }
 
@@ -21,14 +21,75 @@ export const UserPlantsClient = ({
   const router = useRouter();
   const pathname = usePathname();
 
-  const [plants, setPlants] = useState<PlantType[]>(initialPlants);
+  const [plants, setPlants] = useState<PlantType[]>(initialPlants ?? []);
+  const [loading, setLoading] = useState(!initialPlants || initialPlants.length === 0);
   const [currentUser, setCurrentUser] = useState<string | null>(null);
-  const [selectedPlantIndex, setSelectedPlantIndex] = useState<number | null>(
-    null
-  );
+  const [selectedPlantIndex, setSelectedPlantIndex] = useState<number | null>(null);
 
   const currentPage = Number(searchParams.get('page')) || 1;
   const itemsPerPage = 12;
+  const tGardens = useTranslations('GardensPage');
+
+  useEffect(() => {
+    apiFetch('/api/auth/me/')
+      .then(res => res.json())
+      .then(data => setCurrentUser(data.username))
+      .catch(() => { });
+  }, []);
+
+  useEffect(() => {
+    if (initialPlants && initialPlants.length > 0) return;
+
+    let cancelled = false;
+
+    (async () => {
+      try {
+        const res = await apiFetch(`/api/plant/?username=${encodeURIComponent(profileUsername)}`, { skipRedirect: true });
+
+        if (!res.ok) {
+          if (!cancelled) setLoading(false);
+          return;
+        }
+
+        const data = await res.json();
+        const mapped = data.map((p: any) => {
+          const isDefaultGarden =
+            p.garden_name.includes("'s Garden") || p.garden_name === 'Home Garden';
+
+          let imageUrl = p.image;
+          if (imageUrl) {
+            if (imageUrl.startsWith('http')) {
+              try {
+                const u = new URL(imageUrl);
+                if (u.pathname.startsWith('/media/')) imageUrl = u.pathname;
+              } catch { /* ignore */ }
+            } else {
+              imageUrl = imageUrl.startsWith('/') ? imageUrl : `/${imageUrl}`;
+            }
+          }
+
+          return {
+            id: p.plant_id,
+            commonName: p.nickname,
+            latinName: p.species || '',
+            author: p.owner_username,
+            garden: isDefaultGarden ? tGardens('defaultGardenName') : p.garden_name,
+            gardenId: p.garden_id,
+            image: imageUrl,
+          };
+        });
+
+        if (!cancelled) {
+          setPlants(mapped);
+          setLoading(false);
+        }
+      } catch {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+
+    return () => { cancelled = true; };
+  }, [initialPlants, profileUsername, tGardens]);
 
   const sortedPlants = [...plants].reverse();
   const totalPages = Math.ceil(plants.length / itemsPerPage) || 1;
@@ -37,17 +98,9 @@ export const UserPlantsClient = ({
     startIndex,
     startIndex + itemsPerPage
   );
-  const t = useTranslations('GardensPage');
 
   const btnStyle =
     'bg-[#186618] text-[#fff] px-4 py-2 rounded-lg font-bold text-xs uppercase tracking-widest cursor-pointer disabled:opacity-50 focus:outline focus:outline-2 focus:outline-[#fff] focus:outline-offset-2 active:outline-none';
-
-  useEffect(() => {
-    apiFetch('/api/auth/me/')
-      .then(res => res.json())
-      .then(data => setCurrentUser(data.username))
-      .catch(() => {});
-  }, []);
 
   const handlePageChange = (page: number) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -57,6 +110,16 @@ export const UserPlantsClient = ({
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
   };
+
+  if (loading) {
+    return (
+      <section className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
+        <div className="text-white-text font-bold text-sm uppercase tracking-widest animate-pulse">
+          Loading...
+        </div>
+      </section>
+    );
+  }
 
   return (
     <>
@@ -80,7 +143,7 @@ export const UserPlantsClient = ({
               disabled={currentPage === 1}
               className={btnStyle}
             >
-              {t('firstPage')}
+              {tGardens('firstPage')}
             </button>
             <button
               onClick={() => handlePageChange(currentPage - 1)}
@@ -104,7 +167,7 @@ export const UserPlantsClient = ({
               disabled={currentPage === totalPages}
               className={btnStyle}
             >
-              {t('lastPage')}
+              {tGardens('lastPage')}
             </button>
           </div>
         )}

@@ -5,9 +5,10 @@
  * EN: Component displaying a grid of the latest gardens with dynamic images.
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { GardenCard } from '@/components/gardens/GardenCard';
+import { apiFetch } from '@/lib/auth';
 
 export type GardenType = {
   id: number;
@@ -20,18 +21,103 @@ export type GardenType = {
 };
 
 interface GardensPageClientProps {
-  gardens: Array<GardenType>;
+  gardens?: Array<GardenType>;
   hideTitle?: boolean;
 }
 
+function buildImageUrl(raw: string | null | undefined): string | null {
+  if (!raw) return null;
+  if (raw.startsWith('http')) {
+    try {
+      const u = new URL(raw);
+      if (u.pathname.startsWith('/media/')) return u.pathname;
+    } catch { /* ignore */ }
+    return raw;
+  }
+  if (raw.startsWith('/')) return raw;
+  return `/${raw}`;
+}
+
 export const GardensPageClient = ({
-  gardens,
+  gardens: initialGardens,
   hideTitle,
 }: GardensPageClientProps) => {
   const t = useTranslations('GardensPage');
 
+  const [gardens, setGardens] = useState<GardenType[]>(initialGardens ?? []);
+  const [loading, setLoading] = useState(!initialGardens || initialGardens.length === 0);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 12;
+
+  useEffect(() => {
+    if (initialGardens && initialGardens.length > 0) return;
+
+    let cancelled = false;
+
+    (async () => {
+      try {
+        const res = await apiFetch('/api/garden/', { skipRedirect: true });
+        if (!res.ok) { if (!cancelled) setLoading(false); return; }
+        const allGardens = await res.json();
+
+        const mapped = await Promise.all(
+          allGardens
+            .filter((g: any) => g.user_count > 0)
+            .map(async (garden: any) => {
+              const plantsRes = await apiFetch(
+                `/api/plant/?garden=${garden.garden_id}`,
+                { skipRedirect: true }
+              );
+              const plants = plantsRes.ok ? await plantsRes.json() : [];
+
+              const oldestPlantWithImage = plants
+                .filter((p: any) => p.image_url || p.image || p.thumbnail)
+                .sort((a: any, b: any) => (a.plant_id || 0) - (b.plant_id || 0))[0];
+
+              const rawImage = oldestPlantWithImage
+                ? oldestPlantWithImage.image_url ||
+                oldestPlantWithImage.image ||
+                oldestPlantWithImage.thumbnail
+                : garden.thumbnail;
+
+              const finalImage = buildImageUrl(rawImage);
+
+              const envMap: Record<string, string> = {
+                i: 'indoor',
+                o: 'outdoor',
+                g: 'greenhouse',
+              };
+              const rawEnv = String(garden.environment || '')
+                .toLowerCase()
+                .charAt(0);
+              const envKey = envMap[rawEnv] || 'indoor';
+
+              return {
+                id: garden.garden_id,
+                name:
+                  garden.name.includes("'s Garden") ||
+                    garden.name === 'Default Garden'
+                    ? t('defaultGardenName')
+                    : garden.name,
+                owner: garden.owner || t('unknownOwner'),
+                plantsCount: garden.plant_count || 0,
+                styleName: t(`environments.${envKey}`),
+                image: finalImage,
+              };
+            })
+        );
+
+        if (!cancelled) {
+          setGardens([...mapped].reverse());
+          setLoading(false);
+        }
+      } catch {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+
+    return () => { cancelled = true; };
+  }, [initialGardens, t]);
 
   const totalPages = Math.ceil(gardens.length / itemsPerPage) || 1;
   const startIndex = (currentPage - 1) * itemsPerPage;
@@ -39,6 +125,16 @@ export const GardensPageClient = ({
 
   const btnStyle =
     'bg-[#186618] text-[#fff] px-4 py-2 rounded-lg font-bold text-xs uppercase tracking-widest cursor-pointer disabled:opacity-50 focus:outline focus:outline-2 focus:outline-[#fff] focus:outline-offset-2 active:outline-none';
+
+  if (loading) {
+    return (
+      <section className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
+        <div className="text-white-text font-bold text-sm uppercase tracking-widest animate-pulse">
+          Loading...
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
