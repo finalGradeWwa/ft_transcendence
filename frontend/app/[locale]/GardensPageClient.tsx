@@ -9,6 +9,7 @@ import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { GardenCard } from '@/components/gardens/GardenCard';
 import { apiFetch } from '@/lib/auth';
+import { buildImageUrl } from '@/lib/imageUrl';
 
 export type GardenType = {
   id: number;
@@ -23,19 +24,6 @@ export type GardenType = {
 interface GardensPageClientProps {
   gardens?: Array<GardenType>;
   hideTitle?: boolean;
-}
-
-function buildImageUrl(raw: string | null | undefined): string | null {
-  if (!raw) return null;
-  if (raw.startsWith('http')) {
-    try {
-      const u = new URL(raw);
-      if (u.pathname.startsWith('/media/')) return u.pathname;
-    } catch { /* ignore */ }
-    return raw;
-  }
-  if (raw.startsWith('/')) return raw;
-  return `/${raw}`;
 }
 
 export const GardensPageClient = ({
