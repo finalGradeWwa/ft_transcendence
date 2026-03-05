@@ -50,7 +50,6 @@ class GardenViewSet(viewsets.ViewSet):
     def retrieve(self, request, pk):
         """
         Retrieve a single garden details.
-        Visible to all authenticated users (public read).
         """
         queryset = self._get_detailed_gardens()
         garden = get_object_or_404(queryset, pk=pk)

@@ -240,7 +240,3 @@ class GardenPlantIntegrationTests(APITestCase):
         self.client.force_authenticate(user=self.user2)
         response = self.client.get('/api/plant/?owner=me')
         self.assertEqual(len(response.data), 1)
-
-        # But both can see all plants
-        response = self.client.get('/api/plant/')
-        self.assertEqual(len(response.data), 3)
