@@ -31,6 +31,7 @@ export const GardensPageClient = ({
   hideTitle,
 }: GardensPageClientProps) => {
   const t = useTranslations('GardensPage');
+  const tCommon = useTranslations();
 
   const [gardens, setGardens] = useState<GardenType[]>(initialGardens ?? []);
   const [loading, setLoading] = useState(!initialGardens || initialGardens.length === 0);
@@ -98,7 +99,7 @@ export const GardensPageClient = ({
     return (
       <section className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
         <div className="text-white-text font-bold text-sm uppercase tracking-widest animate-pulse">
-          Loading...
+          {tCommon('ProfilePage.aria.loadingAction')}
         </div>
       </section>
     );

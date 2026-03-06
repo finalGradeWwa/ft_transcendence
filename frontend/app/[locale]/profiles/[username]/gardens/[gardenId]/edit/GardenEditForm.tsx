@@ -8,6 +8,7 @@ import { apiFetch } from '@/lib/auth';
 export function GardenEditForm({ garden: initialGarden, username, gardenId }: any) {
   const router = useRouter();
   const t = useTranslations('GardensPage');
+  const tCommon = useTranslations();
 
   const [garden, setGarden] = useState<any>(initialGarden);
   const [name, setName] = useState(initialGarden?.name || '');
@@ -82,7 +83,7 @@ export function GardenEditForm({ garden: initialGarden, username, gardenId }: an
     return (
       <div className="flex justify-center items-center py-12">
         <div className="text-dark-text font-bold text-sm uppercase tracking-widest animate-pulse">
-          Loading...
+          {tCommon('ProfilePage.aria.loadingAction')}
         </div>
       </div>
     );
