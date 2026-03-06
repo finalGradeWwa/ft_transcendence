@@ -1,4 +1,4 @@
-const DEFAULT_API_URL = 'http://localhost:8000';
+const DEFAULT_API_URL = 'https://localhost:8443';
 const ACCESS_TOKEN_KEY = 'accessToken';
 
 /**
