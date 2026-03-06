@@ -45,3 +45,4 @@ jobs:
           ALLOWED_HOSTS: 'localhost'
           GITHUB_OAUTH_KEY: ${{ secrets.OAUTH_KEY }}
           GITHUB_OAUTH_SECRET: ${{ secrets.OAUTH_SECRET }}
+          SECURE_SSL_REDIRECT: 'false'
