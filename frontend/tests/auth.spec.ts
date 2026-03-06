@@ -16,7 +16,7 @@ async function loginAs(page: any, email: string, password: string) {
     state: 'detached',
     timeout: 15000,
   });
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('load')
 }
 
 /**

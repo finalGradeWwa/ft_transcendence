@@ -1,5 +1,5 @@
 from django.shortcuts import get_object_or_404
-from django.db.models import Count, Q
+from django.db.models import Count
 from django.contrib.auth import get_user_model
 from rest_framework import viewsets, status
 from rest_framework.response import Response
@@ -50,7 +50,6 @@ class GardenViewSet(viewsets.ViewSet):
     def retrieve(self, request, pk):
         """
         Retrieve a single garden details.
-        Visible to all authenticated users (public read).
         """
         queryset = self._get_detailed_gardens()
         garden = get_object_or_404(queryset, pk=pk)
@@ -82,10 +81,11 @@ class GardenViewSet(viewsets.ViewSet):
         List gardens visible to the current user (where user is owner OR member).
         """
         # 1. Base Query: Gardens where I am Owner OR Member
-        gardens = self._get_detailed_gardens().filter(
-            Q(owners__organization_user__user=request.user) |
-            Q(gardenuser__user=request.user)
-        ).distinct()
+        # gardens = self._get_detailed_gardens().filter(
+        #     Q(owners__organization_user__user=request.user) |
+        #     Q(gardenuser__user=request.user)
+        # ).distinct()
+        gardens = self._get_detailed_gardens().distinct()
 
         # 2. Apply Filters
         owner_param = request.query_params.get("owner")

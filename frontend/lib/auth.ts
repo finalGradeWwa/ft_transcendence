@@ -71,7 +71,7 @@ export async function logout(): Promise<void> {
       'Content-Type': 'application/json',
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
     },
-  }).catch(() => {});
+  }).catch(() => { });
 
   // PL: Dopiero teraz usuń tokeny lokalnie
   // EN: Only now clear tokens locally
@@ -81,7 +81,7 @@ export async function logout(): Promise<void> {
   }
 }
 
-let refreshPromise: Promise<string> | null = null;
+let refreshPromise: Promise<string | null> | null = null;
 
 type RefreshResponse = { access?: string };
 
@@ -91,7 +91,7 @@ type RefreshResponse = { access?: string };
  * EN: Refreshes the access token using refresh_token from cookie.
  * On failure, logs out the user and redirects to the login page.
  */
-export async function refreshAccessToken(): Promise<string> {
+export async function refreshAccessToken(skipRedirect = false): Promise<string | null> {
   const apiUrl = getApiUrl();
 
   const res = await fetch(`${apiUrl}/api/auth/token/refresh/`, {
@@ -102,15 +102,15 @@ export async function refreshAccessToken(): Promise<string> {
 
   if (!res.ok) {
     await logout();
-    if (typeof window !== 'undefined') {
+    if (!skipRedirect && typeof window !== 'undefined') {
       const locale = window.location.pathname.split('/')[1] || 'pl';
       window.location.href = `/${locale}?showLogin=true`;
     }
-    return new Promise(() => {});
+    return null;
   }
 
   const data = (await res.json()) as RefreshResponse;
-  if (!data?.access) throw new Error('REFRESH_EMPTY');
+  if (!data?.access) return null;
 
   setAccessToken(data.access);
 
@@ -123,14 +123,15 @@ export async function refreshAccessToken(): Promise<string> {
  * EN: Returns a valid access token — from sessionStorage or by refreshing.
  * Deduplicates parallel refresh calls using a shared Promise.
  */
-export async function getValidAccessToken(): Promise<string> {
+export async function getValidAccessToken(skipRedirect = false): Promise<string | null> {
   const existing = getAccessToken();
   if (existing && !isTokenExpired(existing)) {
     return existing;
   }
 
   if (!refreshPromise) {
-    refreshPromise = refreshAccessToken().finally(() => {
+    refreshPromise = refreshAccessToken(skipRedirect);
+    refreshPromise.finally(() => {
       refreshPromise = null;
     });
   }
@@ -146,25 +147,28 @@ export async function getValidAccessToken(): Promise<string> {
  */
 export async function apiFetch(
   path: string,
-  init: RequestInit = {}
+  init: RequestInit & { skipRedirect?: boolean } = {}
 ): Promise<Response> {
+  const { skipRedirect, ...fetchInit } = init;
   const apiUrl = getApiUrl();
   const url = path.startsWith('http') ? path : `${apiUrl}${path}`;
 
-  const token = await getValidAccessToken();
+  const token = await getValidAccessToken(skipRedirect);
 
-  const doRequest = (access: string) => {
-    const headers = new Headers(init.headers);
+  const doRequest = (access: string | null) => {
+    const headers = new Headers(fetchInit.headers);
 
-    headers.set('Authorization', `Bearer ${access}`);
+    if (access) {
+      headers.set('Authorization', `Bearer ${access}`);
+    }
 
-    const body = (init as RequestInit).body;
+    const body = (fetchInit as RequestInit).body;
     if (body && !(body instanceof FormData) && !headers.has('Content-Type')) {
       headers.set('Content-Type', 'application/json');
     }
 
     return fetch(url, {
-      ...init,
+      ...fetchInit,
       credentials: 'include',
       headers,
     });
@@ -172,11 +176,13 @@ export async function apiFetch(
 
   let res = await doRequest(token);
 
-  /** PL: Przy błędzie 401 próbujemy odświeżyć token i ponowić żądanie. EN: On 401 error, try to refresh the token and retry the request. */
-  if (res.status === 401) {
+  /** PL: Przy błędzie 401 próbujemy odświeżyć token i ponowić żądanie (o ile to nie było od razu na guestcie). */
+  if (res.status === 401 && token) {
     clearAccessToken();
-    const fresh = await getValidAccessToken();
-    res = await doRequest(fresh);
+    const fresh = await getValidAccessToken(skipRedirect);
+    if (fresh) {
+      res = await doRequest(fresh);
+    }
   }
 
   return res;

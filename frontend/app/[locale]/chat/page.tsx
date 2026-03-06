@@ -129,7 +129,7 @@ export default function ChatPage() {
 
       try {
         const accessToken = await getValidAccessToken();
-        if (cancelled) return;
+        if (cancelled || !accessToken) return;
 
         const socketUrl = buildWebSocketUrl(accessToken);
         const socket = new WebSocket(socketUrl);
