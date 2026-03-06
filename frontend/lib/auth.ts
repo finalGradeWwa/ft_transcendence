@@ -81,7 +81,7 @@ export async function logout(): Promise<void> {
   }
 }
 
-let refreshPromise: Promise<string> | null = null;
+let refreshPromise: Promise<string | null> | null = null;
 
 type RefreshResponse = { access?: string };
 
@@ -130,7 +130,7 @@ export async function getValidAccessToken(skipRedirect = false): Promise<string 
   }
 
   if (!refreshPromise) {
-    refreshPromise = refreshAccessToken(skipRedirect) as Promise<string>;
+    refreshPromise = refreshAccessToken(skipRedirect);
     refreshPromise.finally(() => {
       refreshPromise = null;
     });

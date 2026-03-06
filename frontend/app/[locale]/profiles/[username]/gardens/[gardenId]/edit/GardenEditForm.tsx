@@ -28,11 +28,11 @@ export function GardenEditForm({ garden: initialGarden, username, gardenId }: an
         if (!res.ok) {
           if (!cancelled) {
             if (res.status === 401 || res.status === 403) {
-              setError('Brak uprawnień do edycji tego ogrodu');
+              setError('You do not have permission to edit this garden');
             } else if (res.status === 404) {
-              setError('Nie znaleziono ogrodu');
+              setError('Garden not found');
             } else {
-              setError('Błąd wczytywania ogrodu');
+              setError('Failed to load garden');
             }
             setInitialLoading(false);
           }
@@ -48,7 +48,7 @@ export function GardenEditForm({ garden: initialGarden, username, gardenId }: an
         }
       } catch {
         if (!cancelled) {
-          setError('Błąd wczytywania ogrodu');
+          setError('Failed to load garden');
           setInitialLoading(false);
         }
       }
@@ -74,7 +74,7 @@ export function GardenEditForm({ garden: initialGarden, username, gardenId }: an
       }
     } catch (error) {
     } finally {
-      if (!router) setLoading(false);
+      setLoading(false);
     }
   };
 
@@ -91,12 +91,12 @@ export function GardenEditForm({ garden: initialGarden, username, gardenId }: an
   if (error || !garden) {
     return (
       <div className="text-center py-12">
-        <p className="text-red-500 font-bold">{error || 'Nie znaleziono ogrodu'}</p>
+        <p className="text-red-500 font-bold">{error || 'Garden not found'}</p>
         <button
           onClick={() => router.back()}
           className="mt-6 bg-primary-green text-white px-8 py-3 rounded-xl font-bold uppercase text-xs tracking-widest"
         >
-          {t('back') || 'Powrót'}
+          {t('back')}
         </button>
       </div>
     );
@@ -108,16 +108,16 @@ export function GardenEditForm({ garden: initialGarden, username, gardenId }: an
     return (
       <div className="text-center py-8">
         <h2 className="text-2xl font-black text-red-600 uppercase mb-4">
-          {t('accessDenied') || 'Brak uprawnień'}
+          {t('accessDenied')}
         </h2>
         <p className="text-neutral-600 mb-6 font-semibold">
-          {t('cannotEditDefault') || 'Główny ogród nie może być edytowany.'}
+          {t('cannotEditDefault')}
         </p>
         <button
           onClick={() => router.back()}
           className="bg-primary-green text-white px-8 py-3 rounded-xl font-bold uppercase text-xs tracking-widest"
         >
-          {t('back') || 'Powrót'}
+          {t('back')}
         </button>
       </div>
     );
@@ -130,7 +130,7 @@ export function GardenEditForm({ garden: initialGarden, username, gardenId }: an
           htmlFor="edit-garden-name"
           className="block text-xs font-bold uppercase tracking-widest text-primary-green mb-2"
         >
-          {t('fields.name') || 'Nazwa ogrodu'}
+          {t('fields.name')}
         </label>
         <input
           maxLength={25}
@@ -148,7 +148,7 @@ export function GardenEditForm({ garden: initialGarden, username, gardenId }: an
           htmlFor="edit-garden-environment"
           className="block text-xs font-bold uppercase tracking-widest text-primary-green mb-2"
         >
-          {t('fields.environment') || 'Środowisko'}
+          {t('fields.environment')}
         </label>
         <select
           id="edit-garden-environment"
@@ -168,14 +168,14 @@ export function GardenEditForm({ garden: initialGarden, username, gardenId }: an
           disabled={loading}
           className="flex-1 bg-primary-green text-white font-bold uppercase text-xs tracking-widest py-4 rounded-xl hover:bg-primary-green/90 transition disabled:opacity-50 shadow-lg shadow-primary-green/20 focus:outline focus:outline-2 focus:outline-gray-600 focus:outline-offset-[3px]"
         >
-          {loading ? '...' : t('saveChanges') || 'Zapisz zmiany'}
+          {loading ? '...' : t('saveChanges')}
         </button>
         <button
           type="button"
           onClick={() => router.back()}
           className="px-6 bg-orange-800 text-white font-bold uppercase text-xs tracking-widest border border-primary-green/20 rounded-xl hover:bg-orange-800/90 transition focus:outline focus:outline-2 focus:outline-gray-600 focus:outline-offset-[3px]"
         >
-          {t('cancel') || 'Anuluj'}
+          {t('cancel')}
         </button>
       </div>
     </form>
