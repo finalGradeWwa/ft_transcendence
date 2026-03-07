@@ -112,6 +112,7 @@ ASGI_APPLICATION = 'mysite.asgi.application'
 
 # Channel layers configuration for WebSocket support
 # REDIS_HOST: defaults to 'redis' for Docker, set to 'localhost' for local development
+# REDIS_PORT: defaults to 6379, can be overridden for local non-Docker runs
 if 'test' in sys.argv:
     # Use in-memory channel layer for tests to avoid Redis dependency
     CHANNEL_LAYERS = {
@@ -120,11 +121,13 @@ if 'test' in sys.argv:
         }
     }
 else:
+    redis_host = os.getenv('REDIS_HOST', 'redis')
+    redis_port = int(os.getenv('REDIS_PORT', '6379'))
     CHANNEL_LAYERS = {
         'default': {
             'BACKEND': 'channels_redis.core.RedisChannelLayer',
             'CONFIG': {
-                'hosts': [(os.getenv('REDIS_HOST', 'redis'), 6379)],
+                'hosts': [(redis_host, redis_port)],
             },
         }
     }

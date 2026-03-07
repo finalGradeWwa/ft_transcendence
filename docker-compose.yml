@@ -100,7 +100,7 @@ services:
     image: redis:7-alpine
     container_name: redis
     ports:
-      - "6379:6379" # needed for testing purposes
+      - "${REDIS_PORT:-6380}:6379" # host port configurable; defaults to 6380 to avoid conflicts
     # Redis is used ONLY for Django Channels (WebSocket routing), NOT for message storage.
     # Messages are persisted in the database. Redis data is ephemeral and can be safely lost.
     # --save "" --appendonly no: Disables persistence for better performance.
