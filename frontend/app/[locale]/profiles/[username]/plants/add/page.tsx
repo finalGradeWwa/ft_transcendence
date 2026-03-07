@@ -30,7 +30,7 @@ export default function AddPlantPage({
   useEffect(() => {
     const fetchGardens = async () => {
       try {
-        const response = await apiFetch('/api/garden/?owner=me');
+        const response = await apiFetch('/api/garden/?member=me');
         if (response.ok) {
           const data = await response.json();
           setGardens(data);

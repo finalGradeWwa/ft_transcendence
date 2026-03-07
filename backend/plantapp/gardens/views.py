@@ -75,7 +75,7 @@ class GardenViewSet(viewsets.ViewSet):
         )
 
     # GET /api/garden/
-    # Query Params: ?owner=me | ?owner={id} | ?username={name} | ?member={username}
+    # Query Params: ?owner=me | ?owner={id} | ?username={name} | ?member={username} | ?member=me
     def list(self, request):
         """
         List gardens visible to the current user (where user is owner OR member).
@@ -106,9 +106,12 @@ class GardenViewSet(viewsets.ViewSet):
 
         # Filter by Member (finding shared gardens)
         if member_param:
-            # Note: 'member=me' is redundant as base query already limits to my gardens.
-            # This is useful for: "Gardens where I am a member AND 'Alice' is also a member"
-            gardens = gardens.filter(gardenuser__user__username=member_param)
+            if member_param.lower() == "me":
+                # Get gardens where current user is a member (including as owner)
+                gardens = gardens.filter(gardenuser__user=request.user)
+            else:
+                # This is useful for: "Gardens where I am a member AND 'Alice' is also a member"
+                gardens = gardens.filter(gardenuser__user__username=member_param)
 
         serializer = GardenListSerializer(gardens, many=True, context={'request': request})
         return Response(serializer.data)
