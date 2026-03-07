@@ -181,7 +181,9 @@
     "socketConnectionError": "Nie udało się połączyć z czatem na żywo.",
     "messageSendError": "Nie udało się wysłać wiadomości.",
     "typeMessage": "Wpisz wiadomość...",
-    "send": "Wyślij"
+    "send": "Wyślij",
+    "online": "Online",
+    "offline": "Offline"
   },
   "AboutUs": {
     "title": "O nas",

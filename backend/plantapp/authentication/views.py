@@ -55,6 +55,9 @@ class RegisterView(APIView):
 		serializer = UserRegistrationSerializer(data=request.data)
 		serializer.is_valid(raise_exception=True)
 		user = serializer.save()
+		# Set newly registered user as online
+		user.is_online = True
+		user.save(update_fields=['is_online'])
 
 		refresh = RefreshToken.for_user(user)
 
@@ -92,6 +95,11 @@ class LogoutView(APIView):
 
     def post(self, request):
         refresh_token = request.COOKIES.get(REFRESH_COOKIE_NAME)
+        
+        # Set user as offline
+        user = request.user
+        user.is_online = False
+        user.save(update_fields=['is_online'])
 
         response = Response(status=status.HTTP_205_RESET_CONTENT)
 
@@ -118,6 +126,10 @@ class LoginView(APIView):
 		serializer.is_valid(raise_exception=True)
 
 		user = serializer.validated_data["user"]
+		# Set user as online
+		user.is_online = True
+		user.save(update_fields=['is_online'])
+		
 		refresh = RefreshToken.for_user(user)
 
 		response = Response({

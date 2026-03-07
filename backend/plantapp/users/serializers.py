@@ -17,6 +17,7 @@ class UserSerializer(serializers.ModelSerializer):
             "email",
             "date_joined",
             "is_active",
+            "is_online",
             "avatar_photo",
             "plants_count",
             "gardens_count",
@@ -100,4 +101,5 @@ class UserUpdateSerializer(serializers.ModelSerializer):
 class PublicUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ("id", "username", "first_name", "last_name", "avatar_photo")
+        fields = ("id", "username", "first_name", "last_name", "avatar_photo", "is_online")
+

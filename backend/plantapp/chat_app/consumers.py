@@ -22,12 +22,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
         Called when the WebSocket is handshaking as part of initial connection.
         """
         self.user = self.scope["user"]
-        
+
         # Reject connection if user is not authenticated
         if not self.user.is_authenticated:
             await self.close()
             return
-        
+
         # Create a personal room for this user
         self.room_name = f"user_{self.user.id}"
         self.room_group_name = f"chat_{self.room_name}"
@@ -40,8 +40,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         await self.accept()
         
-        # Update user's online status
-        await self.update_user_status(True)
+        # Update user's online status and broadcast to friends
+        await self.set_user_online(True)
 
     async def disconnect(self, close_code):
         """
@@ -53,10 +53,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 self.room_group_name,
                 self.channel_name
             )
-        
+
         # Update user's online status if user exists and is authenticated
         if hasattr(self, 'user') and self.user and self.user.is_authenticated:
-            await self.update_user_status(False)
+            await self.set_user_online(False)
 
     async def receive(self, text_data):
         """
@@ -66,7 +66,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         try:
             data = json.loads(text_data)
             message_type = data.get("type")
-            
+
             if message_type == "chat_message":
                 await self.handle_chat_message(data)
             elif message_type == "typing":
@@ -77,7 +77,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 await self.send(text_data=json.dumps({
                     "error": "Unknown message type"
                 }))
-        
+
         except json.JSONDecodeError:
             await self.send(text_data=json.dumps({
                 "error": "Invalid JSON"
@@ -98,7 +98,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         """
         message_content = data.get("message")
         recipient_username = data.get("recipient_username")
-        
+
         if not isinstance(message_content, str) or not message_content.strip() or not recipient_username:
             await self.send(text_data=json.dumps({
                 "error": "Message and recipient_username are required"
@@ -110,23 +110,23 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 "error": f"Message is too long (max {MAX_MESSAGE_LENGTH} characters)"
             }))
             return
-        
+
         # Save message to database and get recipient
         result = await self.save_message(
             sender=self.user,
             recipient_username=recipient_username,
             content=message_content
         )
-        
+
         if result.get("error"):
             await self.send(text_data=json.dumps({
                 "error": result["error"]
             }))
             return
-        
+
         message_data = result["message"]
         recipient_id = result["recipient_id"]
-        
+
         # Send message to recipient's room
         recipient_room_group = f"chat_user_{recipient_id}"
         await self.channel_layer.group_send(
@@ -136,7 +136,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 "message": message_data
             }
         )
-        
+
         # Send confirmation back to sender
         await self.send(text_data=json.dumps({
             "type": "message_sent",
@@ -149,14 +149,14 @@ class ChatConsumer(AsyncWebsocketConsumer):
         """
         recipient_username = data.get("recipient_username")
         is_typing = data.get("is_typing", True)
-        
+
         if not recipient_username:
             return
-        
+
         recipient = await self.get_user_by_username(recipient_username)
         if not recipient:
             return
-        
+
         recipient_room_group = f"chat_user_{recipient.id}"
         await self.channel_layer.group_send(
             recipient_room_group,
@@ -172,15 +172,15 @@ class ChatConsumer(AsyncWebsocketConsumer):
         Mark messages as read when user opens conversation.
         """
         sender_username = data.get("sender_username")
-        
+
         if not sender_username:
             return
-        
+
         await self.mark_messages_as_read(
             sender_username=sender_username,
             recipient=self.user
         )
-        
+
         # Notify sender that messages were read
         sender = await self.get_user_by_username(sender_username)
         if sender:
@@ -223,6 +223,16 @@ class ChatConsumer(AsyncWebsocketConsumer):
             "reader_username": event["reader_username"]
         }))
 
+    async def status_update_handler(self, event):
+        """
+        Called when a friend's online status changes.
+        """
+        await self.send(text_data=json.dumps({
+            "type": "status_update",
+            "user_id": event["user_id"],
+            "is_online": event["is_online"]
+        }))
+
     # Database operations wrapped with database_sync_to_async
     @database_sync_to_async
     def save_message(self, sender, recipient_username, content):
@@ -236,7 +246,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 recipient=recipient,
                 content=content
             )
-            
+
             return {
                 "message": {
                     "id": message.id,
@@ -294,11 +304,46 @@ class ChatConsumer(AsyncWebsocketConsumer):
     @database_sync_to_async
     def update_user_status(self, is_online):
         """
-        Update user's online status.
+        Update user's online status in User model.
         """
         try:
-            profile, created = UserProfile.objects.get_or_create(user=self.user)
-            profile.is_online = is_online
-            profile.save()
+            self.user.is_online = is_online
+            self.user.save(update_fields=['is_online'])
         except Exception:
             pass
+
+    async def set_user_online(self, is_online):
+        """
+        Set user online status and broadcast to all friends.
+        """
+        # Update database
+        await self.update_user_status(is_online)
+        # Broadcast status change to all friends
+        await self.broadcast_status_to_friends(is_online)
+
+    @database_sync_to_async
+    def get_user_friends(self):
+        """
+        Get all friends of the current user (mutual connections).
+        """
+        try:
+            return list(self.user.get_friends().values_list('id', flat=True))
+        except Exception:
+            return []
+
+    async def broadcast_status_to_friends(self, is_online):
+        """
+        Broadcast status update to all friends of the current user.
+        """
+        friend_ids = await self.get_user_friends()
+
+        for friend_id in friend_ids:
+            friend_room_group = f"chat_user_{friend_id}"
+            await self.channel_layer.group_send(
+                friend_room_group,
+                {
+                    "type": "status_update_handler",
+                    "user_id": self.user.id,
+                    "is_online": is_online
+                }
+            )

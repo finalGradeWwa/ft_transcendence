@@ -10,6 +10,7 @@ type User = {
   username: string;
   first_name?: string;
   last_name?: string;
+  isOnline?: boolean;
 };
 
 type Message = {
@@ -52,9 +53,11 @@ export default function ChatPage() {
 
   // Scrolls the chat to the bottom to show the latest message
   //-----
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+    }
   };
 
   useEffect(() => {
@@ -97,8 +100,16 @@ export default function ChatPage() {
           throw new Error(`FRIENDS_FETCH_FAILED:${followingRes.status}`);
         }
 
-        const following = (await followingRes.json()) as User[];
-        setFriends(following);
+        // API returns users of the current user's friendships.  the backend
+        // already includes an "is_online" boolean in the payload; map that
+        // field into our local camelCase `isOnline` property so the component
+        // can render presence controls.
+        const following = (await followingRes.json()) as Array<
+          User & { is_online?: boolean }
+        >;
+
+      const mapped = following.map(f => ({ ...f, isOnline: f.is_online ?? false }));
+      setFriends(mapped);
 
         if (following.length > 0) {
           setSelectedFriend(prev => {
@@ -185,6 +196,23 @@ export default function ChatPage() {
               if (activeFriend && senderUsername === activeFriend.username) {
                 setMessages(prevMessages => [...prevMessages, incomingMessage]);
               }
+              return;
+            }
+
+            if (payload.type === 'status_update') {
+              const { user_id, is_online } = payload as any;
+              setFriends(prev =>
+                prev.map(f =>
+                  f.id === user_id ? { ...f, isOnline: is_online } : f
+                )
+              );
+
+              if (selectedFriendRef.current?.id === user_id) {
+                setSelectedFriend(prev =>
+                  prev ? { ...prev, isOnline: is_online } : prev
+                );
+              }
+              return;
             }
           } catch (error) {
             console.error('Invalid websocket payload', error);
@@ -346,7 +374,18 @@ export default function ChatPage() {
                             : 'bg-gray-700 text-gray-100 hover:bg-gray-600'
                         }`}
                       >
-                        <p className="font-medium">{friend.username}</p>
+                        <div className="flex justify-between items-center">
+                          <p className="font-medium">{friend.username}</p>
+                          {friend.isOnline != null && (
+                            <span
+                              className={`text-xs font-semibold ml-2 ${
+                                friend.isOnline ? 'text-green-400' : 'text-gray-400'
+                              }`}
+                            >
+                              {friend.isOnline ? t('online') : t('offline')}
+                            </span>
+                          )}
+                        </div>
                         {fullName && (
                           <p className="text-xs opacity-80">{fullName}</p>
                         )}
@@ -361,9 +400,20 @@ export default function ChatPage() {
           <div className="flex-1 flex flex-col">
             {selectedFriend && (
               <div className="border-b border-gray-700 px-6 py-3 bg-black/20">
-                <p className="font-semibold text-white">
-                  {selectedFriend.username}
-                </p>
+                <div className="flex items-center justify-between">
+                  <p className="font-semibold text-white">
+                    {selectedFriend.username}
+                  </p>
+                  {selectedFriend.isOnline != null && (
+                    <span
+                      className={`text-xs font-semibold ml-2 ${
+                        selectedFriend.isOnline ? 'text-green-400' : 'text-gray-400'
+                      }`}
+                    >
+                      {selectedFriend.isOnline ? t('online') : t('offline')}
+                    </span>
+                  )}
+                </div>
               </div>
             )}
 
@@ -374,7 +424,7 @@ export default function ChatPage() {
             )}
 
             {/* Messages Area */}
-            <div className="flex-1 overflow-y-auto p-6 space-y-4">
+            <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-6 space-y-4">
               {!selectedFriend ? (
                 <p className="text-gray-900 font-semibold text-sm">
                   {t('selectFriend')}
@@ -409,7 +459,6 @@ export default function ChatPage() {
                   </div>
                 ))
               )}
-              <div ref={messagesEndRef} />
             </div>
 
             {/* Input Area */}

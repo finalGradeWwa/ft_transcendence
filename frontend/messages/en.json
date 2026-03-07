@@ -181,7 +181,9 @@
     "socketConnectionError": "Realtime chat connection failed.",
     "messageSendError": "Failed to send message.",
     "typeMessage": "Type a message...",
-    "send": "Send"
+    "send": "Send",
+    "online": "Online",
+    "offline": "Offline"
   },
   "AboutUs": {
     "title": "About Us",
