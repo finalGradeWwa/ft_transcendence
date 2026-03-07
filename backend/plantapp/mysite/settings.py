@@ -235,8 +235,7 @@ SIMPLE_JWT = {
 }
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",  # Next.js dev server
-    "http://127.0.0.1:3000",
+    "https://localhost:8443",
 ]
 
 CORS_ALLOW_CREDENTIALS = True # For cookies
@@ -278,21 +277,19 @@ SOCIAL_AUTH_PIPELINE = (
     'authentication.pipeline.get_tokens_for_user',
 )
 
-FRONTEND_URL = os.getenv("FRONTEND_BASE_URL", "http://localhost:3000")
+FRONTEND_URL = os.getenv("FRONTEND_BASE_URL", "https://localhost:8443")
 SOCIAL_AUTH_LOGIN_ERROR_URL = f"{FRONTEND_URL.rstrip('/')}/?showLogin=true&error=access_denied"
 
-# CSRF_COOKIE_SECURE = not DEBUG
-# CSRF_COOKIE_HTTPONLY = False
-# CSRF_COOKIE_SAMESITE = 'Lax'
+# HTTPS security settings on proxy
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+USE_X_FORWARDED_HOST = True
 
-SOCIAL_AUTH_REDIRECT_IS_HTTPS = not DEBUG
+SECURE_SSL_REDIRECT = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+
+CSRF_TRUSTED_ORIGINS = ['https://localhost:8443']
+
+SOCIAL_AUTH_REDIRECT_IS_HTTPS = True
 SOCIAL_AUTH_SANITIZE_REDIRECTS = True
-# SOCIAL_AUTH_LOGIN_REDIRECT_URL = f"{FRONTEND_URL.rstrip('/')}/?auth=login_success&provider=github"
-# SOCIAL_AUTH_NEW_USER_REDIRECT_URL = f"{FRONTEND_URL.rstrip('/')}/?auth=login_success&provider=github"
-
-# Session configuration for OAuth
-# SESSION_COOKIE_AGE = 3600  # 1 hour
-# SESSION_COOKIE_SECURE = not DEBUG
-# SESSION_COOKIE_HTTPONLY = True
-# SESSION_COOKIE_SAMESITE = 'Lax'
 

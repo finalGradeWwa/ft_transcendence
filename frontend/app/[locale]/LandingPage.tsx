@@ -30,7 +30,7 @@ export function LandingPage({
       <div className="max-w-2xl mx-auto bg-secondary-beige/90 rounded-3xl shadow-2xl p-10 border border-primary-green/20">
         <div className="text-6xl mb-6">🌿</div>
         <h1 className="text-3xl sm:text-5xl font-black text-primary-green uppercase tracking-tighter mb-4">
-          {t('appName')}
+          Plant Portal
         </h1>
         <p className="text-neutral-600 font-semibold mb-8 text-sm sm:text-base leading-relaxed">
           {t('description')}

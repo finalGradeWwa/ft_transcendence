@@ -13,17 +13,14 @@ const withNextIntl = createNextIntlPlugin();
  */
 const nextConfig: NextConfig = {
   output: 'standalone',
-  env: {
-    NEXT_PUBLIC_BUILD_TIME: new Date().toISOString(),
-  },
   images: {
     deviceSizes: [480, 828, 1200, 1920],
     imageSizes: [96, 256, 384],
     remotePatterns: [
       {
-        protocol: 'http',
+        protocol: 'https',
         hostname: 'localhost',
-        port: '8000',
+        port: '8443',
         pathname: '/media/**',
       },
     ],

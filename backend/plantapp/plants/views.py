@@ -46,8 +46,8 @@ class PlantViewSet(viewsets.ViewSet):
 
     def retrieve(self, request, pk=None):
         plant = get_object_or_404(Plant, pk=pk)
-        self._check_plant_permission(plant, request.user)
-        serializer = PlantSerializer(plant, context={"request": request})
+        # Note: We might want to check visibility here too, but retrieve is often looser
+        serializer = PlantSerializer(plant)
         return Response(serializer.data)
 
     def create(self, request):

@@ -136,10 +136,11 @@ export default function AddPinPage({
                 key={type}
                 type="button"
                 onClick={() => setPinType(type)}
-                className={`flex-1 py-3 rounded-xl font-bold uppercase text-[10px] tracking-widest transition-bg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-green ${pinType === type
+                className={`flex-1 py-3 rounded-xl font-bold uppercase text-[10px] tracking-widest transition-bg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-green ${
+                  pinType === type
                     ? 'bg-primary-green text-white shadow-md'
                     : 'bg-container-light-2 border border-gray-green-text/50 text-dark-text hover:bg-black/5'
-                  }`}
+                }`}
               >
                 {type === 'plant' ? t('typePlant') : t('typeGarden')}
               </button>
@@ -169,7 +170,7 @@ export default function AddPinPage({
               >
                 {items.length === 0 && (
                   <option value="">
-                    {pinType === 'plant' ? t('noPlants') : t('noGardens')}
+                    {pinType === 'plant' ? 'Brak roślin' : 'Brak ogrodów'}
                   </option>
                 )}
                 {items.map(item => {

@@ -35,7 +35,7 @@ export const GardenCard = ({
               onDelete?.();
             }}
             className="absolute top-2 right-2 z-10 bg-red-600 text-white rounded-full p-1.5 hover:bg-red-700 transition"
-            title={t('deleteGarden')}
+            title="Usuń ogród"
           >
             <Icon name="trash" size={14} />
           </button>
@@ -44,7 +44,7 @@ export const GardenCard = ({
         <div className="relative w-full h-48 mb-3 overflow-hidden rounded-lg bg-neutral-200">
           <NextImage
             src={garden.image || '/images/garden/garden-placeholder.webp'}
-            alt={garden.image ? garden.name : t('gardenPlaceholderAlt')}
+            alt={garden.image ? garden.name : 'Garden placeholder'}
             fill
             priority={priority}
             loading={priority ? 'eager' : 'lazy'}
@@ -58,7 +58,7 @@ export const GardenCard = ({
             {garden.name}
           </h2>
           <p className="text-xs italic opacity-80 overflow-hidden uppercase">
-            {garden.styleName || t('communitySpace')}
+            {garden.styleName || 'Community Space'}
           </p>
           <div className="pt-3 space-y-1 text-xs uppercase tracking-wider font-semibold overflow-hidden">
             <div className="flex items-center gap-1.5 text-dark-text">

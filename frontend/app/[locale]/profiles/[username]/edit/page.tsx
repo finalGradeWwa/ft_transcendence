@@ -83,7 +83,7 @@ export default function EditProfilePage({
             setPreviewUrl(getFullAvatarUrl(data.avatar_photo));
           }
         }
-      } catch (err) { }
+      } catch (err) {}
     };
     fetchUserData();
   }, [initialUsername]);
@@ -96,29 +96,14 @@ export default function EditProfilePage({
     };
   }, [previewUrl]);
 
-  /** PL: Obsługa zmiany pliku graficznego z walidacją formatu i rozmiaru. EN: Handling image file change with format and size validation. */
-  const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
-  const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
-
+  /** PL: Obsługa zmiany pliku graficznego i tworzenie tymczasowego podglądu. EN: Handling image file change and creating a temporary preview. */
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file) return;
-
-    if (!ALLOWED_TYPES.includes(file.type)) {
-      setError(tr('errorInvalidFormat'));
-      if (fileInputRef.current) fileInputRef.current.value = '';
-      return;
+    if (file) {
+      setFileName(file.name);
+      setPreviewUrl(URL.createObjectURL(file));
+      setError(null);
     }
-
-    if (file.size > MAX_FILE_SIZE) {
-      setError(tr('avatarRequirements'));
-      if (fileInputRef.current) fileInputRef.current.value = '';
-      return;
-    }
-
-    setFileName(file.name);
-    setPreviewUrl(URL.createObjectURL(file));
-    setError(null);
   };
 
   /** PL: Przywracanie poprzedniego awatara i resetowanie wyboru pliku. EN: Restoring previous avatar and resetting file selection. */

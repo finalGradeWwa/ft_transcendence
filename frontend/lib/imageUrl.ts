@@ -1,8 +1,21 @@
 export function buildImageUrl(path: string | null | undefined): string | null {
   if (!path) return null;
+
+  if (path.startsWith('http')) {
+    try {
+      const u = new URL(path);
+      if (u.pathname.startsWith('/media/')) return u.pathname;
+    } catch { /* ignore */ }
+    return path;
+  }
+
+  if (path.startsWith('/media/') || path.startsWith('/')) {
+    return path;
+  }
+
   const baseUrl = (
-    process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000'
+    process.env.NEXT_PUBLIC_API_URL ?? 'https://localhost:8443'
   ).replace(/\/$/, '');
-  if (path.startsWith('http')) return path;
-  return `${baseUrl}${path}`;
+
+  return `${baseUrl}/${path}`;
 }

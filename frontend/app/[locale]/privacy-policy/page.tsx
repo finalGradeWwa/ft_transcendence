@@ -2,28 +2,9 @@ import fs from 'fs';
 import path from 'path';
 import { notFound } from 'next/navigation';
 import ReactMarkdown from 'react-markdown';
-import { getTranslations } from 'next-intl/server';
 
 interface PrivacyPolicyPageProps {
   params: Promise<{ locale: string }>;
-}
-
-/**
- * PL: Generuje metadane SEO dla strony polityki prywatności.
- * EN: Generates SEO metadata for the privacy policy page.
- */
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ locale: string }>;
-}) {
-  const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: 'Metadata' });
-
-  return {
-    title: t('privacyPolicy'),
-    description: t('privacyPolicyDescription'),
-  };
 }
 
 async function getPrivacyContent(locale: string) {

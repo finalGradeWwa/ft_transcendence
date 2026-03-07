@@ -5,19 +5,11 @@
  * EN: Collection of presentational components and interfaces for the user profile.
  */
 
-import { useState, useEffect } from 'react';
 import { Heading } from '@/components/Heading';
 import { Link } from '@/i18n/navigation';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { apiFetch } from '@/lib/auth';
-import { useToast } from '@/components/ToastProvider';
-
-/**
- * PL: Typ funkcji tłumaczącej zwracanej przez useTranslations.
- * EN: Translation function type returned by useTranslations.
- */
-type TranslateFunction = ReturnType<typeof useTranslations>;
 
 /**
  * PL: Interfejs definiujący dane profilu użytkownika przekazywane do komponentów.
@@ -58,16 +50,26 @@ export interface UserProfileProps {
  */
 export const getAvatarUrl = (path?: string) => {
   if (!path) return '/images/favicon/fav_480.webp';
-  if (path.startsWith('http')) return path;
 
-  const apiUrl = (process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000').replace(/\/+$/, '');
+  if (path.startsWith('http')) {
+    try {
+      const u = new URL(path);
+      if (u.pathname.startsWith('/media/')) return u.pathname;
+    } catch { /* ignore */ }
+    return path;
+  }
+
   const cleanPath = path.startsWith('/') ? path : `/${path}`;
 
   if (cleanPath.startsWith('/media/')) {
-    return `${apiUrl}${cleanPath}`;
+    return cleanPath;
   }
 
-  return `${apiUrl}/media${cleanPath}`;
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+  if (!apiUrl) return path;
+
+  const baseUrl = apiUrl.replace(/\/+$/, '');
+  return `${baseUrl}/media${cleanPath}`;
 };
 
 /**
@@ -100,7 +102,7 @@ export const UserJoinedInfo = ({
   t,
 }: {
   dateJoined: string;
-  t: TranslateFunction;
+  t: any;
 }) => (
   <div className="flex flex-col items-center md:items-start pt-2 flex-grow">
     <span className="text-[16px] font-black uppercase tracking-[0.04em] text-primary-green leading-none mb-1">
@@ -125,126 +127,6 @@ export const PersonalInfoSkeleton = () => (
 );
 
 /**
- * PL: Typ stanu relacji znajomości między użytkownikami.
- * EN: Type for friendship status between users.
- */
-type FriendStatus = 'loading' | 'none' | 'request-sent' | 'request-received' | 'friends';
-
-/**
- * PL: Przycisk zarządzania relacją znajomości (dodaj/usuń znajomego, anuluj/akceptuj zaproszenie).
- * EN: Friendship management button (add/remove friend, cancel/accept request).
- */
-export const FriendRequestButton = ({
-  userId,
-  isOwnProfile,
-  isLoggedIn,
-}: {
-  userId: number;
-  isOwnProfile: boolean;
-  isLoggedIn: boolean;
-}) => {
-  const t = useTranslations('ProfilePage');
-  const tErrors = useTranslations('errors');
-  const { showToast } = useToast();
-  const [status, setStatus] = useState<FriendStatus>('loading');
-  const [isProcessing, setIsProcessing] = useState(false);
-
-  useEffect(() => {
-    if (isOwnProfile || !isLoggedIn) return;
-
-    const checkStatus = async () => {
-      try {
-        const [friendsRes, outgoingRes, incomingRes] = await Promise.all([
-          apiFetch('/api/friends/'),
-          apiFetch('/api/friend-requests/outgoing/'),
-          apiFetch('/api/friend-requests/'),
-        ]);
-
-        const friends = friendsRes.ok ? await friendsRes.json() : [];
-        const outgoing = outgoingRes.ok ? await outgoingRes.json() : [];
-        const incoming = incomingRes.ok ? await incomingRes.json() : [];
-
-        if (Array.isArray(friends) && friends.some((u: any) => u.id === userId)) {
-          setStatus('friends');
-        } else if (Array.isArray(outgoing) && outgoing.some((u: any) => u.id === userId)) {
-          setStatus('request-sent');
-        } else if (Array.isArray(incoming) && incoming.some((u: any) => u.id === userId)) {
-          setStatus('request-received');
-        } else {
-          setStatus('none');
-        }
-      } catch {
-        setStatus('none');
-      }
-    };
-
-    checkStatus();
-  }, [userId, isOwnProfile, isLoggedIn]);
-
-  if (isOwnProfile || !isLoggedIn || status === 'loading') return null;
-
-  const handleAction = async () => {
-    setIsProcessing(true);
-    try {
-      switch (status) {
-        case 'none': {
-          const res = await apiFetch(`/users/${userId}/send-request/`, { method: 'POST' });
-          if (res.ok) { setStatus('request-sent'); showToast(t('actions.addFriend'), 'success'); }
-          break;
-        }
-        case 'request-sent': {
-          const res = await apiFetch(`/users/${userId}/cancel-request/`, { method: 'POST' });
-          if (res.ok) { setStatus('none'); showToast(t('actions.cancelRequest'), 'info'); }
-          break;
-        }
-        case 'request-received': {
-          const res = await apiFetch(`/users/${userId}/accept/`, { method: 'POST' });
-          if (res.ok) { setStatus('friends'); showToast(t('actions.acceptRequest'), 'success'); }
-          break;
-        }
-        case 'friends': {
-          const res = await apiFetch(`/users/${userId}/unfriend/`, { method: 'POST' });
-          if (res.ok) { setStatus('none'); showToast(t('actions.removeFriend'), 'info'); }
-          break;
-        }
-      }
-    } catch {
-      showToast(tErrors('genericError'), 'error');
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-
-  const getButtonConfig = (): { label: string; style: string } => {
-    switch (status) {
-      case 'none':
-        return { label: t('actions.addFriend'), style: 'bg-primary-green text-white hover:opacity-90' };
-      case 'request-sent':
-        return { label: t('actions.cancelRequest'), style: 'bg-yellow-600 text-white hover:bg-yellow-700' };
-      case 'request-received':
-        return { label: t('actions.acceptRequest'), style: 'bg-primary-green text-white hover:opacity-90' };
-      case 'friends':
-        return { label: t('actions.removeFriend'), style: 'bg-red-700/80 text-white hover:bg-red-800' };
-      default:
-        return { label: '', style: '' };
-    }
-  };
-
-  const config = getButtonConfig();
-
-  return (
-    <button
-      onClick={handleAction}
-      disabled={isProcessing}
-      className={`px-5 py-2.5 rounded-lg font-bold text-sm uppercase tracking-wider transition-all disabled:opacity-50 shadow-sm w-fit ${config.style}`}
-      aria-label={config.label}
-    >
-      {isProcessing ? t('aria.loadingAction') : config.label}
-    </button>
-  );
-};
-
-/**
  * PL: Główny kontener danych profilowych (Avatar, Nazwa, Statystyki, Akcje).
  * EN: Main profile data container (Avatar, Name, Stats, Actions).
  */
@@ -252,12 +134,10 @@ export const PersonalInfoContent = ({
   user,
   t,
   isOwnProfile,
-  currentLoggedUser,
 }: {
   user: NonNullable<UserProfileProps['user']>;
-  t: TranslateFunction;
+  t: any;
   isOwnProfile: boolean;
-  currentLoggedUser: string | null;
 }) => {
   const dateJoined = user.date_joined
     ? new Date(user.date_joined).toISOString().split('T')[0]
@@ -277,11 +157,7 @@ export const PersonalInfoContent = ({
         </div>
         <UserJoinedInfo dateJoined={dateJoined} t={t} />
 
-        <FriendRequestButton
-          userId={user.id}
-          isOwnProfile={isOwnProfile}
-          isLoggedIn={!!currentLoggedUser}
-        />
+        {/* FolloButton removed */}
       </div>
     </div>
   );
@@ -295,18 +171,16 @@ export const PersonalInfo = ({
   user,
   t,
   isOwnProfile,
-  currentLoggedUser,
 }: {
   user: UserProfileProps['user'];
-  t: TranslateFunction;
+  t: any;
   isOwnProfile: boolean;
-  currentLoggedUser: string | null;
 }) => {
   if (!user) {
     return <PersonalInfoSkeleton />;
   }
 
-  return <PersonalInfoContent user={user} t={t} isOwnProfile={isOwnProfile} currentLoggedUser={currentLoggedUser} />;
+  return <PersonalInfoContent user={user} t={t} isOwnProfile={isOwnProfile} />;
 };
 /**
  * PL: Karta statystyki (np. liczba ogrodów, roślin) z obsługą stanu ładowania.
@@ -369,7 +243,7 @@ export const PaginationControls = ({
   currentPage: number;
   totalPages: number;
   onPageChange: (page: number) => void;
-  t: TranslateFunction;
+  t: any;
 }) => {
   const btnStyle =
     'inline-flex items-center justify-center rounded-md px-3 py-1.5 bg-primary-green text-white hover:opacity-85 disabled:opacity-50 transition transition-opacity duration-300';
@@ -420,14 +294,12 @@ export const PinsGallery = ({
   itemsPerPage,
   currentLoggedUser,
   onDeleted,
-  showCreator,
 }: {
   pins: any[];
   currentPage: number;
   itemsPerPage: number;
   currentLoggedUser?: string | null;
   onDeleted?: (pinId: number) => void;
-  showCreator?: boolean;
 }) => {
   const t = useTranslations('ProfilePage');
   const tGardens = useTranslations('GardensPage');
@@ -455,8 +327,7 @@ export const PinsGallery = ({
   const getImageUrl = (url: string | null) => {
     if (!url) return null;
     if (url.startsWith('http')) return url;
-    const base = (process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000').replace(/\/$/, '');
-    return `${base}${url}`;
+    return `${process.env.NEXT_PUBLIC_API_URL}${url}`;
   };
 
   return (
@@ -466,14 +337,6 @@ export const PinsGallery = ({
           key={pin.id}
           className="p-6 bg-secondary-beige border border-primary-green/10 rounded-xl shadow-lg flex flex-col min-h-[140px] w-full outline outline-2 outline-neutral-900 outline-offset-2"
         >
-          {showCreator && pin.creator && (
-            <Link
-              href={`/profiles/${pin.creator}`}
-              className="text-primary-green font-bold text-sm hover:underline mb-2 rounded-md w-fit focus-visible:outline focus-visible:outline-2 focus-visible:outline-header-main focus-visible:outline-offset-2"
-            >
-              @{pin.creator}
-            </Link>
-          )}
           {(pin.plant_image || pin.garden_image) && (
             <div className="relative w-full h-64 sm:h-96 mb-4 overflow-hidden rounded-lg">
               <img
@@ -548,7 +411,7 @@ export const EditProfileButton = ({
   t,
   username,
 }: {
-  t: TranslateFunction;
+  t: any;
   username?: string;
 }) => (
   <Link
@@ -673,7 +536,7 @@ export const ProfileFooter = ({
   setCurrentPage: (page: number) => void;
   pins: Array<{ id: number; title: string; image: string }>;
   itemsPerPage: number;
-  t: TranslateFunction;
+  t: any;
   username?: string;
   currentLoggedUser?: string | null;
   onDeletedPin?: (pinId: number) => void;
@@ -742,7 +605,7 @@ export const ProfileContent = ({
     <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pt-4 pb-12 flex flex-col justify-center h-full flex-grow">
       <div className="bg-container-light/10 backdrop-blur-md py-6 px-0 sm:p-10 rounded-xl shadow-2xl w-full mt-12">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <PersonalInfo user={user} t={t} isOwnProfile={isOwnProfile} currentLoggedUser={currentLoggedUser ?? null} />
+          <PersonalInfo user={user} t={t} isOwnProfile={isOwnProfile} />
           <StatsSection user={user} />
         </div>
 

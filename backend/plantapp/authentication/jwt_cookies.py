@@ -7,7 +7,7 @@ refresh_lifetime = settings.SIMPLE_JWT.get("REFRESH_TOKEN_LIFETIME", timedelta(d
 
 def set_refresh_cookie(response, refresh_token: str):
 
-    use_secure_cookie = not settings.DEBUG
+    use_secure_cookie = True
 
     response.set_cookie(
         REFRESH_COOKIE_NAME,
