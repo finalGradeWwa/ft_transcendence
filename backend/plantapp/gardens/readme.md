@@ -69,11 +69,14 @@ Returns all gardens (visible to all authenticated users).
 
 **Query Parameters**:
 - `owner` (optional): Filter by owner - use `me` for your own gardens or a user ID for specific user's gardens
+- `member` (optional): Filter by member - use `me` for gardens where you are a member (including as owner) or a username for gardens where both you and that user are members
 
 **Examples**:
 - `/api/garden/` - All gardens
-- `/api/garden/?owner=me` - Only your gardens
+- `/api/garden/?owner=me` - Only gardens you own
+- `/api/garden/?member=me` - Gardens where you are a member (including gardens you own)
 - `/api/garden/?owner=42` - Gardens owned by user 42
+- `/api/garden/?member=alice` - Gardens where both you and Alice are members
 
 **Response Fields**:
 - `garden_id`: Garden identifier
@@ -84,7 +87,7 @@ Returns all gardens (visible to all authenticated users).
 
 **Access**: Any authenticated user
 
-**Note**: By default, this returns **all gardens**. Use the `?owner=me` query parameter to see only your own gardens.
+**Note**: By default, this returns **all gardens**. Use `?owner=me` for gardens you own, or `?member=me` for all gardens where you can add/modify plants (i.e., where you are a member).
 
 ---
 
