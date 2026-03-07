@@ -1,4 +1,4 @@
-FROM alpine:latest
+FROM alpine:3.23
 
 # Install OpenSSL to generate certificates
 RUN apk add --no-cache openssl
