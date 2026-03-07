@@ -311,16 +311,16 @@
       "selectItem": "Wähle eine Pflanze oder einen Garten aus",
       "addDescription": "Notizinhalt hinzufügen",
       "tooLong": "Maximal 150 Zeichen"
-    },
-    "NotificationsModal": {
+    }
+  },
+  "NotificationsModal": {
       "title": "Freundschaftsanfragen",
       "close": "Benachrichtigungen schließen",
       "loading": "Anfragen werden geladen...",
       "noRequests": "Keine ausstehenden Freundschaftsanfragen",
       "accept": "Freundschaftsanfrage annehmen",
       "reject": "Freundschaftsanfrage ablehnen"
-    }
-  },
+    },
   "PlantCard": {
     "deleteConfirm": "Sind Sie sicher, dass Sie diese Pflanze löschen möchten?"
   }

@@ -32,6 +32,12 @@ type ConversationResponse = {
   messages: Message[];
 };
 
+type StatusUpdatePayload = {
+  type: 'status_update';
+  user_id: number;
+  is_online: boolean;
+};
+
 export default function ChatPage() {
   const t = useTranslations('ChatPage');
   const locale = useLocale();
@@ -99,17 +105,12 @@ export default function ChatPage() {
         if (!followingRes.ok) {
           throw new Error(`FRIENDS_FETCH_FAILED:${followingRes.status}`);
         }
-
-        // API returns users of the current user's friendships.  the backend
-        // already includes an "is_online" boolean in the payload; map that
-        // field into our local camelCase `isOnline` property so the component
-        // can render presence controls.
         const following = (await followingRes.json()) as Array<
           User & { is_online?: boolean }
         >;
 
-      const mapped = following.map(f => ({ ...f, isOnline: f.is_online ?? false }));
-      setFriends(mapped);
+        const mapped = following.map(f => ({ ...f, isOnline: f.is_online ?? false }));
+        setFriends(mapped);
 
         if (following.length > 0) {
           setSelectedFriend(prev => {
@@ -200,17 +201,22 @@ export default function ChatPage() {
             }
 
             if (payload.type === 'status_update') {
-              const { user_id, is_online } = payload as any;
-              setFriends(prev =>
-                prev.map(f =>
-                  f.id === user_id ? { ...f, isOnline: is_online } : f
-                )
-              );
+              const statusPayload = payload as StatusUpdatePayload;
+              const user_id = typeof statusPayload.user_id === 'number' ? statusPayload.user_id : null;
+              const is_online = Boolean(statusPayload.is_online);
 
-              if (selectedFriendRef.current?.id === user_id) {
-                setSelectedFriend(prev =>
-                  prev ? { ...prev, isOnline: is_online } : prev
+              if (user_id !== null) {
+                setFriends(prev =>
+                  prev.map(f =>
+                    f.id === user_id ? { ...f, isOnline: is_online } : f
+                  )
                 );
+
+                if (selectedFriendRef.current?.id === user_id) {
+                  setSelectedFriend(prev =>
+                    prev ? { ...prev, isOnline: is_online } : prev
+                  );
+                }
               }
               return;
             }

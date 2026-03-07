@@ -305,16 +305,16 @@
       "selectItem": "Wybierz roślinę lub ogród",
       "addDescription": "Dodaj treść notatki",
       "tooLong": "Maksymalnie 150 znaków"
-    },
-    "NotificationsModal": {
+    }
+  },
+  "NotificationsModal": {
       "title": "Zaproszenia do Znajomych",
       "close": "Zamknij powiadomienia",
       "loading": "Ładowanie zaproszeń...",
       "noRequests": "Brak oczekujących zaproszeń",
       "accept": "Zaakceptuj zaproszenie",
       "reject": "Odrzuć zaproszenie"
-    }
-  },
+    },
   "PlantCard": {
     "deleteConfirm": "Czy na pewno chcesz usunąć tę roślinę?"
   }

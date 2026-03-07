@@ -305,16 +305,16 @@
       "selectItem": "اختر نبتة أو حديقة",
       "addDescription": "أضف محتوى الملاحظة",
       "tooLong": "الحد الأقصى 150 حرفاً"
-    },
-    "NotificationsModal": {
+    }
+  },
+  "NotificationsModal": {
       "title": "طلبات الصداقة",
       "close": "إغلاق الإشعارات",
       "loading": "جارٍ تحميل الطلبات...",
       "noRequests": "لا توجد طلبات صداقة معلقة",
       "accept": "قبول طلب الصداقة",
       "reject": "رفض طلب الصداقة"
-    }
-  },
+    },
   "PlantCard": {
     "deleteConfirm": "هل أنت متأكد أنك تريد حذف هذه النبتة؟"
   }
