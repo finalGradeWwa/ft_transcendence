@@ -71,7 +71,7 @@ class ListFriendsAPIView(APIView):
     def get(self, request, user_id):
         user = get_object_or_404(User, pk=user_id)
         friends = user.get_friends()
-        
+
         serializer = PublicUserSerializer(friends, many=True)
         return Response(serializer.data)
 
@@ -83,13 +83,13 @@ class IsFriendAPIView(APIView):
     def get(self, request, user_id):
         user = get_object_or_404(User, pk=user_id)
         target_id = request.query_params.get("target_id")
-        
+
         if not target_id:
             return Response(
                 {"detail": "target_id query parameter required"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-       
+
         try:
             target_id_int = int(target_id)
         except (TypeError, ValueError):
@@ -97,10 +97,10 @@ class IsFriendAPIView(APIView):
                 {"detail": "target_id must be an integer"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        
+
         target = get_object_or_404(User, pk=target_id_int)
         is_friend = user.is_friend_with(target)
-        
+
         return Response({"is_friend": is_friend})
 
 

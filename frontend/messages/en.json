@@ -91,6 +91,14 @@
       "follow": "Follow",
       "unfollow": "Unfollow"
     },
+    "buttons": {
+      "addFriend": "Add Friend",
+      "pending": "Pending",
+      "accept": "Accept Request",
+      "deleteFriend": "Delete Friend",
+      "confirmUnfriend": "Are you sure you want to delete this friend?",
+      "errorSending": "Failed to send request"
+    },
     "settings": {
       "title": "Settings",
       "edit": {

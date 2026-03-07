@@ -91,6 +91,14 @@
       "follow": "متابعة",
       "unfollow": "إلغاء المتابعة"
     },
+    "buttons": {
+      "addFriend": "إضافة صديق",
+      "pending": "قيد الانتظار",
+      "accept": "قبول الطلب",
+      "deleteFriend": "حذف الصديق",
+      "confirmUnfriend": "هل أنت متأكد أنك تريد حذف هذا الصديق؟",
+      "errorSending": "فشل في إرسال الطلب"
+    },
     "settings": {
       "title": "الإعدادات",
       "edit": {

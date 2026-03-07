@@ -10,6 +10,7 @@ import { Link } from '@/i18n/navigation';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { apiFetch } from '@/lib/auth';
+import { useState, useEffect } from 'react';
 
 /**
  * PL: Interfejs definiujący dane profilu użytkownika przekazywane do komponentów.
@@ -113,6 +114,182 @@ export const UserJoinedInfo = ({
 );
 
 /**
+ * PL: Przycisk do wysłania prośby o dodanie do znajomych.
+ * EN: Button to send a friend request.
+ */
+export const AddFriendButton = ({
+  userId,
+  isOwnProfile,
+  currentLoggedUser,
+  t,
+}: {
+  userId: number;
+  isOwnProfile: boolean;
+  currentLoggedUser?: string | null;
+  t: any;
+}) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [status, setStatus] = useState<'checking' | 'add' | 'pending' | 'accept' | 'friends'>('checking');
+
+  // Check if request already sent or incoming or friends
+  useEffect(() => {
+    if (isOwnProfile || !currentLoggedUser) {
+      setStatus('checking');
+      return;
+    }
+
+    const checkStatus = async () => {
+      try {
+        // Check if already friends
+        const friendsRes = await apiFetch('/api/friends/');
+        if (friendsRes.ok) {
+          const friends = await friendsRes.json();
+          if (Array.isArray(friends) && friends.some(u => u.id === userId)) {
+            setStatus('friends');
+            return;
+          }
+        }
+
+        // Check outgoing requests
+        const outgoingRes = await apiFetch('/api/friend-requests/outgoing/');
+        if (outgoingRes.ok) {
+          const outgoing = await outgoingRes.json();
+          if (Array.isArray(outgoing) && outgoing.some(u => u.id === userId)) {
+            setStatus('pending');
+            return;
+          }
+        }
+
+        // Check incoming requests
+        const incomingRes = await apiFetch('/api/friend-requests/');
+        if (incomingRes.ok) {
+          const incoming = await incomingRes.json();
+          if (Array.isArray(incoming) && incoming.some(u => u.id === userId)) {
+            setStatus('accept');
+            return;
+          }
+        }
+
+        setStatus('add');
+      } catch (error) {
+        console.error('[AddFriendButton] Error checking status:', error);
+        setStatus('add');
+      }
+    };
+
+    checkStatus();
+  }, [userId, isOwnProfile, currentLoggedUser]);
+
+  if (isOwnProfile || status === 'checking') {
+    return null;
+  }
+
+  const handleAddFriend = async () => {
+    setIsLoading(true);
+    try {
+      const endpoint = status === 'pending'
+        ? `/users/${userId}/cancel-request/`
+        : `/users/${userId}/send-request/`;
+
+      const response = await apiFetch(endpoint, {
+        method: 'POST',
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('[AddFriendButton] API Error:', {
+          status: response.status,
+          statusText: response.statusText,
+          data: errorData,
+        });
+        throw new Error(errorData.detail || 'Failed to update request');
+      }
+
+      // Update status after successful request
+      if (status === 'pending') {
+        setStatus('add');
+      } else if (status === 'add') {
+        setStatus('pending');
+      }
+    } catch (error) {
+      console.error('[AddFriendButton] Error:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to update request';
+      alert(errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleUnfriend = async () => {
+    if (!confirm(t('buttons.confirmUnfriend') || 'Are you sure you want to delete this friend?')) {
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const response = await apiFetch(`/users/${userId}/unfriend/`, {
+        method: 'POST',
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('[DeleteFriendButton] API Error:', {
+          status: response.status,
+          statusText: response.statusText,
+          data: errorData,
+        });
+        throw new Error(errorData.detail || 'Failed to delete friend');
+      }
+
+      setStatus('add');
+    } catch (error) {
+      console.error('[DeleteFriendButton] Error:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to delete friend';
+      alert(errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const buttonText = {
+    pending: t('buttons.pending') || 'Pending',
+    add: t('buttons.addFriend') || 'Add Friend',
+    accept: t('buttons.accept') || 'Accept Request',
+    friends: t('buttons.deleteFriend') || 'Delete Friend',
+  }[status];
+
+  if (status === 'friends') {
+    return (
+      <button
+        onClick={handleUnfriend}
+        disabled={isLoading}
+        className="px-6 py-2 rounded-lg font-bold text-sm uppercase tracking-wide transition-colors duration-200 bg-red-500 text-white hover:bg-red-600 disabled:opacity-50"
+        aria-label={buttonText}
+      >
+        {isLoading ? '...' : buttonText}
+      </button>
+    );
+  }
+
+  return (
+    <button
+      onClick={handleAddFriend}
+      disabled={isLoading || status === 'accept'}
+      className={`px-6 py-2 rounded-lg font-bold text-sm uppercase tracking-wide transition-colors duration-200 ${
+        status === 'pending'
+          ? 'bg-amber-500 text-white hover:bg-amber-600'
+          : status === 'accept'
+          ? 'bg-primary-green text-white cursor-not-allowed opacity-70'
+          : 'bg-primary-green text-white hover:bg-primary-green/90'
+      }`}
+      aria-label={buttonText}
+    >
+      {isLoading ? '...' : buttonText}
+    </button>
+  );
+};
+
+/**
  * PL: Szkielet ładowania (Skeleton) dla sekcji informacji osobistych.
  * EN: Loading skeleton for the personal information section.
  */
@@ -134,10 +311,12 @@ export const PersonalInfoContent = ({
   user,
   t,
   isOwnProfile,
+  currentLoggedUser,
 }: {
   user: NonNullable<UserProfileProps['user']>;
   t: any;
   isOwnProfile: boolean;
+  currentLoggedUser?: string | null;
 }) => {
   const dateJoined = user.date_joined
     ? new Date(user.date_joined).toISOString().split('T')[0]
@@ -157,7 +336,17 @@ export const PersonalInfoContent = ({
         </div>
         <UserJoinedInfo dateJoined={dateJoined} t={t} />
 
-        {/* FolloButton removed */}
+        {/* Add Friend Button */}
+        {!isOwnProfile && (
+          <div className="pt-4">
+            <AddFriendButton
+              userId={user.id}
+              isOwnProfile={isOwnProfile}
+              currentLoggedUser={currentLoggedUser}
+              t={t}
+            />
+          </div>
+        )}
       </div>
     </div>
   );
@@ -171,16 +360,25 @@ export const PersonalInfo = ({
   user,
   t,
   isOwnProfile,
+  currentLoggedUser,
 }: {
   user: UserProfileProps['user'];
   t: any;
   isOwnProfile: boolean;
+  currentLoggedUser?: string | null;
 }) => {
   if (!user) {
     return <PersonalInfoSkeleton />;
   }
 
-  return <PersonalInfoContent user={user} t={t} isOwnProfile={isOwnProfile} />;
+  return (
+    <PersonalInfoContent
+      user={user}
+      t={t}
+      isOwnProfile={isOwnProfile}
+      currentLoggedUser={currentLoggedUser}
+    />
+  );
 };
 /**
  * PL: Karta statystyki (np. liczba ogrodów, roślin) z obsługą stanu ładowania.
@@ -605,7 +803,12 @@ export const ProfileContent = ({
     <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pt-4 pb-12 flex flex-col justify-center h-full flex-grow">
       <div className="bg-container-light/10 backdrop-blur-md py-6 px-0 sm:p-10 rounded-xl shadow-2xl w-full mt-12">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <PersonalInfo user={user} t={t} isOwnProfile={isOwnProfile} />
+          <PersonalInfo
+            user={user}
+            t={t}
+            isOwnProfile={isOwnProfile}
+            currentLoggedUser={currentLoggedUser}
+          />
           <StatsSection user={user} />
         </div>
 

@@ -91,6 +91,14 @@
       "follow": "Obserwuj",
       "unfollow": "Przestań obserwować"
     },
+    "buttons": {
+      "addFriend": "Dodaj do znajomych",
+      "pending": "Oczekujące",
+      "accept": "Zaakceptuj zaproszenie",
+      "deleteFriend": "Usuń ze znajomych",
+      "confirmUnfriend": "Czy na pewno chcesz usunąć tego znajomego?",
+      "errorSending": "Nie udało się wysłać zaproszenia"
+    },
     "settings": {
       "title": "Ustawienia",
       "edit": {

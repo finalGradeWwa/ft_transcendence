@@ -97,6 +97,14 @@
       "follow": "Folgen",
       "unfollow": "Nicht mehr folgen"
     },
+    "buttons": {
+      "addFriend": "Freund hinzufügen",
+      "pending": "Ausstehend",
+      "accept": "Anfrage akzeptieren",
+      "deleteFriend": "Freund löschen",
+      "confirmUnfriend": "Sind Sie sicher, dass Sie diesen Freund löschen möchten?",
+      "errorSending": "Anfrage konnte nicht gesendet werden"
+    },
     "settings": {
       "title": "Einstellungen",
       "edit": {

@@ -39,9 +39,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
         )
 
         await self.accept()
-        
+
         # Update user's online status and broadcast to friends
         await self.set_user_online(True)
+        await self.broadcast_status_to_friends()
 
     async def disconnect(self, close_code):
         """
@@ -331,16 +332,44 @@ class ChatConsumer(AsyncWebsocketConsumer):
         except Exception:
             return []
 
+    @database_sync_to_async
+    def get_all_connected_users(self):
+        """
+        Get all users connected to this user:
+        - Mutual friends
+        - Users who sent friend requests to this user
+        - Users this user sent friend requests to
+        """
+        try:
+            user_ids = set()
+
+            # Mutual friends
+            mutual_friends = self.user.get_friends().values_list('id', flat=True)
+            user_ids.update(mutual_friends)
+
+            # Users who follow this user (sent requests)
+            followers = self.user.followers.all().values_list('id', flat=True)
+            user_ids.update(followers)
+
+            # Users this user follows (sent requests to)
+            following = self.user.following.all().values_list('id', flat=True)
+            user_ids.update(following)
+
+            return list(user_ids)
+        except Exception:
+            return []
+
     async def broadcast_status_to_friends(self, is_online):
         """
-        Broadcast status update to all friends of the current user.
+        Broadcast status update to all connected users (friends + pending requests).
         """
-        friend_ids = await self.get_user_friends()
+        user_ids = await self.get_all_connected_users()
 
-        for friend_id in friend_ids:
-            friend_room_group = f"chat_user_{friend_id}"
+        for user_id in user_ids:
+            # Use same format as connect(): room_group_name = f"chat_user_{user_id}"
+            user_room_group = f"chat_user_{user_id}"
             await self.channel_layer.group_send(
-                friend_room_group,
+                user_room_group,
                 {
                     "type": "status_update_handler",
                     "user_id": self.user.id,

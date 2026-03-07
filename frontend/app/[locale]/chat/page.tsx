@@ -112,12 +112,12 @@ export default function ChatPage() {
         const mapped = following.map(f => ({ ...f, isOnline: f.is_online ?? false }));
         setFriends(mapped);
 
-        if (following.length > 0) {
+        if (mapped.length > 0) {
           setSelectedFriend(prev => {
-            if (prev && following.some(friend => friend.id === prev.id)) {
-              return prev;
+            if (prev && mapped.some(friend => friend.id === prev.id)) {
+              return mapped.find(friend => friend.id === prev.id) || mapped[0];
             }
-            return following[0];
+            return mapped[0];
           });
         } else {
           setSelectedFriend(null);
@@ -206,17 +206,21 @@ export default function ChatPage() {
               const is_online = Boolean(statusPayload.is_online);
 
               if (user_id !== null) {
-                setFriends(prev =>
-                  prev.map(f =>
+                setFriends(prev => {
+                  const updated = prev.map(f =>
                     f.id === user_id ? { ...f, isOnline: is_online } : f
-                  )
-                );
-
-                if (selectedFriendRef.current?.id === user_id) {
-                  setSelectedFriend(prev =>
-                    prev ? { ...prev, isOnline: is_online } : prev
                   );
-                }
+
+                  // If this is the selected friend, update it too
+                  if (selectedFriendRef.current?.id === user_id) {
+                    const updatedFriend = updated.find(f => f.id === user_id);
+                    if (updatedFriend) {
+                      setSelectedFriend(updatedFriend);
+                    }
+                  }
+
+                  return updated;
+                });
               }
               return;
             }

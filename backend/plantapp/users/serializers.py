@@ -99,7 +99,12 @@ class UserUpdateSerializer(serializers.ModelSerializer):
         return instance
 
 class PublicUserSerializer(serializers.ModelSerializer):
+    is_online = serializers.SerializerMethodField()
+    
     class Meta:
         model = User
         fields = ("id", "username", "first_name", "last_name", "avatar_photo", "is_online")
+    
+    def get_is_online(self, obj):
+        return bool(obj.is_online)
 

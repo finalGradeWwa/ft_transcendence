@@ -55,10 +55,6 @@ class RegisterView(APIView):
 		serializer = UserRegistrationSerializer(data=request.data)
 		serializer.is_valid(raise_exception=True)
 		user = serializer.save()
-		# Set newly registered user as online
-		user.is_online = True
-		user.save(update_fields=['is_online'])
-
 		refresh = RefreshToken.for_user(user)
 
 		response = Response({
@@ -126,10 +122,6 @@ class LoginView(APIView):
 		serializer.is_valid(raise_exception=True)
 
 		user = serializer.validated_data["user"]
-		# Set user as online
-		user.is_online = True
-		user.save(update_fields=['is_online'])
-		
 		refresh = RefreshToken.for_user(user)
 
 		response = Response({
