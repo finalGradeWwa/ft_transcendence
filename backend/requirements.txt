@@ -6,7 +6,7 @@ djangorestframework-simplejwt
 django-cors-headers
 channels~=4.3.2
 channels-redis
-daphne~=4.2.1
+daphne[tls]~=4.2.1
 django-organizations~=2.5.0
 social-auth-app-django~=5.4.3
 django_filter~=25.2

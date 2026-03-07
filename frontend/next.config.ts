@@ -18,9 +18,9 @@ const nextConfig: NextConfig = {
     imageSizes: [96, 256, 384],
     remotePatterns: [
       {
-        protocol: 'http',
+        protocol: 'https',
         hostname: 'localhost',
-        port: '8000',
+        port: '8443',
         pathname: '/media/**',
       },
     ],

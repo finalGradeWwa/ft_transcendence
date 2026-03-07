@@ -1,9 +1,10 @@
 name: Backend CI
 
 on:
-  pull_request:
-  push:
-    branches: [main]
+  workflow_dispatch:  # Manual trigger only
+  # pull_request:
+  # push:
+  #   branches: [main]
 
 jobs:
   lint:
@@ -45,3 +46,4 @@ jobs:
           ALLOWED_HOSTS: 'localhost'
           GITHUB_OAUTH_KEY: ${{ secrets.OAUTH_KEY }}
           GITHUB_OAUTH_SECRET: ${{ secrets.OAUTH_SECRET }}
+          SECURE_SSL_REDIRECT: 'false'
