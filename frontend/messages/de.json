@@ -187,7 +187,9 @@
     "socketConnectionError": "Die Echtzeit-Chatverbindung ist fehlgeschlagen.",
     "messageSendError": "Nachricht konnte nicht gesendet werden.",
     "typeMessage": "Nachricht eingeben...",
-    "send": "Senden"
+    "send": "Senden",
+    "online": "Online",
+    "offline": "Offline"
   },
   "AboutUs": {
     "title": "Über uns",
