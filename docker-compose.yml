@@ -41,7 +41,7 @@ services:
 
     volumes:
       - ./backend:/app
-      - backend_db:/app/plantapp
+      - backend_db:/app/plantapp/db_data
       - ./certs:/certs:ro
 
     restart: unless-stopped
@@ -64,7 +64,7 @@ services:
 
     volumes:
       - ./backend:/app
-      - backend_db:/app/plantapp
+      - backend_db:/app/plantapp/db_data
     env_file:
       - ./backend/.env
     command: python manage.py migrate
