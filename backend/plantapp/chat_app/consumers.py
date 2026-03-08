@@ -23,39 +23,48 @@ class ChatConsumer(AsyncWebsocketConsumer):
         """
         Called when the WebSocket is handshaking as part of initial connection.
         """
-        self.user = self.scope["user"]
-
-        # Reject connection if user is not authenticated
-        if not self.user.is_authenticated:
-            logger.warning("WebSocket connection rejected: user not authenticated")
-            await self.close()
-            return
-
-        # Create a personal room for this user
-        self.room_name = f"user_{self.user.id}"
-        self.room_group_name = f"chat_{self.room_name}"
-
-        # Join room group
-        await self.channel_layer.group_add(
-            self.room_group_name,
-            self.channel_name
-        )
-
-        await self.accept()
-        logger.info(f"WebSocket connected: user_id={self.user.id}, username={self.user.username}")
-
-        # Increment connection count and set online status if first connection
         try:
-            connection_count = await self.increment_user_connections(self.user.id)
-            logger.info(f"User {self.user.username} connection count: {connection_count}")
-            if connection_count == 1:
-                # First connection - set user online
-                logger.info(f"Setting user {self.user.username} online (first connection)")
-                await self.set_user_online(True)
-            else:
-                logger.info(f"User {self.user.username} already has active connections, not updating status")
+            self.user = self.scope["user"]
+            
+            logger.info(f"WebSocket connect attempt: user={getattr(self.user, 'username', 'Anonymous')}, authenticated={self.user.is_authenticated}")
+
+            # Reject connection if user is not authenticated
+            if not self.user.is_authenticated:
+                logger.warning("WebSocket connection rejected: user not authenticated")
+                await self.close()
+                return
+
+            # Create a personal room for this user
+            self.room_name = f"user_{self.user.id}"
+            self.room_group_name = f"chat_{self.room_name}"
+            logger.info(f"User {self.user.username} joining group: {self.room_group_name}")
+
+            # Join room group
+            await self.channel_layer.group_add(
+                self.room_group_name,
+                self.channel_name
+            )
+            logger.info(f"User {self.user.username} added to group successfully")
+
+            await self.accept()
+            logger.info(f"WebSocket accepted for {self.user.username}")
+            logger.info(f"WebSocket connected: user_id={self.user.id}, username={self.user.username}, room_group={self.room_group_name}")
+
+            # Increment connection count and set online status if first connection
+            try:
+                connection_count = await self.increment_user_connections(self.user.id)
+                logger.info(f"User {self.user.username} connection count: {connection_count}")
+                if connection_count == 1:
+                    # First connection - set user online
+                    logger.info(f"Setting user {self.user.username} online (first connection)")
+                    await self.set_user_online(True)
+                else:
+                    logger.info(f"User {self.user.username} already has active connections, not updating status")
+            except Exception as e:
+                logger.error(f"Error handling connection for user {self.user.username}: {e}", exc_info=True)
         except Exception as e:
-            logger.error(f"Error handling connection for user {self.user.username}: {e}", exc_info=True)
+            logger.error(f"Fatal error in WebSocket connect: {e}", exc_info=True)
+            await self.close()
 
     async def disconnect(self, close_code):
         """
@@ -248,6 +257,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         """
         Called when a friend's online status changes.
         """
+        logger.info(f"Sending status update to client: user_id={event['user_id']}, is_online={event['is_online']}")
         await self.send(text_data=json.dumps({
             "type": "status_update",
             "user_id": event["user_id"],
@@ -335,6 +345,17 @@ class ChatConsumer(AsyncWebsocketConsumer):
         except Exception as e:
             logger.error(f"Failed to update user status for {self.user.username}: {e}", exc_info=True)
 
+    @database_sync_to_async
+    def get_user_online_status(self, user_id):
+        """
+        Get user's online status from database.
+        """
+        try:
+            user = User.objects.get(id=user_id)
+            return user.is_online
+        except User.DoesNotExist:
+            return False
+
     async def set_user_online(self, is_online):
         """
         Set user online status and broadcast to all friends.
@@ -342,7 +363,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
         # Update database
         await self.update_user_status(is_online)
         # Broadcast status change to all friends
-        await self.broadcast_status_to_friends(is_online)
+        try:
+            await self.broadcast_status_to_friends(is_online)
+        except Exception as e:
+            logger.error(f"Failed to broadcast status for {self.user.username}: {e}", exc_info=True)
 
     @database_sync_to_async
     def get_user_friends(self):
@@ -386,7 +410,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
         Broadcast status update to all connected users (friends + pending requests).
         """
         user_ids = await self.get_all_connected_users()
-
+        
+        logger.info(f"Broadcasting {self.user.username} status ({'online' if is_online else 'offline'}) to {len(user_ids)} connected users")
+        
         for user_id in user_ids:
             # Use same format as connect(): room_group_name = f"chat_user_{user_id}"
             user_room_group = f"chat_user_{user_id}"
@@ -398,6 +424,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     "is_online": is_online
                 }
             )
+            logger.debug(f"Sent status update to user {user_id} in group {user_room_group}")
 
     def get_redis_client(self):
         """
@@ -429,9 +456,31 @@ class ChatConsumer(AsyncWebsocketConsumer):
         redis_client = self.get_redis_client()
         try:
             key = f"user_connections:{user_id}"
+            
+            # Check if key exists and validate its value
+            existing = await redis_client.get(key)
+            if existing is not None:
+                try:
+                    existing_count = int(existing)
+                    
+                    # Get user's actual database online status
+                    db_is_online = await self.get_user_online_status(user_id)
+                    
+                    # If user is offline in DB but has Redis connections, reset
+                    if not db_is_online and existing_count > 0:
+                        logger.warning(f"User {user_id} is offline in DB but has {existing_count} Redis connections, resetting")
+                        await redis_client.set(key, 0)
+                    # If count is suspiciously high, reset it
+                    elif existing_count > 10:
+                        logger.warning(f"Resetting suspicious connection count for user {user_id}: {existing_count}")
+                        await redis_client.set(key, 0)
+                except (ValueError, TypeError):
+                    logger.warning(f"Invalid connection count for user {user_id}, resetting")
+                    await redis_client.set(key, 0)
+            
             count = await redis_client.incr(key)
-            # Set expiry to 24 hours as a safety measure
-            await redis_client.expire(key, 86400)
+            # Set expiry to 1 hour (shorter TTL to auto-cleanup stale data)
+            await redis_client.expire(key, 3600)
             return count
         finally:
             await redis_client.aclose()
@@ -448,6 +497,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
             if count < 0:
                 await redis_client.set(key, 0)
                 return 0
+            # Refresh expiry on decrement too
+            if count > 0:
+                await redis_client.expire(key, 3600)
+            else:
+                # Count reached 0, delete the key to free memory
+                await redis_client.delete(key)
             return count
         finally:
             await redis_client.aclose()
