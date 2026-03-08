@@ -35,13 +35,13 @@ class MessageModelTestCase(TestCase):
 
 	def test_message_creation(self):
 		from chat_app.models import Message
-		
+
 		message = Message.objects.create(
 			sender=self.sender,
 			recipient=self.recipient,
 			content='Hello, this is a test message'
 		)
-		
+
 		self.assertEqual(message.sender, self.sender)
 		self.assertEqual(message.recipient, self.recipient)
 		self.assertEqual(message.content, 'Hello, this is a test message')
@@ -49,19 +49,19 @@ class MessageModelTestCase(TestCase):
 
 	def test_message_str_representation(self):
 		from chat_app.models import Message
-		
+
 		message = Message.objects.create(
 			sender=self.sender,
 			recipient=self.recipient,
 			content='Test message'
 		)
-		
+
 		expected_str = f"Message from {self.sender.username} to {self.recipient.username}"
 		self.assertEqual(str(message), expected_str)
 
 	def test_message_timestamp(self):
 		from chat_app.models import Message
-		
+
 		before = timezone.now()
 		message = Message.objects.create(
 			sender=self.sender,
@@ -69,22 +69,22 @@ class MessageModelTestCase(TestCase):
 			content='Test'
 		)
 		after = timezone.now()
-		
+
 		self.assertTrue(before <= message.timestamp <= after)
 
 	def test_message_mark_as_read(self):
 		from chat_app.models import Message
-		
+
 		message = Message.objects.create(
 			sender=self.sender,
 			recipient=self.recipient,
 			content='Test message'
 		)
-		
+
 		self.assertFalse(message.is_read)
 		message.is_read = True
 		message.save()
-		
+
 		refreshed_message = Message.objects.get(id=message.id)
 		self.assertTrue(refreshed_message.is_read)
 
@@ -101,28 +101,28 @@ class UserProfileModelTestCase(TestCase):
 
 	def test_user_profile_creation(self):
 		from chat_app.models import UserProfile
-		
+
 		profile = UserProfile.objects.create(user=self.user)
-		
+
 		self.assertEqual(profile.user, self.user)
 		self.assertFalse(profile.is_online)
 
 	def test_user_profile_online_status(self):
 		from chat_app.models import UserProfile
-		
+
 		profile = UserProfile.objects.create(user=self.user)
 		self.assertFalse(profile.is_online)
-		
+
 		profile.is_online = True
 		profile.save()
-		
+
 		refreshed_profile = UserProfile.objects.get(user=self.user)
 		self.assertTrue(refreshed_profile.is_online)
 
 	def test_user_profile_str_representation(self):
 
 		from chat_app.models import UserProfile
-		
+
 		profile = UserProfile.objects.create(user=self.user)
 		expected_str = f"UserProfile of {self.user.username}"
 		self.assertEqual(str(profile), expected_str)
@@ -283,13 +283,13 @@ class ChatConsumerWebSocketTestCase(TransactionTestCase):
 			connected, _ = await communicator.connect()
 			self.assertTrue(connected)
 
-			profile = await database_sync_to_async(UserProfile.objects.get)(user=self.user1)
-			self.assertTrue(profile.is_online)
+			user1 = await database_sync_to_async(User.objects.get)(pk=self.user1.pk)
+			self.assertTrue(user1.is_online)
 
 			await communicator.disconnect()
 
-			profile = await database_sync_to_async(UserProfile.objects.get)(user=self.user1)
-			self.assertFalse(profile.is_online)
+			user1 = await database_sync_to_async(User.objects.get)(pk=self.user1.pk)
+			self.assertFalse(user1.is_online)
 
 		async_to_sync(scenario)()
 
@@ -356,7 +356,7 @@ class ChatConsumerWebSocketTestCase(TransactionTestCase):
 		async def scenario():
 			comm1 = WebsocketCommunicator(self.application, f"/ws/chat/?token={self._token(self.user1)}")
 			comm2 = WebsocketCommunicator(self.application, f"/ws/chat/?token={self._token(self.user2)}")
-			
+
 			connected1, _ = await comm1.connect()
 			connected2, _ = await comm2.connect()
 			self.assertTrue(connected1)

@@ -91,6 +91,17 @@
       "follow": "Obserwuj",
       "unfollow": "Przestań obserwować"
     },
+    "buttons": {
+      "addFriend": "Dodaj do znajomych",
+      "pending": "Oczekujące",
+      "accept": "Zaakceptuj zaproszenie",
+      "requestReceived": "Otrzymano zaproszenie",
+      "requestReceivedHint": "Sprawdź powiadomienia, aby zaakceptować lub odrzucić",
+      "deleteFriend": "Usuń ze znajomych",
+      "confirmUnfriend": "Czy na pewno chcesz usunąć tego znajomego?",
+      "errorSending": "Nie udało się wysłać zaproszenia",
+      "errorDeleting": "Nie udało się usunąć znajomego"
+    },
     "settings": {
       "title": "Ustawienia",
       "edit": {
@@ -181,7 +192,9 @@
     "socketConnectionError": "Nie udało się połączyć z czatem na żywo.",
     "messageSendError": "Nie udało się wysłać wiadomości.",
     "typeMessage": "Wpisz wiadomość...",
-    "send": "Wyślij"
+    "send": "Wyślij",
+    "online": "Online",
+    "offline": "Offline"
   },
   "AboutUs": {
     "title": "O nas",
@@ -303,16 +316,16 @@
       "selectItem": "Wybierz roślinę lub ogród",
       "addDescription": "Dodaj treść notatki",
       "tooLong": "Maksymalnie 150 znaków"
-    },
-    "NotificationsModal": {
+    }
+  },
+  "NotificationsModal": {
       "title": "Zaproszenia do Znajomych",
       "close": "Zamknij powiadomienia",
       "loading": "Ładowanie zaproszeń...",
       "noRequests": "Brak oczekujących zaproszeń",
       "accept": "Zaakceptuj zaproszenie",
       "reject": "Odrzuć zaproszenie"
-    }
-  },
+    },
   "PlantCard": {
     "deleteConfirm": "Czy na pewno chcesz usunąć tę roślinę?"
   }

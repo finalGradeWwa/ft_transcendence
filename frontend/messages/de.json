@@ -97,6 +97,17 @@
       "follow": "Folgen",
       "unfollow": "Nicht mehr folgen"
     },
+    "buttons": {
+      "addFriend": "Freund hinzufügen",
+      "pending": "Ausstehend",
+      "accept": "Anfrage akzeptieren",
+      "requestReceived": "Anfrage erhalten",
+      "requestReceivedHint": "Überprüfen Sie die Benachrichtigungen zum Akzeptieren oder Ablehnen",
+      "deleteFriend": "Freund löschen",
+      "confirmUnfriend": "Sind Sie sicher, dass Sie diesen Freund löschen möchten?",
+      "errorSending": "Anfrage konnte nicht gesendet werden",
+      "errorDeleting": "Freund konnte nicht gelöscht werden"
+    },
     "settings": {
       "title": "Einstellungen",
       "edit": {
@@ -187,7 +198,9 @@
     "socketConnectionError": "Die Echtzeit-Chatverbindung ist fehlgeschlagen.",
     "messageSendError": "Nachricht konnte nicht gesendet werden.",
     "typeMessage": "Nachricht eingeben...",
-    "send": "Senden"
+    "send": "Senden",
+    "online": "Online",
+    "offline": "Offline"
   },
   "AboutUs": {
     "title": "Über uns",
@@ -309,16 +322,16 @@
       "selectItem": "Wähle eine Pflanze oder einen Garten aus",
       "addDescription": "Notizinhalt hinzufügen",
       "tooLong": "Maximal 150 Zeichen"
-    },
-    "NotificationsModal": {
+    }
+  },
+  "NotificationsModal": {
       "title": "Freundschaftsanfragen",
       "close": "Benachrichtigungen schließen",
       "loading": "Anfragen werden geladen...",
       "noRequests": "Keine ausstehenden Freundschaftsanfragen",
       "accept": "Freundschaftsanfrage annehmen",
       "reject": "Freundschaftsanfrage ablehnen"
-    }
-  },
+    },
   "PlantCard": {
     "deleteConfirm": "Sind Sie sicher, dass Sie diese Pflanze löschen möchten?"
   }

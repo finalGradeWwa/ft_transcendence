@@ -231,6 +231,38 @@ export function HeaderControls() {
 
   // PL: Stan informujący o nowych wiadomościach EN: State indicating new messages
   const [hasNewMessages, setHasNewMessages] = useState(false);
+  // PL: Stan informujący o oczekujących zaproszeniach EN: State indicating pending friend requests
+  const [hasPendingRequests, setHasPendingRequests] = useState(false);
+
+  // PL: Sprawdzanie oczekujących zaproszeń co 30 sekund EN: Checking for pending friend requests every 30 seconds
+  useEffect(() => {
+    if (!username) return;
+
+    const checkRequests = async () => {
+      try {
+        const response = await apiFetch('/api/friend-requests/');
+        if (response.ok) {
+          const data = await response.json();
+          setHasPendingRequests(Array.isArray(data) && data.length > 0);
+        } else {
+          setHasPendingRequests(false);
+        }
+      } catch {
+        setHasPendingRequests(false);
+      }
+    };
+
+    checkRequests();
+    const interval = setInterval(checkRequests, 30000);
+    return () => clearInterval(interval);
+  }, [username]);
+
+  // PL: Czyści bąbelek gdy modal powiadomień zostanie otwarty EN: Clears the badge when the notifications modal is opened
+  useEffect(() => {
+    if (searchParams.get('showNotifications') === 'true') {
+      setHasPendingRequests(false);
+    }
+  }, [searchParams]);
 
   // PL: Sprawdzanie nieprzeczytanych wiadomości co 30 sekund EN: Checking for unread messages every 30 seconds
   useEffect(() => {
@@ -360,11 +392,19 @@ export function HeaderControls() {
          * EN: Notifications button - visible only for logged-in users.
          */}
         {username && (
-          <IconButton
-            href={{ pathname, query: { showNotifications: 'true' } }}
-            icon="bell"
-            label={tAria('notificationsButton')}
-          />
+          <div className="relative">
+            <IconButton
+              href={{ pathname, query: { showNotifications: 'true' } }}
+              icon="bell"
+              label={tAria('notificationsButton')}
+            />
+            {hasPendingRequests && (
+              <span
+                aria-hidden="true"
+                className="absolute top-0 right-0 block h-3 w-3 rounded-full bg-red-500 border-2 border-secondary-beige animate-pulse"
+              />
+            )}
+          </div>
         )}
 
         {/**

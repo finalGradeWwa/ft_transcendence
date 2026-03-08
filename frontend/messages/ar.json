@@ -91,6 +91,17 @@
       "follow": "متابعة",
       "unfollow": "إلغاء المتابعة"
     },
+    "buttons": {
+      "addFriend": "إضافة صديق",
+      "pending": "قيد الانتظار",
+      "accept": "قبول الطلب",
+      "requestReceived": "تم استلام الطلب",
+      "requestReceivedHint": "تحقق من الإشعارات لقبول أو رفض",
+      "deleteFriend": "حذف الصديق",
+      "confirmUnfriend": "هل أنت متأكد أنك تريد حذف هذا الصديق؟",
+      "errorSending": "فشل في إرسال الطلب",
+      "errorDeleting": "فشل في حذف الصديق"
+    },
     "settings": {
       "title": "الإعدادات",
       "edit": {
@@ -181,7 +192,9 @@
     "socketConnectionError": "فشل الاتصال بالدردشة الفورية.",
     "messageSendError": "تعذر إرسال الرسالة.",
     "typeMessage": "اكتب رسالة...",
-    "send": "إرسال"
+    "send": "إرسال",
+    "online": "متصل",
+    "offline": "غير متصل"
   },
   "AboutUs": {
     "title": "من نحن",
@@ -303,16 +316,16 @@
       "selectItem": "اختر نبتة أو حديقة",
       "addDescription": "أضف محتوى الملاحظة",
       "tooLong": "الحد الأقصى 150 حرفاً"
-    },
-    "NotificationsModal": {
+    }
+  },
+  "NotificationsModal": {
       "title": "طلبات الصداقة",
       "close": "إغلاق الإشعارات",
       "loading": "جارٍ تحميل الطلبات...",
       "noRequests": "لا توجد طلبات صداقة معلقة",
       "accept": "قبول طلب الصداقة",
       "reject": "رفض طلب الصداقة"
-    }
-  },
+    },
   "PlantCard": {
     "deleteConfirm": "هل أنت متأكد أنك تريد حذف هذه النبتة؟"
   }

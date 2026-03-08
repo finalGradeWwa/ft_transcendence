@@ -91,6 +91,17 @@
       "follow": "Follow",
       "unfollow": "Unfollow"
     },
+    "buttons": {
+      "addFriend": "Add Friend",
+      "pending": "Pending",
+      "accept": "Accept Request",
+      "requestReceived": "Request Received",
+      "requestReceivedHint": "Check notifications to accept or reject",
+      "deleteFriend": "Delete Friend",
+      "confirmUnfriend": "Are you sure you want to delete this friend?",
+      "errorSending": "Failed to send request",
+      "errorDeleting": "Failed to delete friend"
+    },
     "settings": {
       "title": "Settings",
       "edit": {
@@ -181,7 +192,9 @@
     "socketConnectionError": "Realtime chat connection failed.",
     "messageSendError": "Failed to send message.",
     "typeMessage": "Type a message...",
-    "send": "Send"
+    "send": "Send",
+    "online": "Online",
+    "offline": "Offline"
   },
   "AboutUs": {
     "title": "About Us",
@@ -303,16 +316,16 @@
       "selectItem": "Select a plant or garden",
       "addDescription": "Add note content",
       "tooLong": "Maximum 150 characters"
-    },
-    "NotificationsModal": {
+    }
+  },
+  "NotificationsModal": {
       "title": "Friend Requests",
       "close": "Close notifications",
       "loading": "Loading requests...",
       "noRequests": "No pending friend requests",
       "accept": "Accept friend request",
       "reject": "Reject friend request"
-    }
-  },
+    },
   "PlantCard": {
     "deleteConfirm": "Are you sure you want to delete this plant?"
   }
