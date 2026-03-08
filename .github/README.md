@@ -371,3 +371,25 @@ UserProfile (chat_app_userprofile)
 ___
 # resources (+ AI usage)
 - 📘 Canva Visualisation: [canva](https://www.canva.com/design/DAG97aUDBss/Z4gOAUNjw9QdsX-HSqcBqA/edit) (created by mwojtcza)
+
+## 🌱 Populate Database with Sample Data
+
+To quickly test the application with sample users, friendships, gardens, and plants:
+
+```bash
+./populate_database.sh
+```
+
+This creates:
+- **5 users** with friendships (alice_green, bob_gardener, charlie_plant, diana_bloom, eve_flower)
+- **5 gardens** (indoor, outdoor, greenhouse)
+- **12 plants** distributed across the gardens
+
+**Login credentials:** All users use password `password123`
+- alice@example.com
+- bob@example.com
+- charlie@example.com
+- diana@example.com
+- eve@example.com
+
+The script is idempotent—safe to run multiple times without creating duplicates.
