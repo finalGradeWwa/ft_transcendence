@@ -101,9 +101,12 @@
       "addFriend": "Freund hinzufügen",
       "pending": "Ausstehend",
       "accept": "Anfrage akzeptieren",
+      "requestReceived": "Anfrage erhalten",
+      "requestReceivedHint": "Überprüfen Sie die Benachrichtigungen zum Akzeptieren oder Ablehnen",
       "deleteFriend": "Freund löschen",
       "confirmUnfriend": "Sind Sie sicher, dass Sie diesen Freund löschen möchten?",
-      "errorSending": "Anfrage konnte nicht gesendet werden"
+      "errorSending": "Anfrage konnte nicht gesendet werden",
+      "errorDeleting": "Freund konnte nicht gelöscht werden"
     },
     "settings": {
       "title": "Einstellungen",

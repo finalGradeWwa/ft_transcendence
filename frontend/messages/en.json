@@ -95,9 +95,12 @@
       "addFriend": "Add Friend",
       "pending": "Pending",
       "accept": "Accept Request",
+      "requestReceived": "Request Received",
+      "requestReceivedHint": "Check notifications to accept or reject",
       "deleteFriend": "Delete Friend",
       "confirmUnfriend": "Are you sure you want to delete this friend?",
-      "errorSending": "Failed to send request"
+      "errorSending": "Failed to send request",
+      "errorDeleting": "Failed to delete friend"
     },
     "settings": {
       "title": "Settings",

@@ -1,5 +1,6 @@
 import json
 import logging
+import redis.asyncio as redis
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 from django.contrib.auth import get_user_model
@@ -40,9 +41,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         await self.accept()
 
-        # Update user's online status and broadcast to friends
-        await self.set_user_online(True)
-        await self.broadcast_status_to_friends()
+        # Increment connection count and set online status if first connection
+        connection_count = await self.increment_user_connections(self.user.id)
+        if connection_count == 1:
+            # First connection - set user online
+            await self.set_user_online(True)
 
     async def disconnect(self, close_code):
         """
@@ -57,7 +60,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         # Update user's online status if user exists and is authenticated
         if hasattr(self, 'user') and self.user and self.user.is_authenticated:
-            await self.set_user_online(False)
+            # Decrement connection count and set offline only if last connection
+            connection_count = await self.decrement_user_connections(self.user.id)
+            if connection_count == 0:
+                # Last connection closed - set user offline
+                await self.set_user_online(False)
 
     async def receive(self, text_data):
         """
@@ -376,3 +383,45 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     "is_online": is_online
                 }
             )
+
+    def get_redis_client(self):
+        """
+        Get Redis client from channel layer configuration.
+        """
+        hosts = self.channel_layer.hosts
+        if hosts:
+            host, port = hosts[0]
+            return redis.Redis(host=host, port=port, decode_responses=True)
+        # Fallback to default
+        return redis.Redis(decode_responses=True)
+
+    async def increment_user_connections(self, user_id):
+        """
+        Increment the connection count for a user.
+        Returns the new count.
+        """
+        redis_client = self.get_redis_client()
+        try:
+            key = f"user_connections:{user_id}"
+            count = await redis_client.incr(key)
+            # Set expiry to 24 hours as a safety measure
+            await redis_client.expire(key, 86400)
+            return count
+        finally:
+            await redis_client.aclose()
+
+    async def decrement_user_connections(self, user_id):
+        """
+        Decrement the connection count for a user.
+        Returns the new count (minimum 0).
+        """
+        redis_client = self.get_redis_client()
+        try:
+            key = f"user_connections:{user_id}"
+            count = await redis_client.decr(key)
+            if count < 0:
+                await redis_client.set(key, 0)
+                return 0
+            return count
+        finally:
+            await redis_client.aclose()

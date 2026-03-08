@@ -95,9 +95,12 @@
       "addFriend": "إضافة صديق",
       "pending": "قيد الانتظار",
       "accept": "قبول الطلب",
+      "requestReceived": "تم استلام الطلب",
+      "requestReceivedHint": "تحقق من الإشعارات لقبول أو رفض",
       "deleteFriend": "حذف الصديق",
       "confirmUnfriend": "هل أنت متأكد أنك تريد حذف هذا الصديق؟",
-      "errorSending": "فشل في إرسال الطلب"
+      "errorSending": "فشل في إرسال الطلب",
+      "errorDeleting": "فشل في حذف الصديق"
     },
     "settings": {
       "title": "الإعدادات",

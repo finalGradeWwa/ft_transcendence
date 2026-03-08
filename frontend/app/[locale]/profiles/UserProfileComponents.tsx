@@ -130,6 +130,7 @@ export const AddFriendButton = ({
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [status, setStatus] = useState<'checking' | 'add' | 'pending' | 'accept' | 'friends'>('checking');
+  const [error, setError] = useState<string | null>(null);
 
   // Check if request already sent or incoming or friends
   useEffect(() => {
@@ -186,6 +187,7 @@ export const AddFriendButton = ({
 
   const handleAddFriend = async () => {
     setIsLoading(true);
+    setError(null);
     try {
       const endpoint = status === 'pending'
         ? `/users/${userId}/cancel-request/`
@@ -213,8 +215,10 @@ export const AddFriendButton = ({
       }
     } catch (error) {
       console.error('[AddFriendButton] Error:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Failed to update request';
-      alert(errorMessage);
+      const errorMessage = error instanceof Error ? error.message : (t('buttons.errorSending') || 'Failed to update request');
+      setError(errorMessage);
+      // Auto-dismiss error after 5 seconds
+      setTimeout(() => setError(null), 5000);
     } finally {
       setIsLoading(false);
     }
@@ -226,6 +230,7 @@ export const AddFriendButton = ({
     }
 
     setIsLoading(true);
+    setError(null);
     try {
       const response = await apiFetch(`/users/${userId}/unfriend/`, {
         method: 'POST',
@@ -244,8 +249,10 @@ export const AddFriendButton = ({
       setStatus('add');
     } catch (error) {
       console.error('[DeleteFriendButton] Error:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Failed to delete friend';
-      alert(errorMessage);
+      const errorMessage = error instanceof Error ? error.message : (t('buttons.errorDeleting') || 'Failed to delete friend');
+      setError(errorMessage);
+      // Auto-dismiss error after 5 seconds
+      setTimeout(() => setError(null), 5000);
     } finally {
       setIsLoading(false);
     }
@@ -254,38 +261,69 @@ export const AddFriendButton = ({
   const buttonText = {
     pending: t('buttons.pending') || 'Pending',
     add: t('buttons.addFriend') || 'Add Friend',
-    accept: t('buttons.accept') || 'Accept Request',
+    accept: t('buttons.requestReceived') || 'Request Received',
     friends: t('buttons.deleteFriend') || 'Delete Friend',
   }[status];
 
   if (status === 'friends') {
     return (
-      <button
-        onClick={handleUnfriend}
-        disabled={isLoading}
-        className="px-6 py-2 rounded-lg font-bold text-sm uppercase tracking-wide transition-colors duration-200 bg-red-500 text-white hover:bg-red-600 disabled:opacity-50"
-        aria-label={buttonText}
-      >
-        {isLoading ? '...' : buttonText}
-      </button>
+      <div className="flex flex-col gap-2">
+        <button
+          onClick={handleUnfriend}
+          disabled={isLoading}
+          className="px-6 py-2 rounded-lg font-bold text-sm uppercase tracking-wide transition-colors duration-200 bg-red-500 text-white hover:bg-red-600 disabled:opacity-50"
+          aria-label={buttonText}
+        >
+          {isLoading ? '...' : buttonText}
+        </button>
+        {error && (
+          <div className="text-red-600 text-sm font-medium px-2" role="alert">
+            {error}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // If incoming request, show status indicator
+  if (status === 'accept') {
+    return (
+      <div className="flex flex-col gap-2">
+        <div
+          className="px-6 py-2 rounded-lg font-bold text-sm uppercase tracking-wide bg-blue-100 text-blue-700 border-2 border-blue-300 cursor-default"
+          title={t('buttons.requestReceivedHint') || 'Check notifications to accept or reject'}
+        >
+          {buttonText}
+        </div>
+        {error && (
+          <div className="text-red-600 text-sm font-medium px-2" role="alert">
+            {error}
+          </div>
+        )}
+      </div>
     );
   }
 
   return (
-    <button
-      onClick={handleAddFriend}
-      disabled={isLoading || status === 'accept'}
-      className={`px-6 py-2 rounded-lg font-bold text-sm uppercase tracking-wide transition-colors duration-200 ${
-        status === 'pending'
-          ? 'bg-amber-500 text-white hover:bg-amber-600'
-          : status === 'accept'
-          ? 'bg-primary-green text-white cursor-not-allowed opacity-70'
-          : 'bg-primary-green text-white hover:bg-primary-green/90'
-      }`}
-      aria-label={buttonText}
-    >
-      {isLoading ? '...' : buttonText}
-    </button>
+    <div className="flex flex-col gap-2">
+      <button
+        onClick={handleAddFriend}
+        disabled={isLoading}
+        className={`px-6 py-2 rounded-lg font-bold text-sm uppercase tracking-wide transition-colors duration-200 ${
+          status === 'pending'
+            ? 'bg-amber-500 text-white hover:bg-amber-600'
+            : 'bg-primary-green text-white hover:bg-primary-green/90'
+        }`}
+        aria-label={buttonText}
+      >
+        {isLoading ? '...' : buttonText}
+      </button>
+      {error && (
+        <div className="text-red-600 text-sm font-medium px-2" role="alert">
+          {error}
+        </div>
+      )}
+    </div>
   );
 };
 

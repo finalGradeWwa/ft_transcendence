@@ -95,9 +95,12 @@
       "addFriend": "Dodaj do znajomych",
       "pending": "Oczekujące",
       "accept": "Zaakceptuj zaproszenie",
+      "requestReceived": "Otrzymano zaproszenie",
+      "requestReceivedHint": "Sprawdź powiadomienia, aby zaakceptować lub odrzucić",
       "deleteFriend": "Usuń ze znajomych",
       "confirmUnfriend": "Czy na pewno chcesz usunąć tego znajomego?",
-      "errorSending": "Nie udało się wysłać zaproszenia"
+      "errorSending": "Nie udało się wysłać zaproszenia",
+      "errorDeleting": "Nie udało się usunąć znajomego"
     },
     "settings": {
       "title": "Ustawienia",
