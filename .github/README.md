@@ -1,9 +1,10 @@
 # ft_transcendence
 
 *This project has been created as part of the 42 curriculum by zogorzeb, prutkows, phoehne, mwojtcza and mlibucha*
+
 # Description
 
-The PlantApp is a full-stack social networking application for plant lovers to manage plants, organize collaborative gardens, share updates via social feeds, add other users to friends, and communicate through chat.
+The Plant Portal is a full-stack social networking application for plant lovers to manage plants, organize collaborative gardens, share updates via social feeds, add other users to friends, and communicate through chat.
 
 ## Key features
 
@@ -11,15 +12,15 @@ The PlantApp is a full-stack social networking application for plant lovers to m
 
 - **Authentication:** Registration, login, JWT tokens, GitHub OAuth, password management (prutkows as backend dev & phoehne as frontend dev)
 
-- **User Profiles:** Avatars, friends system, social connections (prutkows as backend dev & phoehne as frontend dev)
+- **User Profiles:** Avatars, friends system, social connections (prutkows as backend dev, mwojtcza & phoehne as frontend dev)
 
 - **Gardens:** Collaborative spaces (organizations) with multi-user access, auto-created default gardens (zogorzeb as backend dev & phoehne as frontend dev) 
 
-- **Plants:** CRUD operations with images, garden association, owner-based filtering (zogorzeb as backend dev & phoehne as frontend dev)
+- **Plants:** Create, read and delete operations with images, garden association, owner-based filtering (zogorzeb as backend dev & phoehne as frontend dev)
 
 - **Social Feed (Pins):** Posts with images, personalized feeds from friends (zogorzeb as backend dev & phoehne as frontend dev)
 
-- **Chat System:** Direct messaging with inbox, unread counts, conversation history (mlibucha as backend dev & mwojtcza as frontend dev)
+- **Chat System:** Direct messaging with inbox, conversation history (mlibucha as backend dev & mwojtcza as frontend dev)
 
   
 
@@ -48,7 +49,9 @@ The PlantApp is a full-stack social networking application for plant lovers to m
 - **Component-driven architecture**
 
 - **HttpOnly cookies** for secure token storage
+
 ___
+
 # instructions
 
   ## �� Prerequisites
@@ -59,6 +62,7 @@ ___
 - Git
 
 **Ubuntu/Debian: Prerequisites instalation and configuration**
+
 ```bash
 sudo apt-get update && sudo apt-get install -y docker.io docker-compose-plugin build-essential git
 sudo usermod -aG docker $USER  # Log out and back in after this
@@ -67,39 +71,49 @@ sudo usermod -aG docker $USER  # Log out and back in after this
 ## �� Installation & Setup
 
 ### 1. Clone the repository
+
 ```bash
 git clone https://github.com/finalGradeWwa/ft_transcendence.git
 cd ft_transcendence
 ```
 
 ### 2. Configure environment variables
+
 Create a `.env` file in the project root:
+
 ```bash
 cat > .env << EOF
 SECRET_KEY=your-secret-key-change-this-in-production
 DEBUG_VALUE=True
-ALLOWED_HOSTS=localhost,127.0.0.1
+COOKIE_SECURE=True
+ALLOWED_HOSTS=localhost,127.0.0.1, backend
 # Docker backend: REDIS_HOST=redis, REDIS_PORT=6379
 # Local backend (outside Docker): REDIS_HOST=localhost, REDIS_PORT=6379
 REDIS_HOST=redis
 REDIS_PORT=6379
 SOCIAL_AUTH_GITHUB_KEY=your-github-client-id
 SOCIAL_AUTH_GITHUB_SECRET=your-github-client-secret
+FRONTEND_URL=https://localhost:8443
+FRONTEND_BASE_URL=https://localhost:8443
 EOF
 ```
+
 ### 3. Build and start the application
+
 ```bash
 make build
 make up
 ```
 
 Or using Docker Compose directly:
+
 ```bash
 docker compose build
 docker compose up -d
 ```
 
 ### 4. Verify services are running
+
 ```bash
 make ps
 # or
@@ -109,13 +123,15 @@ docker compose ps
 You should see all services in "Up" state.
 
 ## �� Access the Application
+
 - **Frontend (via HTTPS)**: https://localhost:3000
 - **Backend API**: http://localhost:8000/api/
-**Note**: Your browser will show a security warning for the self-signed certificate. This is normal for local development—click "Advanced" and proceed.
+  **Note**: Your browser will show a security warning for the self-signed certificate. This is normal for local development—click "Advanced" and proceed.
 
 ## ��️ Development Commands
 
 ### Using Makefile
+
 ```bash
 make help           # Show all available commands
 make build          # Build Docker images
@@ -127,6 +143,7 @@ make ps             # List running containers
 ```
 
 ### View logs
+
 ```bash
 # All services
 make logs
@@ -138,6 +155,7 @@ docker compose logs -f nginx
 ```
 
 ### Restart a specific service
+
 ```bash
 docker compose restart frontend
 docker compose restart backend
@@ -147,22 +165,26 @@ docker compose restart nginx
 ## �� Uninstallation
 
 ### Stop and remove containers
+
 ```bash
 make down
 ```
 
 ### Remove containers, volumes, and images
+
 ```bash
 make clean
 ```
 
 ### Complete cleanup (including build cache)
+
 ```bash
 make fclean
 docker system prune -a --volumes
 ```
 
 ### Manual cleanup
+
 ```bash
 # Stop and remove containers
 docker compose down
@@ -179,10 +201,12 @@ docker builder prune -a
 ```
 
 ### Remove project directory
+
 ```bash
 cd ..
 rm -rf ft_transcendence
 ```
+
 ___
 
 to check if Redis is working:
@@ -191,205 +215,219 @@ to check if Redis is working:
 - go to /backend/plantapp
 - run ./manage test_redis
 - this should be the output:
-`Using: RedisChannelLayer ✓ Redis working!`
+  `Using: RedisChannelLayer ✓ Redis working!`
 
 # Individual Contributions
 
 ## prutkows (Paweł Rutkowski) - tech lead & backend developer
+
 - Major backend apps: authentication (auth, registration, JWT management), users (user profiles)
 - Responsible for setting up OAuth 2.0
 - GitHub CodeOwner, reviewing every pull request on GitHub
 - Making major decisions on the collaboration rules, ensuring the technical quality of the application
+- Setting up website security (SSL certificates)
 
 ## zogorzeb (Zofia Gorzęba) - project manager & backend developer
+
 - Major backend apps: gardens (collaborative plant organization), plants (individual plant management), social_feed (pin posting system), chat_app (redis service)
 - Reviewing backend pull requests
-- GitHub issues management, GitHub Actions configuration
+- GitHub issues management
 - Ensuring the communication in the group, distribution of tasks, ensuring coverage of the project's requirements
 - Responsible for the technical (redis description) and whole non-technical part of Readme file
 - Responsible for the organizations system backend mechanism (Gardens)
 
 ## phoehne (Przemysław Hoehne) - main frontend developer
+
 - Major frontend functionalities: main page, profile page, footer, all the forms and user inputs validation, gardens view, plants view
 - Integrating frontend modules together
 - Reviewing frontend pull requests
 - Responsible for SSR, custom design system with reusable components, support for multiple languages, RTL language support, support for additional browsers
 
 ## mlibucha (Mateusz Libucha) - backend developer
+
 - Major backend apps: users (friends system), chat_app (messaging with WebSocket infrastructure)
 - Infrastructure set up: Docker Compose, Daphne ASGI server, Nginx service
-- Setting up website security (SSL certificates)
+- Setting up website security (SSL certificate for backend)
 - Providing Makefile and technical part of Readme (prerequisites, instructions)
 
 ## mwojtcza (Mateusz Wojtczak) - product owner & frontend developer
+
 - Ensuring the application's quality, making decisions on the key business features, providing ideas visualization
-- Major frontend functionalities: search bar, chat (WebSockets and visual side), online presence status
+- Major frontend functionalities: search bar, chat (WebSockets and visual side), online presence status, friend system
 - Supporting the communication between teammembers and easing conflicts
 - Implementation of data fixtures for the testing purposes
 - Reviewing frontend + backend pull requests
+
 ___
+
 # Chosen modules
+
 ## Minor modules
+
 ### **Usage of a frontend framework**
+
 The frontend framework used in this project is Next.js, a React-based framework for building web applications. The project also uses TypeScript, Tailwind CSS for styling, and internationalization with next-intl.
+
 ### **Usage of a backend framework**
+
 The backend framework used in this project is Django, a high-level Python web framework.
+
 ### **Support for multiple languages (at least 3 languages).**
+
 This project supports multiple languages, primarily through the frontend using Next.js with next-intl for internationalization. The supported locales are: Polish, English, German and Arabic.
+
 ### **Right-to-left (RTL) language support.**
-The supported right-to-left language is Arabic.
+
+The supported right-to-left language is Arabic and includes complete layout mirroring with RTL-specific UI elements (e.g. using the justify-end property instead of justify-right).
+
 ### **Support for additional browsers.**
-The supported browsers are Google Chrome, Microsoft Edge and Firefox (confirmed with Playwright end-to-end tests).
+
+The supported browsers are Google Chrome, Mozilla Firefox and Edge.
+
 ### **Server-Side Rendering (SSR) for improved performance and SEO**
+
 Next.js 16 with App Router enables SSR (Server-Side Rendering), automatic routing, image optimization, and React Server Components for improved performance and SEO.
+
 ### **Custom-made design system with reusable components, including a proper color palette, typography, and icons (minimum: 10 reusable components)**
+
 The project exceeds the requirement with 15+ reusable components, a complete custom color palette (9 brand colors), a typography system with 4 variants, and a professional icon library integration.
+
 ### **Implementation of remote authentication with OAuth 2.0 (GitHub)**
+
 GitHub OAuth2 authentication with custom pipeline functions for email extraction and JWT token generation. Backend configuration includes environment-validated credentials, user email scope access, and HTTPS redirect enforcement. JWT tokens stored in httpOnly cookies with CSRF protection and sanitized redirects. Frontend provides GitHub login button with locale preservation and callback handling.
+
 ### **ORM for Database**
+
 Django ORM with SQLite3 database managing 9 core models: User, Garden, Plant, Pin, Message, UserProfile, GardenUser, GardenOwner, and GardenInvitation. Implements foreign keys with CASCADE deletion, self-referential many-to-many relationships for user following, one-to-one relationships, automatic timestamps, and custom model methods. Full migration history with schema version control and automatic indexing on primary keys, foreign keys, and unique fields.
+
 # Major modules
+
 ###  **WCAG 2.1 AA Accessibility Compliance**
+
 Skip links allow bypassing navigation. All interactive elements have visible focus indicators with escape key handlers and proper tab order. Screen reader support includes 13+ localized ARIA labels across 4 languages, semantic HTML landmarks, and proper alt text. High contrast colors achieve 7.2:1 ratio for primary elements and 16.8:1 for text. Touch targets meet 32px minimum with responsive text scaling supporting 200% zoom. Dynamic language attributes with RTL support for Arabic and proper error message associations.
+
 ### **Allow users to interact with other users.**
-DO UZUPELNIENIA!!!!
+
+- Real-time messaging with Message model, UserProfile for online status tracking, inbox view with last message preview, conversation endpoint for message history with pagination, and send message functionality.
+- User model with profile fields (username, email, name, avatar, date joined). MeView for GET/PATCH of own profile, UserProfileView for viewing any user by username, with validation preventing duplicate credentials.
+- ManyToMany following field with mutual connections as friends, one-way as pending requests. Complete API: send/accept/reject/cancel friend requests, unfriend, list friends/incoming/outgoing requests. Model methods: get_friends(), get_pending_requests(), get_outgoing_requests(), is_friend_with(), unfriend().
+
 ### **Standard user management and authentication.**
-DO UZUPELNIENIA!!!!
+
+User model includes authentication with email/password, JWT tokens stored in httpOnly cookies for security, and GitHub OAuth2 integration. Profile updates supported through PATCH endpoint with validation preventing duplicate usernames/emails. Avatar upload functionality via ImageField with multipart form parser support, stored in avatars directory. Friend system uses ManyToMany relationship with mutual connections representing friendships and one-way connections as pending requests, complete with send/accept/reject/cancel request endpoints and unfriend functionality. UserProfile model tracks online status and last seen timestamp. Profile viewing available through dedicated endpoint accepting username parameter, displaying user information including avatar, name, email and join date. Profile serializers expose appropriate data with privacy controls distinguishing between own profile and public profiles.
+
 ### **An organization system**
-DO UZUPELNIENIA!!!!
+
+Garden model extends django-organizations Organization with CRUD endpoints for create, read, update, and delete operations. GardenUser junction table manages membership with endpoints to add and remove users from gardens. GardenOwner tracks ownership relationships. Gardens include environment type field, member/owner management, and plant association. Full CRUD functionality implemented through ViewSet with permission-based access control restricting operations to garden members and owners. Auto-creation of default garden for new users via Django signals.
+
 ### **Implement real-time features using WebSockets or similar technology.**
-DO UZUPELNIENIA!!!!
+
+Django Channels with Daphne ASGI server. ChatConsumer handles WebSocket connections at ws/chat/ with JWT authentication middleware. Connection handling includes accept for authenticated users, automatic online status updates on connect, and graceful cleanup on disconnect with status updates and group removal. Message broadcasting uses channel layers with personal user rooms, supporting chat messages, typing indicators, and read receipts. Real-time features include instant message delivery to recipient rooms, typing notifications, read receipt confirmations, and online/offline status tracking via UserProfile model. Database operations wrapped with database_sync_to_async for message persistence, user lookups, and read status updates. Error handling includes JSON validation, message length limits (10000 chars), recipient verification, and proper exception logging. ASGI application configured with ProtocolTypeRouter and JWT authentication stack for secure WebSocket connections.
+
 ## modules points summary 
+
 9 minor modules (9 x 1) + 5 major modules (5 x 2) = 19 points 
+
 ___
+
 # Project Management
+
 The project manager (zogorzeb) was responsible for distributing the tasks. These were distributed during online meetings or via GitHub Issues. Zosia added tasks to GitHub Issues, and the rest of the team assigned tasks to themselves. In most of the cases, the tasks were talked about and assigned to the team member during the meeting. Slack and Google Meet were used for communication. The whole team actively communicated on Slack, reporting blockers and preparing pull requests for review. We held video calls every Monday and Thursday to discuss availability and progress.
 
 ___
+
 # Technical Stack
+
 ## Backend technologies and frameworks used.
 
 - Django framework for the main backend implementation
 - Django Rest Framework for the API endpoints
 - Django Channels for the real-time chat implementation
 - Simple JWT for the authentication tokens
+
 # Frontend technologies and frameworks used
+
 - Framework: Next.js 16 - Using App Router for modern routing, image optimization, and Server Components
 - UI Library: React 19 - Latest version with Actions support and native metadata handling
 - Styling: Tailwind CSS v3.4 - Utility-first CSS with `@tailwindcss/typography` plugin for markdown content
--  Language: TypeScript v5*- Type safety and auto-completion throughout the codebase
+- Language: TypeScript v5*- Type safety and auto-completion throughout the codebase
 - Internationalization: Next-Intl v4.6 - Multi-language support with server and client-side translations
-**Key Helper Libraries:**
+  **Key Helper Libraries:**
 - Lucide-react - Lightweight icon library
 - React-markdown - Renders formatted Markdown content (chat messages, instructions)
 - Js-cookie - Cookie management for session tokens and language preferences
+
 ___
+
 # Database System & Schema
+
 The Django web framework includes a default object-relational mapping layer (ORM) that can be used to interact with application data from various relational databases such as SQLite. Django's ORM makes database work easier by letting developers use Python classes instead of writing SQL.
 
-User (users_user)
-├── id: AutoField (Integer, PK)
-├── email: EmailField (VARCHAR 200, UNIQUE, NOT NULL)
-├── username: CharField (VARCHAR 50, UNIQUE, NOT NULL)
-├── password: CharField (HASHED, NOT NULL)
-├── first_name: CharField (VARCHAR 100, NULL)
-├── last_name: CharField (VARCHAR 100, NULL)
-├── avatar_photo: ImageField (NULL)
-├── is_active: BooleanField (DEFAULT TRUE)
-├── is_staff: BooleanField (DEFAULT FALSE)
-├── is_superuser: BooleanField (DEFAULT FALSE)
-├── date_joined: DateTimeField (DEFAULT NOW)
-├── following: ManyToManyField (self, symmetrical=False)
-├── Plants (1:M via plants_plant.owner_id → FK)
-├── Gardens (M:M via gardens_gardenuser)
-│   └── GardenOwner (ownership through gardens_gardenowner)
-├── Pins (1:M via social_feed_pin.creator_id → FK)
-├── Messages Sent (1:M via chat_app_message.sender_id → FK)
-├── Messages Received (1:M via chat_app_message.recipient_id → FK)
-└── Chat Profile (1:1 via chat_app_userprofile.user_id → OneToOneField)
+<img width="1070" height="768" alt="Screenshot from 2026-03-08 15-39-49" src="https://github.com/user-attachments/assets/28983b52-62af-4d09-a2a8-6feb0678062c" />
+<img width="1065" height="753" alt="Screenshot from 2026-03-08 15-40-05" src="https://github.com/user-attachments/assets/b0840e1c-202b-4b8b-9057-36b29e703051" />
+<img width="1061" height="703" alt="Screenshot from 2026-03-08 15-40-14" src="https://github.com/user-attachments/assets/6027597b-b2a2-436c-8a84-1104da63d2bf" />
+<img width="1087" height="827" alt="Screenshot from 2026-03-08 15-40-24" src="https://github.com/user-attachments/assets/f2ec7f89-4ee9-4540-acd1-137c8b3f2df8" />
 
-Garden (gardens_garden)
-├── garden_id: AutoField (Integer, PK)
-├── name: CharField (NOT NULL, from Organization)
-├── slug: SlugField (UNIQUE, from Organization)
-├── environment: CharField (VARCHAR 1, CHOICES: I/O/G, DEFAULT 'I')
-├── is_active: BooleanField (DEFAULT TRUE, from Organization)
-├── created: DateTimeField (AUTO NOW ADD, from Organization)
-├── modified: DateTimeField (AUTO NOW, from Organization)
-├── Members (M:M via gardens_gardenuser → FK to User)
-├── Owners (1:M via gardens_gardenowner → FK)
-├── Plants (1:M via plants_plant.garden_id → FK)
-├── Pins (1:M via social_feed_pin.garden_id → FK, NULL)
-└── Invitations (1:M via gardens_gardeninvitation.organization_id → FK)
-
-GardenUser (gardens_gardenuser) 
-├── id: AutoField (Integer, PK)
-├── organization_id: ForeignKey (→ Garden, CASCADE)
-├── user_id: ForeignKey (→ User, CASCADE)
-├── created: DateTimeField (AUTO NOW ADD)
-└── modified: DateTimeField (AUTO NOW)
-
-GardenOwner (gardens_gardenowner)
-├── id: AutoField (Integer, PK)
-├── organization_id: ForeignKey (→ Garden, CASCADE)
-├── organization_user_id: ForeignKey (→ GardenUser, CASCADE)
-├── created: DateTimeField (AUTO NOW ADD)
-└── modified: DateTimeField (AUTO NOW)
-
-Plant (plants_plant)
-├── plant_id: AutoField (Integer, PK)
-├── nickname: CharField (VARCHAR 25, UNIQUE, NOT NULL)
-├── species: CharField (VARCHAR 25, NULL)
-├── image: ImageField (NULL, upload_to='plant-images/')
-├── created_at: DateTimeField (DEFAULT NOW)
-├── owner_id: ForeignKey (→ User, CASCADE, related_name='plants')
-├── garden_id: ForeignKey (→ Garden, CASCADE, NOT NULL)
-└── Pins (1:M via social_feed_pin.plant_id → FK, NULL)
-
-Pin (social_feed_pin)
-├── id: AutoField (Integer, PK)
-├── content: TextField (max_length=150, NOT NULL)
-├── image: ImageField (NULL, upload_to='media/')
-├── created_at: DateTimeField (AUTO NOW ADD)
-├── creator_id: ForeignKey (→ User, CASCADE, related_name='pins')
-├── plant_id: ForeignKey (→ Plant, CASCADE, NULL, related_name='pins')
-└── garden_id: ForeignKey (→ Garden, CASCADE, NULL, related_name='pins')
-
-Message (chat_app_message)
-├── id: AutoField (Integer, PK)
-├── content: TextField (NOT NULL)
-├── timestamp: DateTimeField (AUTO NOW ADD, ordered by)
-├── is_read: BooleanField (DEFAULT FALSE)
-├── sender_id: ForeignKey (→ User, CASCADE, related_name='sent_messages')
-└── recipient_id: ForeignKey (→ User, CASCADE, related_name='received_messages')
-
-UserProfile (chat_app_userprofile)
-├── id: AutoField (Integer, PK)
-├── user_id: OneToOneField (→ User, CASCADE, related_name='chat_profile')
-├── is_online: BooleanField (DEFAULT FALSE)
-└── last_seen: DateTimeField (AUTO NOW)
 ___
+
 # resources (+ AI usage)
+
 - 📘 Canva Visualisation: [canva](https://www.canva.com/design/DAG97aUDBss/Z4gOAUNjw9QdsX-HSqcBqA/edit) (created by mwojtcza)
 
-## 🌱 Populate Database with Sample Data
+## frontend
 
-To quickly test the application with sample users, friendships, gardens, and plants:
+- https://www.geeksforgeeks.org/css/tailwind-css/
+- https://tailwindcss.com
+- https://pl.legacy.reactjs.org/tutorial/tutorial.html
+- https://nextjs.org/learn
+- https://www.youtube.com/watch?v=ZVnjOPwW4ZA
 
-```bash
-./populate_database.sh
-```
+## backend
 
-This creates:
-- **5 users** with friendships (alice_green, bob_gardener, charlie_plant, diana_bloom, eve_flower)
-- **5 gardens** (indoor, outdoor, greenhouse)
-- **12 plants** distributed across the gardens
+- https://docs.djangoproject.com/en/6.0/
+- https://django-organizations.readthedocs.io/en/latest/
+- https://channels.readthedocs.io/en/latest/
+- https://tutorial.djangogirls.org/en/django/?q=
+- https://django-rest-framework-simplejwt.readthedocs.io/en/latest/#
+- https://python-social-auth.readthedocs.io/en/latest/configuration/django.html
+- https://www.django-rest-framework.org/
 
-**Login credentials:** All users use password `password123`
-- alice@example.com
-- bob@example.com
-- charlie@example.com
-- diana@example.com
-- eve@example.com
+## AI help
 
-The script is idempotent—safe to run multiple times without creating duplicates.
+- Copilot code review on GitHub
+- Debugging code
+- Writing tests & CI workflow configuration
+- Playwright tests
+- Database schema text representation
+- Translations, especially for the Arabic language
+
+# 🌐 Browser-Specific Notes & Known Issues
+
+## Firefox
+
+#### 1. Next.js Dev Mode Prefetch Warning: You may see a warning regarding _next/static/chunks/...css being preloaded but not used.
+
+Status: This is a known Next.js development server issue specific to Firefox's strict preloading checks.
+Resolution: It does not affect functionality and is automatically resolved in production builds (next build && next start).
+
+#### 2. Font Warnings: Occasional warnings about unused fonts may appear depending on the local environment and cache.
+
+
+#### 3. When using **Firefox**, you may occasionally see the following console warning:
+
+> `Failed to fetch RSC payload for https://localhost:8443/pl. Falling back to browser navigation.`
+
+This is a non-critical warning caused by Firefox's stricter SSL/TLS security policy compared to Chrome or Edge. Firefox applies more aggressive certificate validation for internal fetch requests used by Next.js's React Server Components (RSC) system. When the RSC payload fetch is blocked, Next.js automatically falls back to standard browser navigation — the application continues to work correctly with no impact on functionality or user experience.
+
+This behavior is specific to `localhost` development environments using self-signed certificates. When deployed to a production server with a valid CA-signed SSL certificate, this warning will not appear in any browser.
+
+**This warning does not appear in Chrome or Edge even in local development.**
+
+## Edge / Chromium-based Browsers
+
+Lazy Loading Interventions: Edge may log an [Intervention] message stating that images are replaced with placeholders and load events are deferred.
+Reason: This is a native performance optimization for images marked with loading="lazy". It ensures better initial page load speed by prioritizing core content over off-screen images.
+
+## General / Cross-Browser
+
+UI Rendering (CSS Outlines): This project utilizes specific CSS styling including dark outlines with a 2px offset for improved accessibility and focus visibility. In rare cases, older browser versions may render focus-ring offsets differently; for the best experience, use the latest evergreen browsers.
