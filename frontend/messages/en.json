@@ -167,7 +167,8 @@
     "usernameTaken": "This username is already taken.",
     "invalidEmail": "Invalid email address format.",
     "updateFailed": "Profile update failed. Please try again.",
-    "serverError500": "Server error (500). Please check backend logs."
+    "serverError500": "Server error (500). Please check backend logs.",
+    "fileTooLarge": "MAX 5MB"
   },
   "ChatPage": {
     "title": "Chat",

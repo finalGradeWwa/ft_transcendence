@@ -30,7 +30,10 @@ interface NotificationsModalProps {
  * PL: Komponent zarządzający widocznością i interakcjami modalu powiadomień.
  * EN: Component managing the visibility and interactions of the notifications modal.
  */
-const NotificationsModal = ({ isVisible, onClose }: NotificationsModalProps) => {
+const NotificationsModal = ({
+  isVisible,
+  onClose,
+}: NotificationsModalProps) => {
   const t = useTranslations('NotificationsModal');
 
   const router = useRouter();
@@ -250,11 +253,11 @@ const NotificationsModal = ({ isVisible, onClose }: NotificationsModalProps) => 
 
             {/** No requests message. */}
             {!loading && requests.length === 0 && (
-              <div className="px-4 pb-4 pt-8 text-center text-gray-500">
+              <div className="px-4 pb-4 pt-8 text-center text-dark-text">
                 <Icon
                   name="bell"
                   size={32}
-                  className="mx-auto mb-2 opacity-50"
+                  className="mx-auto mb-2 text-primary-green"
                 />
                 <p>{t('noRequests')}</p>
               </div>
@@ -267,4 +270,3 @@ const NotificationsModal = ({ isVisible, onClose }: NotificationsModalProps) => 
 };
 
 export default NotificationsModal;
-

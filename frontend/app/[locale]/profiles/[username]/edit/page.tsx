@@ -61,6 +61,9 @@ export default function EditProfilePage({
       : `${apiUrl}/media${cleanPath}`;
   };
 
+  const MAX_FILE_SIZE = 5 * 1024 * 1024;
+  const [fileSizeError, setFileSizeError] = useState(false);
+
   /**
    * PL: Pobieranie aktualnych danych użytkownika przy inicjalizacji strony.
    * EN: Fetching current user data upon page initialization.
@@ -99,7 +102,13 @@ export default function EditProfilePage({
   /** PL: Obsługa zmiany pliku graficznego i tworzenie tymczasowego podglądu. EN: Handling image file change and creating a temporary preview. */
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    setFileSizeError(false);
     if (file) {
+      if (file.size > MAX_FILE_SIZE) {
+        setFileSizeError(true);
+        if (fileInputRef.current) fileInputRef.current.value = '';
+        return;
+      }
       setFileName(file.name);
       setPreviewUrl(URL.createObjectURL(file));
       setError(null);
@@ -109,6 +118,7 @@ export default function EditProfilePage({
   /** PL: Przywracanie poprzedniego awatara i resetowanie wyboru pliku. EN: Restoring previous avatar and resetting file selection. */
   const handleRemoveFile = () => {
     setFileName('');
+    setFileSizeError(false);
     if (previewUrl && previewUrl.startsWith('blob:'))
       URL.revokeObjectURL(previewUrl);
     if (fileInputRef.current) fileInputRef.current.value = '';
@@ -122,6 +132,7 @@ export default function EditProfilePage({
    */
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (fileSizeError) return;
     setIsLoading(true);
     setError(null);
 
@@ -272,7 +283,7 @@ export default function EditProfilePage({
               </span>
               <div className="flex flex-wrap items-center gap-5">
                 <div
-                  className="w-16 h-16 rounded-full border-2 border-secondary-beige overflow-hidden bg-neutral-100 flex items-center justify-center shrink-0 shadow-sm"
+                  className={`w-16 h-16 rounded-full border-2 overflow-hidden bg-neutral-100 flex items-center justify-center shrink-0 shadow-sm ${fileSizeError ? 'border-red-950' : 'border-secondary-beige'}`}
                   aria-hidden="true"
                 >
                   {previewUrl ? (
@@ -292,11 +303,15 @@ export default function EditProfilePage({
                   )}
                 </div>
                 <div className="flex flex-col gap-2">
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-4 flex-wrap">
                     <label
                       id="avatar-button-label"
                       htmlFor="avatar-upload"
-                      className="cursor-pointer bg-secondary-beige text-primary-green font-semibold py-2 px-4 rounded-full text-sm hover:bg-amber-100 transition-colors shadow-sm focus-within:outline focus-within:outline-2 focus-within:outline-gray-600 focus-within:outline-offset-2"
+                      className={`cursor-pointer font-semibold py-2 px-4 rounded-full text-sm transition-colors shadow-sm focus-within:outline focus-within:outline-2 focus-within:outline-gray-600 focus-within:outline-offset-2 ${
+                        fileSizeError
+                          ? 'bg-red-950 text-white'
+                          : 'bg-secondary-beige text-primary-green hover:bg-amber-100'
+                      }`}
                     >
                       {tr('chooseFile')}
                       <input
@@ -312,7 +327,13 @@ export default function EditProfilePage({
                       />
                     </label>
 
-                    {fileName && (
+                    {fileSizeError && (
+                      <span className="text-orange-800 text-[12px] font-bold uppercase animate-pulse">
+                        {te('fileTooLarge')}
+                      </span>
+                    )}
+
+                    {fileName && !fileSizeError && (
                       <button
                         type="button"
                         onClick={handleRemoveFile}
@@ -340,7 +361,8 @@ export default function EditProfilePage({
                   </div>
                   <Text
                     variant="small"
-                    className="italic max-w-[200px] truncate text-neutral-600 font-bold"
+                    className="text-sm text-neutral-800 italic max-w-[200px] truncate text-neutral-500"
+                    aria-live="polite"
                   >
                     {fileName || tr('noFileSelected')}
                   </Text>

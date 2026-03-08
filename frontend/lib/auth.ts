@@ -61,24 +61,23 @@ export async function logout(): Promise<void> {
   // EN: Get token BEFORE clearing, so backend can verify the user
   const token = getAccessToken();
 
-  // PL: Wywołaj backend z tokenem w headerze Authorization
-  // EN: Call backend with token in Authorization header
-
-  await apiFetch(`${getApiUrl()}/api/auth/logout/`, {
-    method: 'POST',
-    credentials: 'include',
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    },
-  }).catch(() => { });
-
   // PL: Dopiero teraz usuń tokeny lokalnie
   // EN: Only now clear tokens locally
   clearAccessToken();
   if (typeof window !== 'undefined') {
     localStorage.removeItem('username');
   }
+
+  // PL: Wywołaj backend z tokenem w headerze Authorization
+  // EN: Call backend with token in Authorization header
+  await fetch(`${getApiUrl()}/api/auth/logout/`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+  }).catch(() => {});
 }
 
 let refreshPromise: Promise<string | null> | null = null;
@@ -91,7 +90,9 @@ type RefreshResponse = { access?: string };
  * EN: Refreshes the access token using refresh_token from cookie.
  * On failure, logs out the user and redirects to the login page.
  */
-export async function refreshAccessToken(skipRedirect = false): Promise<string | null> {
+export async function refreshAccessToken(
+  skipRedirect = false
+): Promise<string | null> {
   const apiUrl = getApiUrl();
 
   const res = await fetch(`${apiUrl}/api/auth/token/refresh/`, {
@@ -123,7 +124,9 @@ export async function refreshAccessToken(skipRedirect = false): Promise<string |
  * EN: Returns a valid access token — from sessionStorage or by refreshing.
  * Deduplicates parallel refresh calls using a shared Promise.
  */
-export async function getValidAccessToken(skipRedirect = false): Promise<string | null> {
+export async function getValidAccessToken(
+  skipRedirect = false
+): Promise<string | null> {
   const existing = getAccessToken();
   if (existing && !isTokenExpired(existing)) {
     return existing;

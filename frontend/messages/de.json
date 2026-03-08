@@ -173,7 +173,8 @@
     "usernameTaken": "Dieser Benutzername ist bereits vergeben.",
     "invalidEmail": "Ungültiges E-Mail-Format.",
     "updateFailed": "Profilaktualisierung fehlgeschlagen. Bitte versuchen Sie es erneut.",
-    "serverError500": "Serverfehler (500). Bitte überprüfen Sie die Backend-Protokolle."
+    "serverError500": "Serverfehler (500). Bitte überprüfen Sie die Backend-Protokolle.",
+    "fileTooLarge": "MAX 5MB"
   },
   "ChatPage": {
     "title": "Chat",

@@ -167,7 +167,8 @@
     "usernameTaken": "Ten nick jest już zajęty.",
     "invalidEmail": "Niepoprawny format adresu email.",
     "updateFailed": "Edycja danych nie powiodła się. Spróbuj ponownie.",
-    "serverError500": "Błąd serwera (500). Sprawdź logi backendu."
+    "serverError500": "Błąd serwera (500). Sprawdź logi backendu.",
+    "fileTooLarge": "MAX 5MB"
   },
   "ChatPage": {
     "title": "Czat",

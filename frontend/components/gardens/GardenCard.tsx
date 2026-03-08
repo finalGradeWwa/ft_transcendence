@@ -57,7 +57,7 @@ export const GardenCard = ({
           <h2 className="text-xl font-bold text-primary-green overflow-hidden leading-tight line-clamp-1">
             {garden.name}
           </h2>
-          <p className="text-xs italic opacity-80 overflow-hidden uppercase">
+          <p className="text-xs italic opacity-90 overflow-hidden uppercase">
             {garden.styleName || 'Community Space'}
           </p>
           <div className="pt-3 space-y-1 text-xs uppercase tracking-wider font-semibold overflow-hidden">
