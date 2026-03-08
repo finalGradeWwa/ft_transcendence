@@ -69,8 +69,8 @@ export const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
     setFileSizeError(false);
     if (file) {
       if (file.size > MAX_FILE_SIZE) {
+        handleRemoveFile();
         setFileSizeError(true);
-        if (fileInputRef.current) fileInputRef.current.value = '';
         return;
       }
       setFileName(file.name);
@@ -412,8 +412,8 @@ export const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
           </div>
           <Link
             href="/terms"
-            target="blank"
-            className="underline font-bold text-primary-green italic rounded px-1 focus:outline-none focus:outline focus:outline-2 focus:outline-gray-600 focus:outline-offset-0 text-sm"
+            target="_blank"
+            className="underline font-bold text-primary-green italic rounded px-1 focus-visible:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-gray-600 focus-visible:outline-offset-0 text-sm w-fit"
           >
             {tr('termsLink')}
           </Link>

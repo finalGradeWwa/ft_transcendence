@@ -61,15 +61,15 @@ export async function logout(): Promise<void> {
   // EN: Get token BEFORE clearing, so backend can verify the user
   const token = getAccessToken();
 
-  // PL: Dopiero teraz usuń tokeny lokalnie
-  // EN: Only now clear tokens locally
+  // PL: Usuń tokeny lokalnie przed requestem — zapobiega pętlom refresh
+  // EN: Clear tokens locally before request — prevents refresh loops
   clearAccessToken();
   if (typeof window !== 'undefined') {
     localStorage.removeItem('username');
   }
 
-  // PL: Wywołaj backend z tokenem w headerze Authorization
-  // EN: Call backend with token in Authorization header
+  // PL: Wywołaj backend z tokenem w headerze Authorization (best-effort)
+  // EN: Call backend with token in Authorization header (best-effort)
   await fetch(`${getApiUrl()}/api/auth/logout/`, {
     method: 'POST',
     credentials: 'include',
@@ -102,7 +102,10 @@ export async function refreshAccessToken(
   });
 
   if (!res.ok) {
-    await logout();
+    clearAccessToken();
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('username');
+    }
     if (!skipRedirect && typeof window !== 'undefined') {
       const locale = window.location.pathname.split('/')[1] || 'pl';
       window.location.href = `/${locale}?showLogin=true`;

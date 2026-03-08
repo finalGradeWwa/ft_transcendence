@@ -107,6 +107,10 @@ export default function EditProfilePage({
       if (file.size > MAX_FILE_SIZE) {
         setFileSizeError(true);
         if (fileInputRef.current) fileInputRef.current.value = '';
+        setFileName('');
+        if (previewUrl && previewUrl.startsWith('blob:'))
+          URL.revokeObjectURL(previewUrl);
+        setPreviewUrl(getFullAvatarUrl(userData.avatar_photo));
         return;
       }
       setFileName(file.name);
@@ -361,7 +365,7 @@ export default function EditProfilePage({
                   </div>
                   <Text
                     variant="small"
-                    className="text-sm text-neutral-800 italic max-w-[200px] truncate text-neutral-500"
+                    className="text-sm text-neutral-800 italic max-w-[200px] truncate"
                     aria-live="polite"
                   >
                     {fileName || tr('noFileSelected')}
