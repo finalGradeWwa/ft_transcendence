@@ -61,23 +61,24 @@ export async function logout(): Promise<void> {
   // EN: Get token BEFORE clearing, so backend can verify the user
   const token = getAccessToken();
 
-  // PL: Usuń tokeny lokalnie przed requestem — zapobiega pętlom refresh
-  // EN: Clear tokens locally before request — prevents refresh loops
-  clearAccessToken();
-  if (typeof window !== 'undefined') {
-    localStorage.removeItem('username');
-  }
+  // PL: Wywołaj backend z tokenem w headerze Authorization
+  // EN: Call backend with token in Authorization header
 
-  // PL: Wywołaj backend z tokenem w headerze Authorization (best-effort)
-  // EN: Call backend with token in Authorization header (best-effort)
-  await fetch(`${getApiUrl()}/api/auth/logout/`, {
+  await apiFetch(`${getApiUrl()}/api/auth/logout/`, {
     method: 'POST',
     credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
     },
-  }).catch(() => {});
+  }).catch(() => { });
+
+  // PL: Dopiero teraz usuń tokeny lokalnie
+  // EN: Only now clear tokens locally
+  clearAccessToken();
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem('username');
+  }
 }
 
 let refreshPromise: Promise<string | null> | null = null;
@@ -90,9 +91,7 @@ type RefreshResponse = { access?: string };
  * EN: Refreshes the access token using refresh_token from cookie.
  * On failure, logs out the user and redirects to the login page.
  */
-export async function refreshAccessToken(
-  skipRedirect = false
-): Promise<string | null> {
+export async function refreshAccessToken(skipRedirect = false): Promise<string | null> {
   const apiUrl = getApiUrl();
 
   const res = await fetch(`${apiUrl}/api/auth/token/refresh/`, {
@@ -102,10 +101,7 @@ export async function refreshAccessToken(
   });
 
   if (!res.ok) {
-    clearAccessToken();
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('username');
-    }
+    await logout();
     if (!skipRedirect && typeof window !== 'undefined') {
       const locale = window.location.pathname.split('/')[1] || 'pl';
       window.location.href = `/${locale}?showLogin=true`;
@@ -127,9 +123,7 @@ export async function refreshAccessToken(
  * EN: Returns a valid access token — from sessionStorage or by refreshing.
  * Deduplicates parallel refresh calls using a shared Promise.
  */
-export async function getValidAccessToken(
-  skipRedirect = false
-): Promise<string | null> {
+export async function getValidAccessToken(skipRedirect = false): Promise<string | null> {
   const existing = getAccessToken();
   if (existing && !isTokenExpired(existing)) {
     return existing;
