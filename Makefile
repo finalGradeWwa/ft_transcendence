@@ -1,4 +1,4 @@
-.PHONY: help build up down logs restart clean ps fclean backend frontend logs-backend logs-frontend dev-up dev-down run local-backend local-frontend
+.PHONY: help build up down logs restart clean ps fclean backend frontend logs-backend logs-frontend dev-up dev-down run local-backend local-frontend populate-db clear-status
 
 # Docker Compose file
 COMPOSE_FILE = docker-compose.yml
@@ -24,6 +24,8 @@ help:
 	@echo "  make fclean      - Remove containers, images, volumes, DB file, build cache"
 	@echo "  make backend     - Build and start backend only"
 	@echo "  make frontend    - Build and start frontend only"
+	@echo "  make populate-db - Populate database with sample users, gardens, and plants"
+	@echo "  make clear-status- Clear stale Redis activity status (run after restarts)"
 	@echo ""
 	@echo "Local Commands:"
 	@echo "  make run         - Quick start BE & FE locally in parallel"
@@ -98,4 +100,10 @@ logs-frontend:
 # Development
 dev-up: build up logs
 
+# Database management
+populate-db:
+	./populate_database.sh
+
+clear-status:
+	./clear_stale_status.sh
 dev-down: down clean

@@ -1,5 +1,6 @@
 import json
 import logging
+import os
 import redis.asyncio as redis
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
@@ -26,6 +27,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         # Reject connection if user is not authenticated
         if not self.user.is_authenticated:
+            logger.warning("WebSocket connection rejected: user not authenticated")
             await self.close()
             return
 
@@ -40,12 +42,20 @@ class ChatConsumer(AsyncWebsocketConsumer):
         )
 
         await self.accept()
+        logger.info(f"WebSocket connected: user_id={self.user.id}, username={self.user.username}")
 
         # Increment connection count and set online status if first connection
-        connection_count = await self.increment_user_connections(self.user.id)
-        if connection_count == 1:
-            # First connection - set user online
-            await self.set_user_online(True)
+        try:
+            connection_count = await self.increment_user_connections(self.user.id)
+            logger.info(f"User {self.user.username} connection count: {connection_count}")
+            if connection_count == 1:
+                # First connection - set user online
+                logger.info(f"Setting user {self.user.username} online (first connection)")
+                await self.set_user_online(True)
+            else:
+                logger.info(f"User {self.user.username} already has active connections, not updating status")
+        except Exception as e:
+            logger.error(f"Error handling connection for user {self.user.username}: {e}", exc_info=True)
 
     async def disconnect(self, close_code):
         """
@@ -60,10 +70,13 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         # Update user's online status if user exists and is authenticated
         if hasattr(self, 'user') and self.user and self.user.is_authenticated:
+            logger.info(f"WebSocket disconnected: user_id={self.user.id}, username={self.user.username}, close_code={close_code}")
             # Decrement connection count and set offline only if last connection
             connection_count = await self.decrement_user_connections(self.user.id)
+            logger.info(f"User {self.user.username} connection count after disconnect: {connection_count}")
             if connection_count == 0:
                 # Last connection closed - set user offline
+                logger.info(f"Setting user {self.user.username} offline (last connection closed)")
                 await self.set_user_online(False)
 
     async def receive(self, text_data):
@@ -315,10 +328,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
         Update user's online status in User model.
         """
         try:
+            logger.info(f"Updating user {self.user.username} status to {'online' if is_online else 'offline'}")
             self.user.is_online = is_online
             self.user.save(update_fields=['is_online'])
-        except Exception:
-            pass
+            logger.info(f"Successfully updated user {self.user.username} status")
+        except Exception as e:
+            logger.error(f"Failed to update user status for {self.user.username}: {e}", exc_info=True)
 
     async def set_user_online(self, is_online):
         """
@@ -388,12 +403,23 @@ class ChatConsumer(AsyncWebsocketConsumer):
         """
         Get Redis client from channel layer configuration.
         """
-        hosts = self.channel_layer.hosts
-        if hosts:
-            host, port = hosts[0]
+        try:
+            # Get Redis configuration from Django settings
+            channel_layers_config = settings.CHANNEL_LAYERS.get('default', {}).get('CONFIG', {})
+            hosts = channel_layers_config.get('hosts', [])
+            
+            if hosts and isinstance(hosts[0], (tuple, list)) and len(hosts[0]) == 2:
+                host, port = hosts[0]
+                return redis.Redis(host=host, port=int(port), decode_responses=True)
+            
+            # Fallback: try to get from environment or use defaults
+            host = os.getenv('REDIS_HOST', 'redis')
+            port = int(os.getenv('REDIS_PORT', '6379'))
             return redis.Redis(host=host, port=port, decode_responses=True)
-        # Fallback to default
-        return redis.Redis(decode_responses=True)
+        except Exception as e:
+            logger.error(f"Error creating Redis client: {e}", exc_info=True)
+            # Ultimate fallback
+            return redis.Redis(host='redis', port=6379, decode_responses=True)
 
     async def increment_user_connections(self, user_id):
         """
