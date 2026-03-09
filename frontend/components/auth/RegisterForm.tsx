@@ -41,6 +41,9 @@ export const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
   const [error, setError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
 
+  const MAX_FILE_SIZE = 5 * 1024 * 1024;
+  const [fileSizeError, setFileSizeError] = useState(false);
+
   /** PL: Zarządzanie pamięcią URL podglądu
    *  EN: Managing preview URL memory
    **/
@@ -52,19 +55,24 @@ export const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
 
   const handleRemoveFile = () => {
     setFileName('');
+    setFileSizeError(false);
     if (previewUrl) {
       URL.revokeObjectURL(previewUrl);
       setPreviewUrl(null);
     }
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
+    if (fileInputRef.current) fileInputRef.current.value = '';
     setError(null);
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    setFileSizeError(false);
     if (file) {
+      if (file.size > MAX_FILE_SIZE) {
+        handleRemoveFile();
+        setFileSizeError(true);
+        return;
+      }
       setFileName(file.name);
       setPreviewUrl(URL.createObjectURL(file));
       setError(null);
@@ -74,6 +82,7 @@ export const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     e.stopPropagation();
+    if (fileSizeError) return;
 
     setIsLoading(true);
     setError(null);
@@ -123,6 +132,12 @@ export const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
           Accept: 'application/json',
         },
       });
+
+      if (response.status === 413) {
+        setFileSizeError(true);
+        setIsLoading(false);
+        return;
+      }
 
       const text = await response.text();
 
@@ -228,7 +243,7 @@ export const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
           <div className="flex flex-wrap items-center gap-5">
             <div
               aria-hidden="true"
-              className="w-16 h-16 rounded-full border-2 border-secondary-beige overflow-hidden bg-neutral-100 flex items-center justify-center shrink-0 shadow-sm"
+              className={`w-16 h-16 rounded-full border-2 overflow-hidden bg-neutral-100 flex items-center justify-center shrink-0 shadow-sm ${fileSizeError ? 'border-red-950' : 'border-secondary-beige'}`}
             >
               {previewUrl ? (
                 <img
@@ -248,10 +263,14 @@ export const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
             </div>
 
             <div className="flex flex-col gap-2">
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-4 flex-wrap">
                 <label
                   htmlFor="avatar-upload"
-                  className="cursor-pointer bg-secondary-beige text-primary-green font-semibold py-2 px-4 rounded-full text-sm hover:bg-amber-100 transition-colors shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-gray-600 focus-visible:outline-offset-2"
+                  className={`cursor-pointer font-semibold py-2 px-4 rounded-full text-sm transition-colors shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-gray-600 focus-visible:outline-offset-2 ${
+                    fileSizeError
+                      ? 'bg-red-950 text-white'
+                      : 'bg-secondary-beige text-primary-green hover:bg-amber-100'
+                  }`}
                 >
                   {tr('chooseFile')}
                   <input
@@ -266,7 +285,13 @@ export const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
                   />
                 </label>
 
-                {fileName && (
+                {fileSizeError && (
+                  <span className="text-orange-800 text-[12px] font-bold uppercase animate-pulse">
+                    {te('fileTooLarge')}
+                  </span>
+                )}
+
+                {fileName && !fileSizeError && (
                   <button
                     type="button"
                     onClick={handleRemoveFile}
@@ -387,7 +412,8 @@ export const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
           </div>
           <Link
             href="/terms"
-            className="underline font-bold text-primary-green italic rounded px-1 focus:outline-none focus:outline focus:outline-2 focus:outline-gray-600 focus:outline-offset-0 text-sm"
+            target="_blank"
+            className="underline font-bold text-primary-green italic rounded px-1 focus-visible:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-gray-600 focus-visible:outline-offset-0 text-sm w-fit"
           >
             {tr('termsLink')}
           </Link>

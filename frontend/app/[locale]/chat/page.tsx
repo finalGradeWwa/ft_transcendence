@@ -349,10 +349,10 @@ export default function ChatPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-beige-900 via-beige-800 to-beige-900 text-white">
       <div className="container mx-auto px-4 py-8 max-w-6xl">
-        <div className="bg-secondary-beige backdrop-blur-sm rounded-lg shadow-xl border border-secondary-beige flex h-[600px] overflow-hidden">
+        <div className="bg-secondary-beige backdrop-blur-sm rounded-lg shadow-xl border border-secondary-beige flex flex-col md:flex-row h-[calc(100vh-8rem)] md:h-[600px] overflow-hidden">
           <aside
             aria-label={t('friendsTitle')}
-            className="w-72 border-r border-primary-green/20 p-4 overflow-y-auto bg-black/5"
+            className="w-full md:w-72 border-b md:border-b-0 md:border-r border-primary-green/20 p-4 overflow-y-auto bg-black/5 max-h-48 md:max-h-full"
           >
             <h2 className="text-lg text-primary-green font-semibold mb-4">
               {t('friendsTitle')}
@@ -473,7 +473,10 @@ export default function ChatPage() {
 
             {/* Input Area */}
             <div className="border-t border-gray-700 p-4">
-              <form onSubmit={handleSendMessage} className="flex gap-2">
+              <form
+                onSubmit={handleSendMessage}
+                className="flex flex-wrap justify-end gap-2"
+              >
                 <input
                   maxLength={600}
                   type="text"
@@ -481,7 +484,7 @@ export default function ChatPage() {
                   onChange={e => setInputValue(e.target.value)}
                   placeholder={t('typeMessage')}
                   disabled={!selectedFriend || isSending}
-                  className="flex-1 bg-gray-700 text-white rounded-lg px-4 py-3 outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black focus-visible:ring-2 focus-visible:ring-white"
+                  className="flex-1 min-w-[100px] bg-gray-700 text-white rounded-lg px-4 py-3 outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black focus-visible:ring-2 focus-visible:ring-white"
                 />
                 <button
                   type="submit"

@@ -71,7 +71,7 @@ export const PlantCard = ({
         <h2 className="text-xl font-bold text-primary-green overflow-hidden line-clamp-1">
           {plant.commonName}
         </h2>
-        <p className="text-xs italic opacity-80 overflow-hidden">
+        <p className="text-xs italic opacity-90 overflow-hidden">
           {plant.latinName}
         </p>
 
