@@ -79,7 +79,7 @@ cd ft_transcendence
 
 ### 2. Configure environment variables
 
-Create a `.env` file in the project root:
+Create a `.env` file in the project's backend directory:
 
 ```bash
 cat > .env << EOF
