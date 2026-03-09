@@ -30,11 +30,6 @@ help:
 	@echo "Local Commands:"
 	@echo "  make run         - Quick start BE & FE locally in parallel"
 	@echo ""
-#   @echo "NPM Commands:"
-#   @echo "  make install     - Install frontend dependencies"
-#   @echo "  make npm-remove  - Remove a frontend dependency"
-#   @echo "  make npm-clean   - Clean and reinstall frontend dependencies"
-#   @echo ""
 
 # PL: OPCJA SZYBKIEGO URUCHAMIANIA LOKALNEGO EN: QUICK START OPTION FOR LOCAL DEVELOPMENT
 run:
@@ -79,16 +74,6 @@ backend:
 
 frontend:
 	docker compose -f $(COMPOSE_FILE) up -d --build frontend
-
-
-# install:
-# 	cd frontend && npm install
-
-# npm-remove:
-# 	cd frontend && npm uninstall
-
-# npm-clean:
-# 	cd frontend && rm -rf node_modules package-lock.json && npm install
 
 # Logs
 logs-backend:
