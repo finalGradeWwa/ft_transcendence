@@ -70,9 +70,7 @@ clean:
 	find . -type d -name "__pycache__" -exec rm -rf {} +
 
 fclean:
-	docker compose -f $(COMPOSE_FILE) down -v --remove-orphans
-	rm -f $(BE_DIR)/plantapp/db.sqlite3
-	docker system prune -af --volumes
+	docker compose -f $(COMPOSE_FILE) down -v --remove-orphans --rmi all
 
 backend:
 	docker compose -f $(COMPOSE_FILE) up -d --build backend
