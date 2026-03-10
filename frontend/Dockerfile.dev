@@ -22,6 +22,6 @@ COPY . .
 # EN: Disabling anonymous telemetry data collection by Next.js.
 ENV NEXT_TELEMETRY_DISABLED=1
 
-# PL: Uruchomienie aplikacji w trybie deweloperskim z funkcją Hot Reload.
-# EN: Starting the application in development mode with Hot Reload enabled.
-CMD ["npm", "run", "dev"]
+# PL: Budowanie aplikacji produkcyjnej i uruchomienie serwera produkcyjnego.
+# EN: Building the production application and starting the production server.
+CMD ["sh", "-c", "npm run build && npm start"]

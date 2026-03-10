@@ -12,7 +12,6 @@ const withNextIntl = createNextIntlPlugin();
  * EN: Basic Next.js configuration. The 'standalone' option optimizes the Docker image size.
  */
 const nextConfig: NextConfig = {
-  output: 'standalone',
   images: {
     deviceSizes: [480, 828, 1200, 1920],
     imageSizes: [96, 256, 384],

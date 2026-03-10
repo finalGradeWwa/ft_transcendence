@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev --experimental-https --experimental-https-key /certs/frontend.key --experimental-https-cert /certs/frontend.crt",
     "build": "next build",
-    "start": "next start",
+    "start": "node /app/server.js",
     "lint": "eslint",
     "test": "jest",
     "test:e2e": "playwright test",
